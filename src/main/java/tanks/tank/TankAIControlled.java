@@ -1360,7 +1360,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (!toAvoid.isEmpty() || !toAvoidDeflect.isEmpty())
 			dodgeBulletThreats();
 
-		if (!frameTimerTriggered)
+		if (!frameTimerTriggered || frameTimerTriggeredCnt % 2 == 0)
 			return;
 
 		toAvoid.clear();

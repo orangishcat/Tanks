@@ -11,10 +11,13 @@ import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.Arrays;
 
 public class Ray
 {
+	public static int chunksAdded;
+	public static Chunk[] chunkCache = new Chunk[40];
+
 	public double size = 10;
 	public double tankHitSizeMul = 1;
 
@@ -31,7 +34,6 @@ public class Ray
 
 	public boolean trace = Game.traceAllRays;
 	public boolean dotted = false;
-	public TreeSet<Chunk> chunksToCheck = new TreeSet<>();
 
 	public double speed = 10;
 
@@ -147,7 +149,7 @@ public class Ray
 				double moveX = moveXBase * chunksChecked, moveXPrev = moveXBase * Math.max(0, chunksChecked - 1);
 				double moveY = moveYBase * chunksChecked, moveYPrev = moveYBase * Math.max(0, chunksChecked - 1);
 
-				chunksToCheck.clear();
+				chunksAdded = 0;
 				Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
 				addChunks(current, mid);
 
@@ -157,11 +159,14 @@ public class Ray
 							Chunk.getChunk(posX + moveX, posY + moveYPrev)
 					);
 
-				if (chunksToCheck.isEmpty())
+				if (chunksAdded == 0)
 					break;
 
-				for (Chunk chunk : chunksToCheck)
+				Arrays.sort(chunkCache, 0, chunksAdded);
+
+				for (int i = 0; i < chunksAdded; i++)
 				{
+					Chunk chunk = chunkCache[i];
 					if (chunk == null)
 						continue;
 
@@ -500,7 +505,7 @@ public class Ray
 				continue;
 
 			c.compareTo = compare;
-			chunksToCheck.add(c);
+			chunkCache[chunksAdded++] = c;
 		}
 	}
 
