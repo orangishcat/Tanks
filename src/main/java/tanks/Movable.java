@@ -93,23 +93,46 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 		this.lastPosZ = this.posZ;
 	}
 
+	public static Chunk[] cache = new Chunk[40];
+	public static Chunk leave;
+	public static int position = 0;
+
+	public static boolean cacheContains(Chunk chunk)
+	{
+		for (int i = 0; i < position; i++)
+		{
+			if (cache[i] == chunk)
+				return true;
+		}
+		return false;
+	}
+
 	public void updateChunks()
 	{
-		HashSet<Chunk> chunks = getTouchingChunks().collect(Collectors.toCollection(HashSet::new));
+		position = 0;
+		getTouchingChunks().forEach(c -> cache[position++] = c);
 		for (Chunk c : prevChunks)
 		{
-			if (!chunks.contains(c))
-                onLeaveChunk(c);
+			if (!cacheContains(c))
+			{
+				onLeaveChunk(c);
+				leave = c;
+				break;
+			}
 		}
-
-		for (Chunk c : chunks)
+		if (leave != null)
 		{
-			c.faces.addFaces(this);
-			if (!prevChunks.contains(c))
-				onEnterChunk(c);
+			prevChunks.remove(leave);
+			leave = null;
 		}
 
-		prevChunks = chunks;
+        for (int i = 0; i < position; i++)
+        {
+            Chunk c = cache[i];
+            c.faces.addFaces(this);
+            if (prevChunks.add(c))
+                onEnterChunk(c);
+        }
 	}
 
 	public void onEnterChunk(Chunk c)
