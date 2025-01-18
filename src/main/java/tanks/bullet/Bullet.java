@@ -1024,7 +1024,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 	public Ray getRay()
 	{
-		return new Ray(posX, posY, this.getAngleInDirection(this.posX + this.vX, this.posY + this.vY), this.bounces, tank).setSize(this.size);
+		return Ray.newRay(posX, posY, this.getAngleInDirection(this.posX + this.vX, this.posY + this.vY), this.bounces, tank).setSize(this.size);
 	}
 
 	public void updateHoming()
@@ -1056,7 +1056,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			if (nearest != null && !this.destroy)
 			{
 				double a = this.getAngleInDirection(nearest.posX, nearest.posY);
-				Ray r = new Ray(this.posX, this.posY, a, 0, this.tank);
+				Ray r = Ray.newRay(this.posX, this.posY, a, 0, this.tank);
 
 				if (this instanceof BulletArc || this instanceof BulletAirStrike)
 				{
@@ -1834,6 +1834,12 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 			Game.effects.add(e);
 		}
+	}
+
+	@Override
+	public boolean disableRayCollision()
+	{
+		return !enableCollision || !enableExternalCollisions || !canBeCanceled;
 	}
 
 	public double getRangeMin()

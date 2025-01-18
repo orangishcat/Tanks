@@ -423,7 +423,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			double rangeMax = -1;
 			boolean showTrace = true;
 
-			Ray r = new Ray(this.posX, this.posY, this.angle, 1, this);
+			Ray r = Ray.newRay(this.posX, this.posY, this.angle, 1, this);
 			ItemBullet.ItemStackBullet i = null;
 
 			if (this.getPrimaryAbility() instanceof ItemBullet.ItemStackBullet)

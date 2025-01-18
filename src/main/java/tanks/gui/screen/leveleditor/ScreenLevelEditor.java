@@ -2128,6 +2128,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			else
 				selectSquareToggle.image = "icons/square_unlocked.png";
 		}
+
+		Chunk.drawDebugStuff();
 	}
 
 	public void changeMetadata(int add)

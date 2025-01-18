@@ -16,8 +16,6 @@ import tanks.tankson.MetadataProperty;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class Movable extends GameObject implements IDrawableForInterface, ISolidObject
 {
@@ -93,27 +91,14 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 		this.lastPosZ = this.posZ;
 	}
 
-	public static Chunk[] cache = new Chunk[40];
 	public static Chunk leave;
-	public static int position = 0;
-
-	public static boolean cacheContains(Chunk chunk)
-	{
-		for (int i = 0; i < position; i++)
-		{
-			if (cache[i] == chunk)
-				return true;
-		}
-		return false;
-	}
 
 	public void updateChunks()
 	{
-		position = 0;
-		getTouchingChunks().forEach(c -> cache[position++] = c);
+		Cache<Chunk> cache = getTouchingChunks();
 		for (Chunk c : prevChunks)
 		{
-			if (!cacheContains(c))
+			if (!cache.contains(c))
 			{
 				onLeaveChunk(c);
 				leave = c;
@@ -126,13 +111,14 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 			leave = null;
 		}
 
-        for (int i = 0; i < position; i++)
-        {
-            Chunk c = cache[i];
-            c.faces.addFaces(this);
-            if (prevChunks.add(c))
-                onEnterChunk(c);
-        }
+        cache.forEach(this::processChunk);
+	}
+
+	private void processChunk(Chunk c, Integer i)
+	{
+		c.faces.addFaces(this);
+		if (prevChunks.add(c))
+			onEnterChunk(c);
 	}
 
 	public void onEnterChunk(Chunk c)
@@ -155,7 +141,7 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 		getTouchingChunks().forEach(chunk -> chunk.faces.removeFaces(this));
 	}
 
-	public Stream<Chunk> getTouchingChunks()
+	public Cache<Chunk> getTouchingChunks()
 	{
 		double size = getSize();
 		return Chunk.getChunksInRange(posX - size / 2, posY - size / 2, posX + size / 2, posY + size / 2);

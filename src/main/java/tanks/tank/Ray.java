@@ -17,6 +17,7 @@ public class Ray
 {
 	public static int chunksAdded;
 	public static Chunk[] chunkCache = new Chunk[40];
+	public static Ray cacheRay = new Ray();
 
 	public double size = 10;
 	public double tankHitSizeMul = 1;
@@ -50,12 +51,24 @@ public class Ray
 	public double targetY;
 	public boolean acquiredTarget = false;
 
-	public Ray(double x, double y, double angle, int bounces, Tank tank)
+	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank)
 	{
-		this(x, y, angle, bounces, tank, 10);
+		return newRay(x, y, angle, bounces, tank, 10);
 	}
 
-	public Ray(double x, double y, double angle, int bounces, Tank tank, double speed)
+	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank, double speed)
+	{
+		return cacheRay.set(x, y, angle, bounces, tank, speed);
+	}
+
+	public Ray copy()
+	{
+		return new Ray().set(posX, posY, angle, bounces, tank, speed);
+	}
+
+	private Ray() {}
+
+	public Ray set(double x, double y, double angle, int bounces, Tank tank, double speed)
 	{
 		this.vX = speed * Math.cos(angle);
 		this.vY = speed * Math.sin(angle);
@@ -64,8 +77,23 @@ public class Ray
 		this.posX = this.startX = x;
 		this.posY = this.startY = y;
 		this.bounces = bounces;
+		this.bouncyBounces = 100;
+		setSize(10).setMaxChunks(12);
+
+		this.trace = Game.traceAllRays;
+		this.dotted = false;
+		this.enableBounciness = true;
+		this.ignoreTanks = false;
+		this.ignoreBullets = true;
+		this.ignoreDestructible = false;
+		this.ignoreShootThrough = false;
 
 		this.tank = tank;
+
+		this.bounceX.clear();
+		this.bounceY.clear();
+
+		return this;
 	}
 
 	public Movable getTarget(double mul, Tank targetTank)

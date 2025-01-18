@@ -167,17 +167,26 @@ public class Chunk implements Comparable<Chunk>
             staticFaces.removeFaces(o);
     }
 
-    public static Stream<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)
+    private static final Cache<Chunk> rangeChunkCache = new Cache<>();
+    public static Cache<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)
     {
         return getChunksInRange((int) (x1 / Game.tile_size), (int) (y1 / Game.tile_size),
                 (int) (x2 / Game.tile_size), (int) (y2 / Game.tile_size));
     }
 
-    public static Stream<Chunk> getChunksInRange(int tx1, int ty1, int tx2, int ty2)
+    public static Cache<Chunk> getChunksInRange(int tx1, int ty1, int tx2, int ty2)
     {
         int x1 = tx1 / chunkSize, y1 = ty1 / chunkSize, x2 = tx2 / chunkSize, y2 = ty2 / chunkSize;
-        return chunkList.stream().filter(chunk -> Game.isOrdered(true, x1, chunk.chunkX, x2)
-                && Game.isOrdered(true, y1, chunk.chunkY, y2));
+        rangeChunkCache.reset();
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < chunkList.size(); i++)
+        {
+            Chunk c = chunkList.get(i);
+            if (Game.isOrdered(true, x1, c.chunkX, x2)
+                    && Game.isOrdered(true, y1, c.chunkY, y2))
+                rangeChunkCache.add(c);
+        }
+        return rangeChunkCache;
     }
 
     public static Optional<Tile> getTileOptional(int tileX, int tileY)
@@ -349,13 +358,21 @@ public class Chunk implements Comparable<Chunk>
 
     public static class FaceList
     {
-        /** dynamic x, static y */
+        /**
+         * dynamic x, static y
+         */
         public final TreeSet<Face> topFaces = new TreeSet<>();
-        /** dynamic x, static y */
+        /**
+         * dynamic x, static y
+         */
         public final TreeSet<Face> bottomFaces = new TreeSet<>(Comparator.reverseOrder());
-        /** static x, dynamic y */
+        /**
+         * static x, dynamic y
+         */
         public final TreeSet<Face> leftFaces = new TreeSet<>();
-        /** static x, dynamic y */
+        /**
+         * static x, dynamic y
+         */
         public final TreeSet<Face> rightFaces = new TreeSet<>(Comparator.reverseOrder());
 
         public void addFaces(ISolidObject s)
