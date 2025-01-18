@@ -1815,10 +1815,10 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		}
 
 		if (playing && !paused && !finishedQuick)
-		{
-			this.shrubberyScale = Math.min(this.shrubberyScale + Panel.frameFrequency / 200, 1);
+            this.shrubberyScale = Math.min(this.shrubberyScale + Panel.frameFrequency / 200, 1);
+
+		if (playing && !paused)
 			gameAge += Panel.frameFrequency;
-		}
 
 		if (finishedQuick)
             this.shrubberyScale = Math.max(this.shrubberyScale - Panel.frameFrequency / 200, 0.25);

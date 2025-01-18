@@ -19,21 +19,27 @@ import tanks.replay.ReplayEvents.*;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Replay
 {
     public static double frameFreq;
     public static boolean isRecording;
     public static Replay currentReplay, currentPlaying;
-    public static double deltaCS = 100 / 30.;
+    public static double deltaCS = 100 / 20.;
 
     public double age = 0;
     public int pos = 0;
+    public double endTimer = 250;
 
     public Level prevLevel;
     public String name = "test";
-    public double lastAge;
+    public double lastAge, stackUpdateTimer = deltaCS;
     public ArrayList<IReplayEvent> events = new ArrayList<>();
+
+    public ScreenGame prevGame;
+    public Queue<Double> queue = new LinkedList<>();
 
     public static void draw()
     {
@@ -43,6 +49,15 @@ public class Replay
             return;
 
         double x = Drawing.drawing.getInterfaceEdgeX(true) - 10, y = Drawing.drawing.getInterfaceEdgeY(true) - 20;
+
+        if (r.queue.size() > 100)
+            r.queue.remove();
+
+        int i = 0;
+        Drawing.drawing.setColor(255, 0, 0);
+        for (double events : r.queue)
+            Drawing.drawing.fillInterfaceOval(x - (i++) * 2, y - 150 - events * 20, 5, 5);
+
         Drawing.drawing.setColor(255, 255, 255);
         Drawing.drawing.setInterfaceFontSize(16);
 
@@ -93,9 +108,9 @@ public class Replay
 
     public IReplayEvent getPrevEvent()
     {
-        if (!Game.isOrdered(true, 0, pos - 1, events.size() - 1))
-            return null;
-        return events.get(pos - 1);
+        if (0 < pos && pos < events.size())
+            return events.get(pos - 1);
+        return null;
     }
 
     public static void update()
@@ -105,7 +120,7 @@ public class Replay
             currentPlaying.play();
             currentPlaying.updateControls();
 
-            if (currentPlaying.finished())
+            if (currentPlaying.finished() && currentPlaying.waitEnded())
             {
                 Panel.notifs.add(new ScreenElement.Notification("Finished playing recording"));
                 currentPlaying = null;
@@ -113,6 +128,9 @@ public class Replay
         }
 
         ScreenGame g = ScreenGame.getInstance();
+        if (g == null)
+            Replay.currentPlaying = null;
+
         if ((g != null && g.playingReplay) && currentPlaying == null)
             Game.exitToTitle();
     }
@@ -120,6 +138,11 @@ public class Replay
     public boolean finished()
     {
         return pos >= events.size();
+    }
+
+    public boolean waitEnded()
+    {
+        return (endTimer -= Panel.frameFrequency) <= 0;
     }
 
     public void loadAndPlay()
@@ -146,15 +169,23 @@ public class Replay
 
     public void shiftPosition(double ms)
     {
+        IReplayEvent e;
+
         if (ms < 0)
         {
             while (ms < 0 && pos > 0)
-                ms += events.get(pos--).delay();
+            {
+                ms += (e = events.get(pos--)).delay();
+                e.execute();
+            }
         }
         else
         {
             while (ms > 0 && pos < events.size() - 1)
-                ms -= events.get(pos++).delay();
+            {
+                ms -= (e = events.get(pos++)).delay();
+                e.execute();
+            }
         }
     }
 
@@ -205,13 +236,16 @@ public class Replay
         try
         {
             IReplayEvent event = getCurrentEvent();
+            double eventCnt = 0;
             while (event != null && age - lastAge > event.delay() * 0.1)
             {
+                eventCnt++;
                 event.execute();
                 lastAge += event.delay() * 0.1;
                 pos++;
                 event = getCurrentEvent();
             }
+            queue.add(eventCnt);
         }
         catch (Exception e)
         {
@@ -227,20 +261,29 @@ public class Replay
             return;
 
         double now = g.gameAge;
-        if (now - lastAge <= deltaCS)
+        if ((stackUpdateTimer -= Panel.frameFrequency) <= 0)
+        {
             eventsThisFrame.removeIf(t -> t instanceof IStackableEvent);
+            stackUpdateTimer = deltaCS;
+        }
+
+        if (Game.screen != prevGame && Game.screen instanceof ScreenGame)
+        {
+            prevGame = (ScreenGame) Game.screen;
+            lastAge = 0;
+        }
 
         if (eventsThisFrame.isEmpty())
             return;
 
+        Tick t = new Tick().setParams(eventsThisFrame, (now - lastAge) * 10);
         if (prevLevel != Game.currentLevel)
             events.add(new LevelChange().setLS(Game.currentLevel.levelString));
 
-        Tick t = new Tick().setParams(eventsThisFrame, (now - lastAge) * 10);
-        prevLevel = Game.currentLevel;
-
-        events.add(t);
         lastAge = now;
+
+        prevLevel = Game.currentLevel;
+        events.add(t);
     }
 
     public void save()

@@ -71,6 +71,7 @@ public class ScreenTitle extends Screen implements ISeparateBackgroundScreen
 	Button play = new Button(this.rCenterX, this.rCenterY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Play!", () ->
 	{
 		Game.silentCleanUp();
+		System.gc();
 		Game.screen = new ScreenPlay();
 	}
 	);

@@ -127,7 +127,7 @@ public class ReplayEvents
             ArrayList<Movable> add = new ArrayList<>(), remove = new ArrayList<>();
             for (Movable m : Game.movables)
             {
-                if (!(m instanceof TankPlayerController || m instanceof TankPlayer))
+                if (!(m instanceof TankPlayer))
                     continue;
 
                 add.add(new TankRemote((Tank) m));

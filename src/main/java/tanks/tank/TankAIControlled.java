@@ -2511,16 +2511,12 @@ public class TankAIControlled extends Tank implements ITankField
 		this.vY = this.transformTank.vY;
 		this.angle = this.transformTank.angle;
 
-		this.updateTarget();
-
 		if (this.transformTank.targetEnemy != null)
 		{
 			this.targetEnemy = this.transformTank.targetEnemy;
-			Ray r = new Ray(this.transformTank.posX, this.transformTank.posY, this.transformTank.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY), 0, this);
-
-			r.moveOut(5);
-
-			m = r.getTarget();
+			m = new Ray(this.transformTank.posX, this.transformTank.posY,
+					this.transformTank.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY),
+					0, this).moveOut(5).getTarget();
 		}
 
 		if (this.targetEnemy == null || m != this.targetEnemy || this.targetEnemy.destroy)
