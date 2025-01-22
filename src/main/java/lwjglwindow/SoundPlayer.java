@@ -1,10 +1,8 @@
 package lwjglwindow;
 
 import basewindow.BaseSoundPlayer;
-import org.apache.commons.io.IOUtils;
 import org.lwjgl.openal.*;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +63,7 @@ public class SoundPlayer extends BaseSoundPlayer
         alcMakeContextCurrent(context);
 
         ALCCapabilities alcCapabilities = ALC.createCapabilities(device);
-        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+        AL.createCapabilities(alcCapabilities);
 
         this.window = window;
     }
