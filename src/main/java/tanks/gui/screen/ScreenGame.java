@@ -26,7 +26,6 @@ import tanks.tank.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGameScreen
 {
@@ -789,19 +788,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Panel.panel.lights.add(l);
 			}
 		}
-
-//		for (Effect o: Game.effects)
-//		{
-//			if (o != null && ((IDrawableLightSource) o).lit())
-//			{
-//				double[] l = ((IDrawableLightSource) o).getLightInfo();
-//				l[0] = Drawing.drawing.gameToAbsoluteX(o.posX, 0);
-//				l[1] = Drawing.drawing.gameToAbsoluteY(o.posY, 0);
-//				l[2] = (o.posZ) * Drawing.drawing.scale;
-//				Panel.panel.lights.add(l);
-//			}
-//		}
-	}
+    }
 
 	@Override
 	public void update()
@@ -2168,7 +2155,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		if (!finishedQuick && (Game.playerTank == null || Game.playerTank.destroy) && (spectatingTank == null || !Drawing.drawing.movingCamera) && Panel.panel.zoomTimer <= 0)
 		{
 			AtomicBoolean found = new AtomicBoolean(false);
-			Game.getInRadius(x, y, 100, c -> c.movables).stream().filter(m -> m instanceof Tank).findFirst().ifPresent(t ->
+			Game.getMovablesInRadius(x, y, 100).stream().filter(m -> m instanceof Tank).findFirst().ifPresent(t ->
 			{
 				found.set(true);
 				this.spectatingTank = (Tank) t;
@@ -2375,21 +2362,22 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				c.faces.clear();
 		}
 
-		for (Movable m : Game.movables)
+		if (!Game.game.window.drawingShadow)
 		{
-			AtomicInteger count = new AtomicInteger();
-			m.getTouchingChunks().forEach(c ->
-            {
-				if (isUpdatingGame())
-                    c.addMovable(m);
-
-				count.getAndIncrement();
-            });
-
-			if (Chunk.debug)
+			for (Movable m : Game.movables)
 			{
-				Drawing.drawing.setColor(255, 255, 255);
-				Drawing.drawing.drawText(m.posX, m.posY, m.getSize(), count + "");
+				int count = 0;
+				for (Chunk c : m.getTouchingChunks())
+				{
+					c.addMovable(m);
+					count++;
+				}
+
+				if (Chunk.debug)
+				{
+					Drawing.drawing.setColor(255, 255, 255);
+					Drawing.drawing.drawText(m.posX, m.posY, m.getSize(), count + "");
+				}
 			}
 		}
 

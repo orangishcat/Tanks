@@ -3,6 +3,7 @@ package tanks;
 import basewindow.BaseWindow;
 import basewindow.InputCodes;
 import basewindow.ShaderGroup;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.gui.ChatMessage;
 import tanks.gui.ScreenElement;
 import tanks.gui.screen.ScreenCrusadeDetails;
@@ -212,7 +213,7 @@ public class DebugKeybinds
 
             if (Game.game.window.pressedKeys.contains(InputCodes.KEY_1))
             {
-                Chunk c = Chunk.getChunk(posX, posY, true);
+                Chunk c = Chunk.getChunk(posX, posY);
                 Chunk.Tile t1 = Chunk.getTile(posX, posY);
 
                 if (c != null)
@@ -243,7 +244,7 @@ public class DebugKeybinds
             }
             else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_2))
             {
-                ArrayList<Movable> v = Game.getInRadius(mx, my, 50, c -> c.movables);
+                ObjectArrayList<Movable> v = Game.getMovablesInRadius(mx, my, 50);
                 if (!v.isEmpty())
                     text = v.get(0).getMetadata();
             }

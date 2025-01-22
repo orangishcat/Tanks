@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import tanks.Chunk;
 import tanks.Effect;
 import tanks.Game;
@@ -10,7 +11,6 @@ import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Ray
@@ -44,11 +44,10 @@ public class Ray
 	public Tank tank, targetTank;
 	public double targetTankSizeMul = 0;
 
-	public ArrayList<Double> bounceX = new ArrayList<>();
-	public ArrayList<Double> bounceY = new ArrayList<>();
+	public DoubleArrayList bounceX = new DoubleArrayList();
+	public DoubleArrayList bounceY = new DoubleArrayList();
 
-	public double targetX;
-	public double targetY;
+	public double targetX, targetY;
 	public boolean acquiredTarget = false;
 
 	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank)
@@ -488,8 +487,8 @@ public class Ray
 
 	public double getDist()
 	{
-		this.bounceX.add(0, this.posX);
-		this.bounceY.add(0, this.posY);
+		this.bounceX.add(this.posX);
+		this.bounceY.add(this.posY);
 
 		if (!acquiredTarget)
 			this.getTarget();
@@ -517,7 +516,7 @@ public class Ray
 	{
 		double dist = 0;
 		for (int i = 0; i < this.bounceX.size() - 1; i++)
-            dist += Math.pow(this.bounceX.get(i + 1) - this.bounceX.get(i), 2) + Math.pow(this.bounceY.get(i + 1) - this.bounceY.get(i), 2);
+            dist += Math.pow(this.bounceX.getDouble(i + 1) - this.bounceX.getDouble(i), 2) + Math.pow(this.bounceY.getDouble(i + 1) - this.bounceY.getDouble(i), 2);
 
 		if (this.bounces >= 0)
 			dist += Chunk.chunkToPixel(maxChunkCheck);

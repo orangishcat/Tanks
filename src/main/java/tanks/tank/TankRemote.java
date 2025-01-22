@@ -1,6 +1,7 @@
 package tanks.tank;
 
 import tanks.*;
+import tanks.effect.AttributeModifier;
 import tanks.gui.screen.ScreenGame;
 import tanks.tankson.Property;
 
@@ -140,8 +141,8 @@ public class TankRemote extends Tank
 
 		double pvx = this.prevKnownVXFinal;
 		double pvy = this.prevKnownVYFinal;
-		double cvx = this.getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
-		double cvy = this.getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+		double cvx = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+		double cvy = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
 
 		this.posX = cubicInterpolationVelocity(this.prevKnownPosX, pvx, this.currentKnownPosX, cvx, this.timeSinceRefresh, this.interpolationTime);
 		this.posY = cubicInterpolationVelocity(this.prevKnownPosY, pvy, this.currentKnownPosY, cvy, this.timeSinceRefresh, this.interpolationTime);

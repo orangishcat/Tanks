@@ -2,6 +2,7 @@ package tanks;
 
 import basewindow.*;
 import com.codedisaster.steamworks.SteamMatchmaking;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.bullet.*;
 import tanks.extension.Extension;
 import tanks.extension.ExtensionRegistry;
@@ -46,8 +47,8 @@ public class Game
 
 	public static final double tile_size = 50;
 
-	public static final int[] dirX = {1, -1, 0, 0};
-	public static final int[] dirY = {0, 0, 1, -1};
+	public static final int[] dirX = {1, -1, 0, 0, 1, 1, -1, -1};
+	public static final int[] dirY = {0, 0, 1, -1, 1, -1, 1, -1};
 
 	public static UUID computerID;
 	public static final UUID clientID = UUID.randomUUID();
@@ -1069,38 +1070,65 @@ public class Game
 		return getExtraObstacle((int) (posX / Game.tile_size), (int) (posY / Game.tile_size));
 	}
 
-	/** Iterates through all chunks, applies {@code func} to the ones within the specified position range,
-	 * and filters through the collection it returns. Expects all pixel coordinates. */
-    public static <T extends GameObject> ArrayList<T> getInRange(double x1, double y1, double x2, double y2, Function<Chunk, Collection<T>> func)
+	private static final ObjectArrayList<Movable> movableOut = new ObjectArrayList<>();
+	private static final ObjectArrayList<Obstacle> obstacleOut = new ObjectArrayList<>();
+
+	/** Expects all pixel coordinates.
+	 * @return all the movables within the specified range */
+    public static ObjectArrayList<Movable> getMovablesInRange(double x1, double y1, double x2, double y2)
 	{
-		ArrayList<T> out = new ArrayList<>();
-		Chunk.getChunksInRange(x1, y1, x2, y2).forEach(c ->
-		{
-			for (T o : func.apply(c))
-			{
-				if (Game.isOrdered(true, x1, o.posX, x2) && Game.isOrdered(true, x2, o.posY, y2))
-					out.add(o);
-			}
-		});
-		return out;
+		movableOut.clear();
+        for (Chunk c : Chunk.getChunksInRange(x1, y1, x2, y2))
+        {
+            for (Movable o : c.movables)
+            {
+                if (Game.isOrdered(true, x1, o.posX, x2) && Game.isOrdered(true, x2, o.posY, y2))
+                    movableOut.add(o);
+            }
+        }
+        return movableOut;
 	}
 
 	/** Expects all pixel coordinates.
-	 * Example: <p>{@code Game.getInRadius(posX, posY, explosion.radius, c -> c.movables)}<p>
-	 *     returns all movables within a explosion's radius.
-	 * @param func Used to map the chunks in radius {@code radius} from the position, and return a collection of {@link GameObject}s.
-	 * @return Iterates through all chunks, maps {@code func} to the chunks within {@code radius} of the position,
-	 * and filters through the collection {@code func} is expected to return. */
-	public static <T extends GameObject> ArrayList<T> getInRadius(double posX, double posY, double radius, Function<Chunk, Collection<T>> func)
+	 * @return all the movables within a certain radius of the position */
+	public static ObjectArrayList<Movable> getMovablesInRadius(double posX, double posY, double radius)
 	{
-		ArrayList<T> out = new ArrayList<>();
-		Chunk.getChunksInRadius(posX, posY, radius).forEach(c ->
+		for (Chunk c : Chunk.getChunksInRadius(posX, posY, radius))
 		{
-			for (T o : func.apply(c))
+			for (Movable o : c.movables)
 				if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
-					out.add(o);
-		});
-		return out;
+					movableOut.add(o);
+		}
+		return movableOut;
+	}
+
+	/** Expects all pixel coordinates.
+	 * @return all the obstacles within the specified range */
+	public static ObjectArrayList<Obstacle> getObstaclesInRange(double x1, double y1, double x2, double y2)
+	{
+		obstacleOut.clear();
+		for (Chunk c : Chunk.getChunksInRange(x1, y1, x2, y2))
+		{
+			for (Obstacle o : c.obstacles)
+			{
+				if (Game.isOrdered(true, x1, o.posX, x2) && Game.isOrdered(true, x2, o.posY, y2))
+					obstacleOut.add(o);
+			}
+		}
+		return obstacleOut;
+	}
+
+	/** Expects all pixel coordinates.
+	 * @return all the obstacles within a certain radius of the position */
+	public static ObjectArrayList<Obstacle> getObstaclesInRadius(double posX, double posY, double radius)
+	{
+		for (Chunk c : Chunk.getChunksInRadius(posX, posY, radius))
+		{
+			for (Obstacle o : c.obstacles)
+				if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
+					obstacleOut.add(o);
+		}
+		return obstacleOut;
 	}
 
 	public static void removeObstacle(Obstacle o)

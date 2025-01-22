@@ -1,4 +1,4 @@
-package tanks;
+package tanks.effect;
 
 import tanks.minigames.Arcade;
 
@@ -77,13 +77,13 @@ public class StatusEffect
         public double age;
 
         /**Duration of the Attribute Modifier, leave at 0 for indefinite duration*/
-        public double duration = 0;
+        public double duration;
 
         /**Age at which the Attribute starts to wear off*/
-        public double deteriorationAge = 0;
+        public double deteriorationAge;
 
         /**Age at which the Attribute is at full strength*/
-        public double warmupAge = 0;
+        public double warmupAge;
 
         public Instance(StatusEffect effect, double age, double warmupAge, double deteriorationAge, double maxAge)
         {
@@ -97,6 +97,16 @@ public class StatusEffect
         public double getValue(double in, AttributeModifier.Type type)
         {
             return this.effect.getValue(in, age, type, warmupAge, deteriorationAge, duration);
+        }
+
+        public AttributeModifier getAttribute(AttributeModifier.Type type)
+        {
+            return effect.getAttribute(type);
+        }
+
+        public double getTimeLeft()
+        {
+            return duration - age;
         }
     }
 
@@ -114,30 +124,38 @@ public class StatusEffect
         statusEffectRegistry.put(name, this);
     }
 
+    public AttributeModifier getAttribute(AttributeModifier.Type type)
+    {
+        for (AttributeModifier m : attributeModifiers)
+            if (m.type == type)
+                return m;
+        return null;
+    }
+
     public double getValue(double in, double age, AttributeModifier.Type type, double warmupAge, double deteriorationAge, double duration)
     {
+        if (age >= duration && duration > 0)
+            return in;
+
         for (AttributeModifier a: this.attributeModifiers)
         {
-            if (a.type.equals(type))
-            {
-                if (age >= duration && duration > 0)
-                    return in;
+            if (!a.type.equals(type))
+                continue;
 
-                double val;
-                if (age < warmupAge)
-                    val = a.value * age / warmupAge;
-                else if (age < deteriorationAge || deteriorationAge <= 0)
-                    val = a.value;
-                else
-                    val = a.value * (duration - age) / (duration - deteriorationAge);
+            double val;
+            if (age < warmupAge)
+                val = a.value * age / warmupAge;
+            else if (age < deteriorationAge || deteriorationAge <= 0)
+                val = a.value;
+            else
+                val = a.value * (duration - age) / (duration - deteriorationAge);
 
-                if (a.effect == AttributeModifier.Operation.add)
-                    return in + val;
-                else if (a.effect == AttributeModifier.Operation.multiply)
-                    return in * (val + 1);
-                else
-                    return in;
-            }
+            if (a.operation == AttributeModifier.Operation.add)
+                return in + val;
+            else if (a.operation == AttributeModifier.Operation.multiply)
+                return in * (val + 1);
+            else
+                return in;
         }
 
         return in;

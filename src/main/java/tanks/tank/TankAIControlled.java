@@ -1,18 +1,19 @@
 package tanks.tank;
 
 import basewindow.IModel;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.bullet.BulletArc;
 import tanks.bullet.BulletGas;
 import tanks.bullet.Laser;
+import tanks.effect.AttributeModifier;
 import tanks.gui.screen.ScreenGame;
 import tanks.item.Item;
 import tanks.item.ItemBullet;
 import tanks.item.ItemMine;
 import tanks.network.event.*;
 import tanks.obstacle.Obstacle;
-import tanks.obstacle.ObstacleTeleporter;
 import tanks.registry.RegistryTank;
 import tanks.tankson.Property;
 import tanks.tankson.Serializer;
@@ -443,7 +444,7 @@ public class TankAIControlled extends Tank implements ITankField
 	protected double seekTimer = 0;
 
 	/** Describes the path the tank is currently following*/
-	protected ArrayList<Tile> path;
+	protected LinkedList<Tile> path;
 
 	/* Accelerations */
 	protected double aX;
@@ -690,7 +691,7 @@ public class TankAIControlled extends Tank implements ITankField
 			{
 				this.aim = false;
 
-				double lifeRange = this.bullet.lifespan * this.bullet.speed * this.getAttributeValue(AttributeModifier.bullet_speed, 1);
+				double lifeRange = this.bullet.lifespan * this.bullet.speed * em().getAttributeValue(AttributeModifier.bullet_speed, 1);
 				double limitRange = this.bullet.getRangeMax();
 				double range = Math.min(limitRange, lifeRange);
 
@@ -761,7 +762,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void charge()
 	{
-		double reload = this.getAttributeValue(AttributeModifier.reload, 1);
+		double reload = em().getAttributeValue(AttributeModifier.reload, 1);
 
 		this.cooldown -= Panel.frameFrequency * reload;
 		this.justCharged = true;
@@ -871,7 +872,7 @@ public class TankAIControlled extends Tank implements ITankField
 			speed = Double.MIN_VALUE;
 
 		b.setPolarMotion(angle + offset + this.shotOffset, speed);
-		this.addPolarMotion(b.getPolarDirection() + Math.PI, 25.0 / 32.0 * b.recoil * this.getAttributeValue(AttributeModifier.recoil, 1) * b.frameDamageMultipler);
+		this.addPolarMotion(b.getPolarDirection() + Math.PI, 25.0 / 32.0 * b.recoil * em().getAttributeValue(AttributeModifier.recoil, 1) * b.frameDamageMultipler);
 		b.speed = Math.abs(speed);
 
 		if (b instanceof BulletArc)
@@ -1086,8 +1087,7 @@ public class TankAIControlled extends Tank implements ITankField
 		t.drawAge = this.drawAge;
 		t.possessor = this;
 		t.skipNextUpdate = true;
-		t.attributes = this.attributes;
-		t.statusEffects = this.statusEffects;
+		t.setEffectManager(em());
 		t.coinValue = this.coinValue;
 		t.currentlyVisible = true;
 		t.cooldown = Math.min(t.cooldownBase, this.cooldown);
@@ -1210,82 +1210,86 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void pathfind()
 	{
-		Tile[][] tiles = new Tile[Game.currentSizeX][Game.currentSizeY];
+		ArrayList<Tank> targets = new ArrayList<>();
 
-		for (int i = 0; i < tiles.length; i++)
-            for (int j = 0; j < tiles[i].length; j++)
-                tiles[i][j] = new Tile(this.random, i, j);
-
-		for (Obstacle o: Game.obstacles)
-		{
-			if (o.posX >= 0 && o.posY >= 0 && o.posX <= Game.currentSizeX * Game.tile_size && o.posY <= Game.currentSizeY * Game.tile_size)
-			{
-				Tile.Type t = Tile.Type.solid;
-
-				if (!o.tankCollision && !(o instanceof ObstacleTeleporter))
-					t = Tile.Type.empty;
-				else if (o.destructible && this.enableMineLaying)
-					t = Tile.Type.destructible;
-
-				int x = (int) (o.posX / Game.tile_size);
-				int y = (int) (o.posY / Game.tile_size);
-				Tile tile = tiles[x][y];
-				tile.type = t;
-
-				if (o.unfavorability >= 0)
-					tile.unfavorability = o.unfavorability;
-				else if (o.tankCollision)
-				{
-					tile.unfavorability = 10;
-
-					for (int i = -1; i <= 1; i++)
-					{
-						for (int j = -1; j <= 1; j++)
-						{
-							if (x + i > 0 && x + i < tiles.length && y + j > 0 && y + j < tiles[0].length)
-								tiles[x + i][y + j].unfavorability = tile.unfavorability;
-						}
-					}
-				}
-			}
-		}
-
-		for (Movable m: Game.movables)
+		for (Movable m : Game.movables)
 		{
 			if (this.isInterestingPathTarget(m))
-				tiles[Math.min(Game.currentSizeX - 1, Math.max(0, (int) (m.posX / Game.tile_size)))][Math.min(Game.currentSizeY - 1, Math.max(0, (int) (m.posY / Game.tile_size)))].interesting = true;
+				targets.add((Tank) m);
 		}
 
-		Queue<Tile> queue = new LinkedList<>();
+		if (targets.isEmpty())
+			return;
 
-		Tile t = tiles[(int)(this.posX / Game.tile_size)][(int)(this.posY / Game.tile_size)];
-		t.explored = true;
-		queue.add(t);
+		Tank target = targets.get((int) (Math.random() * targets.size()));
 
-		Tile current = null;
-		boolean found = false;
+		int endX = (int) (target.posX / Game.tile_size);
+		int endY = (int) (target.posY / Game.tile_size);
+		pathfind(endX, endY);
+	}
+
+	public void pathfind(int endX, int endY)
+	{
+		int currX = (int) (this.posX / Game.tile_size);
+		int currY = (int) (this.posY / Game.tile_size);
+
+		if (currX < 0 || currX >= Game.currentSizeX || currY < 0 || currY >= Game.currentSizeY)
+			return;
+
+		ArrayDeque<Tile> queue = new ArrayDeque<>();
+		Tile.reset();
+		boolean[][] visited = new boolean[Game.currentSizeX][Game.currentSizeY];
+
+		queue.add(Tile.newTile(currX, currY, null, this));
+		visited[currX][currY] = true;
+
+		Tile endingTile = null;
 
 		while (!queue.isEmpty())
 		{
-			current = queue.remove();
+			Tile t = queue.remove();
 
-			if (current.search(queue, tiles))
+			if (t.unfavorability > 0)
 			{
-				found = true;
+				t.unfavorability--;
+				queue.add(t);
+				continue;
+			}
+
+			if (t.tileX == endX && t.tileY == endY)
+			{
+				endingTile = t;
 				break;
+			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				int x = t.tileX + Game.dirX[i];
+				int y = t.tileY + Game.dirY[i];
+
+				if (x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
+					continue;
+
+				if (visited[x][y] || t.type == Tile.Type.solid || t.unfavorability >= 75 || (t.type == Tile.Type.destructible && !this.enableMineLaying))
+					continue;
+
+				visited[x][y] = true;
+				queue.add(Tile.newTile(x, y, t, this));
 			}
 		}
 
-		if (found)
+		if (endingTile != null)
 		{
-			this.seekTimer = this.seekTimerBase;
+			this.path = new LinkedList<>();
 			this.currentlySeeking = true;
-			this.path = new ArrayList<>();
+			this.seekTimer = this.seekTimerBase;
 
-			while (current.parent != null)
+			while (endingTile.parent != null)
 			{
-				this.path.add(0, current);
-				current = current.parent;
+				endingTile = endingTile.parent;
+				endingTile.shiftedX = endingTile.shiftSides(this.random, true);
+				endingTile.shiftedY = endingTile.shiftSides(this.random, false);
+				this.path.addFirst(endingTile);
 			}
 		}
 	}
@@ -1377,7 +1381,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void findBulletThreats()
 	{
-		outer : for (Chunk chunk : Chunk.iterateOutwards(posX, posY, Chunk.chunkSize * 4))
+		outer : for (Chunk chunk : Chunk.iterateOutwards(posX, posY, 4))
 		{
 			for (Movable m : chunk.movables)
 			{
@@ -1429,7 +1433,7 @@ public class TankAIControlled extends Tank implements ITankField
                         }
                     }
 
-					if (toAvoid.size() > 8 || toAvoidDeflect.size() > 8)
+					if (toAvoid.size() > 5 || toAvoidDeflect.size() > 5)
 						break outer;
                 }
             }
@@ -1626,7 +1630,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 		if (!this.chargeUp)
 		{
-			double reload = this.getAttributeValue(AttributeModifier.reload, 1);
+			double reload = em().getAttributeValue(AttributeModifier.reload, 1);
 			this.cooldown -= Panel.frameFrequency * reload;
 		}
 
@@ -2175,21 +2179,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 		if (!laidMine && mineFleeTimer <= 0)
 		{
-			ArrayList<IAvoidObject> avoidances = new ArrayList<>();
-
-			for (Movable m: Game.movables)
-			{
-				if (m instanceof IAvoidObject && !(Team.isAllied(this, m) && (this.team != null && !this.team.friendlyFire)))
-					avoidances.add((IAvoidObject) m);
-			}
-
-			for (Obstacle o: Game.obstacles)
-			{
-				if (o instanceof IAvoidObject)
-					avoidances.add((IAvoidObject) o);
-			}
-
-			for (IAvoidObject o: avoidances)
+			for (IAvoidObject o: IAvoidObject.avoidances)
 			{
 				double distSq;
 
@@ -2546,8 +2536,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.orientation = this.sightTransformTank.orientation;
 			this.pitch = this.sightTransformTank.pitch;
 			this.drawAge = this.sightTransformTank.drawAge;
-			this.attributes = this.sightTransformTank.attributes;
-			this.statusEffects = this.sightTransformTank.statusEffects;
+			this.setEffectManager(sightTransformTank.em());
 			this.possessingTank = null;
 			this.currentlyVisible = true;
 			this.targetEnemy = null;
@@ -2617,8 +2606,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.health = t.health;
 			this.orientation = t.orientation;
 			this.drawAge = t.drawAge;
-			this.attributes = t.attributes;
-			this.statusEffects = t.statusEffects;
+			this.setEffectManager(t.em());
 			this.targetEnemy = null;
 
 			if (t instanceof TankAIControlled)
@@ -2703,8 +2691,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.possessingTank = t;
 			t.possessor = this;
 			t.skipNextUpdate = true;
-			t.attributes = this.attributes;
-			t.statusEffects = this.statusEffects;
+			t.setEffectManager(em());
 			t.coinValue = this.coinValue;
 
 			t.baseModel = this.baseModel;
@@ -2788,31 +2775,59 @@ public class TankAIControlled extends Tank implements ITankField
 
 	}
 
+	public void setPathfindingTileProperties(Tile t, Obstacle o)
+	{
+		if (o != null)
+			t.unfavorability = o.unfavorability;
+
+		if (o == null || !o.tankCollision)
+			t.type = Tile.Type.empty;
+		else if (o.destructible)
+			t.type = Tile.Type.destructible;
+		else
+			t.type = Tile.Type.solid;
+
+		for (int i = 0; i < Game.dirX.length; i++)
+		{
+			if (t.isSolid(Game.dirX[i], Game.dirY[i]))
+			{
+				t.unfavorability++;
+				break;
+			}
+		}
+	}
+
 	public static class Tile
 	{
+		private static final ObjectArrayList<Tile> cache = new ObjectArrayList<>();
+		private static int position = 0;
+
 		public enum Type {empty, destructible, solid}
 		public Tile parent;
 
-		public double posX;
-		public double posY;
+		public Type type;
 
-		public double shiftedX;
-		public double shiftedY;
+		private Tile() {}
 
-		public int tileX;
-		public int tileY;
+		public double posX, posY;
+		public double shiftedX, shiftedY;
+		public int tileX, tileY;
+		public int surrounded = 0, unfavorability = 0;
 
-		public Type type = Type.empty;
-		public boolean explored = false;
-
-		public boolean interesting = false;
-		public int unfavorability = 0;
-
-		public Tile(Random r, int x, int y)
+		public static void reset()
 		{
-			this.shiftedX = (r.nextDouble() - 0.5) * Game.tile_size / 2;
-			this.shiftedY = (r.nextDouble() - 0.5) * Game.tile_size / 2;
+			position = 0;
+		}
 
+		public static Tile newTile(int x, int y, Tile parent, TankAIControlled t)
+		{
+			if (position >= cache.size())
+				cache.add(new Tile());
+			return cache.get(position++).set(x, y, parent, t);
+		}
+
+		public Tile set(int x, int y, Tile parent, TankAIControlled t)
+		{
 			this.posX = (x + 0.5) * Game.tile_size;
 			this.posY = (y + 0.5) * Game.tile_size;
 
@@ -2821,70 +2836,65 @@ public class TankAIControlled extends Tank implements ITankField
 
 			this.tileX = x;
 			this.tileY = y;
+
+			this.parent = parent;
+
+			Obstacle o = Game.getObstacle(x, y);
+			t.setPathfindingTileProperties(this, o);
+
+			for (int i = 0; i < 4; i++)
+			{
+				int x1 = x + Game.dirX[i];
+				int y1 = y + Game.dirY[i];
+
+				if (x1 < 0 || x1 >= Game.currentSizeX || y1 < 0 || y1 >= Game.currentSizeY)
+					surrounded++;
+				else if (Game.isSolid(x1, y1))
+					surrounded++;
+			}
+
+			if (surrounded > 0)
+                unfavorability++;
+
+			return this;
 		}
 
-		public boolean search(Queue<Tile> queue, Tile[][] map)
+		public double shiftSides(Random r, boolean x)
 		{
-			boolean freeLeft = this.tileX > 0;
-			boolean freeTop = this.tileY > 0;
-			boolean freeRight = this.tileX < map.length - 1;
-			boolean freeBottom = this.tileY < map[0].length - 1;
-
-			if (this.interesting)
-				return true;
-
-			if (this.unfavorability > 0)
+			boolean left, right;
+			if (x)
 			{
-				queue.add(this);
-				this.unfavorability--;
+				left = isSolid(-1, 0);
+				right = isSolid(1, 0);
+			}
+			else
+			{
+				left = isSolid(0, -1);
+				right = isSolid(0, 1);
+			}
+
+			double d = r.nextDouble();
+			if (left && right)
+				d -= 0.5;
+			else if (right)
+				d *= 0.5;
+			else if (left)
+				d = d * 0.5 - 0.5;
+			else
+				d = 0;
+
+			return (x ? this.posX : this.posY) + d * (Game.tile_size / 2);
+		}
+
+		public boolean isSolid(int x, int y)
+		{
+			int x1 = this.tileX + x;
+			int y1 = this.tileY + y;
+
+			if (x1 < 0 || x1 >= Game.currentSizeX || y1 < 0 || y1 >= Game.currentSizeY)
 				return false;
-			}
 
-			boolean left = freeLeft && map[this.tileX - 1][this.tileY].type != Type.solid;
-			boolean right = freeRight && map[this.tileX + 1][this.tileY].type != Type.solid;
-			boolean top = freeTop && map[this.tileX][this.tileY - 1].type != Type.solid;
-			boolean bottom = freeBottom && map[this.tileX][this.tileY + 1].type != Type.solid;
-
-			if (freeLeft)
-			{
-				map[this.tileX - 1][this.tileY].explore(this, queue);
-
-				if (freeTop && left && top)
-					map[this.tileX - 1][this.tileY - 1].explore(this, queue);
-
-				if (freeBottom && left && bottom)
-					map[this.tileX - 1][this.tileY + 1].explore(this, queue);
-			}
-
-			if (freeTop)
-				map[this.tileX][this.tileY - 1].explore(this, queue);
-
-			if (freeBottom)
-				map[this.tileX][this.tileY + 1].explore(this, queue);
-
-			if (freeRight)
-			{
-				map[this.tileX + 1][this.tileY].explore(this, queue);
-
-				if (freeTop && right && top)
-					map[this.tileX + 1][this.tileY - 1].explore(this, queue);
-
-				if (freeBottom && right && bottom)
-					map[this.tileX + 1][this.tileY + 1].explore(this, queue);
-			}
-
-			return false;
-		}
-
-		public void explore(Tile parent, Queue<Tile> queue)
-		{
-			if (this.type != Type.solid && !this.explored)
-			{
-				this.parent = parent;
-				queue.add(this);
-			}
-
-			this.explored = true;
+			return Game.isSolid(x1, y1);
 		}
 	}
 
@@ -3084,7 +3094,8 @@ public class TankAIControlled extends Tank implements ITankField
 								f.set(t, Drawing.drawing.createModel(value));
 						}
 						else if (f.getType().isEnum())
-							f.set(t, Enum.valueOf((Class<? extends Enum>) f.getType(), value));
+                            //noinspection rawtypes
+                            f.set(t, Enum.valueOf((Class<? extends Enum>) f.getType(), value));
 						else if (Bullet.class.isAssignableFrom(f.getType()))
 						{
 							Item.ItemStack<?> i = Item.ItemStack.fromString(null, s);
