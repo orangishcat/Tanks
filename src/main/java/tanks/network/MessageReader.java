@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class MessageReader 
 {
-	public static final int max_event_size = 104857600;
+	public static final int max_event_size = 10485760;
 
 	public static int downstreamBytes;
 	public static int upstreamBytes;
@@ -31,7 +31,6 @@ public class MessageReader
 	{
 		this.queueMessage(null, c, m, clientID);
 	}
-
 
 	public void queueMessage(ServerHandler s, ByteBuf m, UUID clientID)
 	{

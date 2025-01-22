@@ -98,7 +98,7 @@ public class Chunk implements Comparable<Chunk>
     {
         chunkCache.clear();
         ArrayDeque<Chunk> queue = new ArrayDeque<>();
-        HashSet<Chunk> visited = new HashSet<>();
+        ObjectOpenHashSet<Chunk> visited = new ObjectOpenHashSet<>();
 
         Chunk start = Chunk.getChunk(tileX, tileY);
         if (start != null)

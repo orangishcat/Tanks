@@ -38,6 +38,8 @@ public class EffectManager
         updateStatusEffects();
     }
 
+    private final ObjectCollection<StatusEffect.Instance> stValues = statusEffects.values();
+
     /**
      * Increment ages of status effects, remove them if past duration,
      * and rely on each effect’s attribute modifiers to auto-update partial intensities.
@@ -46,9 +48,8 @@ public class EffectManager
     {
         double frameFrequency = movable.affectedByFrameFrequency ? Panel.frameFrequency : 1;
 
-        for (Object2ObjectMap.Entry<String, StatusEffect.Instance> entry : Object2ObjectMaps.fastIterable(statusEffects))
+        for (StatusEffect.Instance inst : stValues)
         {
-            StatusEffect.Instance inst = entry.getValue();
             double oldAge = inst.age;
 
             // Check for transition into deterioration
@@ -241,15 +242,15 @@ public class EffectManager
         }
     }
 
+    private final ObjectCollection<AttributeModifier> attValues = attributes.values();
     /**
      * Updates normal attributes: increments age, removes if expired, etc.
      * (Status-effect-based attributes will also get updated if they override update().)
      */
     public void updateAttributes()
     {
-        for (Object2ObjectMap.Entry<String, AttributeModifier> entry : Object2ObjectMaps.fastIterable(attributes))
+        for (AttributeModifier a : attValues)
         {
-            AttributeModifier a = entry.getValue();
             a.update();
             if (a.expired)
                 attributeRemovalQueue.add(a);
