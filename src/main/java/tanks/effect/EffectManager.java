@@ -234,7 +234,11 @@ public class EffectManager
             {
                 if (e.getKey().startsWith("statusEffect:" + effectName + "_"))
                     keysToRemove.add(e.getKey());
+
+                AttributeModifier.Instance inst2 = typeInstances.get(e.getValue().type);
+                inst2.attributeList.remove(e.getValue());
             }
+
             for (String k : keysToRemove)
                 attributes.remove(k);
 

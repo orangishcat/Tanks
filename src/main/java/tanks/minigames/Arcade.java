@@ -219,9 +219,7 @@ public class Arcade extends Minigame
             Game.effects.add(e);
 
             if (chain % 3 == 0)
-            {
                 setRampage(chain / 3);
-            }
 
             lastHit = age;
 

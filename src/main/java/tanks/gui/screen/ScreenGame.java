@@ -5,6 +5,7 @@ import basewindow.InputPoint;
 import basewindow.transformation.RotationAboutPoint;
 import basewindow.transformation.ScaleAboutPoint;
 import basewindow.transformation.Translation;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.bullet.BulletArc;
@@ -24,7 +25,10 @@ import tanks.obstacle.Obstacle;
 import tanks.obstacle.ObstacleStackable;
 import tanks.tank.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGameScreen
@@ -125,6 +129,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	protected int specialReadyMusicIterationsLeft = 0;
 	public String specialReadyMusic = null;
 
+    public ObjectArrayList<Button> pauseMenuButtons = new ObjectArrayList<>();
+
 	@SuppressWarnings("unchecked")
 	public ArrayList<IDrawable>[] drawables = (ArrayList<IDrawable>[])(new ArrayList[10]);
 
@@ -163,7 +169,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		ready = true;
 	}
 	);
-
 
 	Button enterShop = new Button(Drawing.drawing.interfaceSizeX - 200, Drawing.drawing.interfaceSizeY - 110, 350, 40, "Shop", new Runnable()
 	{
@@ -566,9 +571,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		ScreenGame.finishTimer = ScreenGame.finishTimerMax;
 
 		for (int i = 0; i < this.drawables.length; i++)
-		{
-			this.drawables[i] = new ArrayList<>();
-		}
+            this.drawables[i] = new ArrayList<>();
 
 		slantRotation = new RotationAboutPoint(Game.game.window, 0, 0, 0, 0, 0.5, -1);
 		slantTranslation = new Translation(Game.game.window, 0, 0, 0);
@@ -628,15 +631,16 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		}
 
 		if (Game.currentLevel != null && Game.currentLevel.timed)
-		{
-			this.timeRemaining = Game.currentLevel.timer;
-		}
+            this.timeRemaining = Game.currentLevel.timer;
+
+        addPauseMenuButtons();
 	}
 
 	public ScreenGame(String s)
 	{
 		this();
 		this.name = s;
+		addPauseMenuButtons();
 	}
 
 	public ScreenGame(ArrayList<Item.ShopItem> shop)
@@ -644,9 +648,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		this();
 		this.initShop(shop);
 		for (int i = 0; i < this.shop.size(); i++)
-		{
-			Game.currentLevel.itemNumbers.put(this.shop.get(i).itemStack.item.name, i + 1);
-		}
+            Game.currentLevel.itemNumbers.put(this.shop.get(i).itemStack.item.name, i + 1);
 	}
 
     public void pause()
@@ -789,6 +791,141 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			}
 		}
     }
+
+    public static void handleRemoveObstacles()
+	{
+		for (Obstacle o: Game.removeObstacles)
+		{
+			if (o instanceof IAvoidObject)
+				IAvoidObject.avoidances.remove(o);
+
+			o.removed = true;
+			Drawing.drawing.terrainRenderer.remove(o);
+
+			if (o.update)
+				Game.updateObstacles.remove(o);
+
+			int x = (int) (o.posX / Game.tile_size);
+			int y = (int) (o.posY / Game.tile_size);
+
+			if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
+			{
+				Game.redraw(o);
+				Game.removeObstacle(o);
+				Game.removeSurfaceObstacle(o);
+			}
+
+			for (Obstacle o1 : o.getNeighbors())
+				o1.onNeighborUpdate();
+
+			Game.obstacles.remove(o);
+		}
+
+		Game.removeObstacles.clear();
+	}
+
+	public void updateFollowingCam()
+	{
+		if (Game.playerTank == null || Game.playerTank.destroy)
+			return;
+
+		ItemBar b = Game.player.hotbar.itemBar;
+		selectedArcBullet = b.selected > -1 && b.slots[b.selected].item instanceof ItemBullet && ((ItemBullet) b.slots[b.selected].item).bullet instanceof BulletArc;
+
+		Game.playerTank.angle += (Drawing.drawing.getInterfaceMouseX() - prevCursorX) * sensitivity / 150;
+		Game.game.window.setCursorLocked(true);
+		if (Game.game.input.tilt.isPressed())
+			fcPitch += (Drawing.drawing.getInterfaceMouseY() - this.prevCursorY) * sensitivity * 5e-4;
+		else if (selectedArcBullet)
+			fcArcAim += (this.prevCursorY - Drawing.drawing.getInterfaceMouseY()) * (sensitivity * 3);
+		fcPitch = Math.max(0, Math.min(0.5, fcPitch));
+		Game.game.window.setCursorPos(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2);
+		updateMousePos();
+
+		if (selectedArcBullet)
+		{
+			Bullet bullet = ((ItemBullet) b.slots[b.selected].item).bullet;
+			fcArcAim = Math.max(bullet.getRangeMin(), Math.min(bullet.getRangeMax() > 0 ? bullet.getRangeMax() : Double.MAX_VALUE, fcArcAim));
+		}
+
+		fcZoomPressed = Game.game.input.fcZoom.isPressed();
+
+		if (fcZoomPressed)
+		{
+			if (Game.game.input.fcZoom.isValid())
+			{
+				if (System.currentTimeMillis() - fcZoomLastTap < 500)
+					fcTargetZoom = 0;
+
+				fcZoomLastTap = System.currentTimeMillis();
+				Game.game.input.fcZoom.invalidate();
+			}
+
+			if (Game.game.window.validScrollUp && fcTargetZoom < 0.9)
+			{
+				fcTargetZoom += 0.1;
+				Game.game.window.validScrollUp = false;
+			}
+
+			if (Game.game.window.validScrollDown && fcTargetZoom > 0)
+			{
+				fcTargetZoom -= 0.1;
+				Game.game.window.validScrollDown = false;
+			}
+		}
+	}
+
+	private void updateMousePos()
+	{
+		this.prevCursorX = Drawing.drawing.getInterfaceMouseX();
+		this.prevCursorY = Drawing.drawing.getInterfaceMouseY();
+	}
+
+	public void togglePerspective()
+	{
+		if (Game.game.window.shift)
+            Game.perspectiveID--;
+		else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_LEFT_CONTROL))
+			Game.perspectiveID = 0;
+		else
+			Game.perspectiveID++;
+
+		Game.perspectiveID = (Game.perspectiveID + 4) % 4;
+
+		switch (Game.perspectiveID)
+		{
+			case 0:
+				Game.angledView = false;
+				Game.followingCam = false;
+				Game.firstPerson = false;
+				break;
+			case 1:
+				Game.angledView = true;
+				Game.followingCam = false;
+				Game.firstPerson = false;
+				break;
+			case 2:
+				Game.angledView = false;
+				Game.followingCam = true;
+				Game.firstPerson = false;
+				break;
+			case 3:
+				Game.angledView = false;
+				Game.followingCam = true;
+				Game.firstPerson = true;
+				break;
+		}
+
+		if (Game.followingCam)
+		{
+			Drawing.drawing.movingCamera = true;
+			Panel.autoZoom = false;
+			Panel.zoomTarget = -1;
+		}
+
+		this.enableMargins = !Game.followingCam;
+		Game.game.input.perspective.invalidate();
+	}
 
 	@Override
 	public void update()
@@ -1137,100 +1274,12 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				if (this.overlay != null)
 					this.overlay.update();
 				else
-				{
-					if (ScreenPartyLobby.isClient)
-					{
-						closeMenuClient.update();
-						exitParty.update();
-					}
-					else if (ScreenPartyHost.isServer)
-					{
-						if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-						{
-							closeMenuLowerPos.update();
-							restartLowerPos.update();
-							back.update();
-						}
-						else if (Crusade.crusadeMode)
-						{
-							closeMenuLowerPos.update();
-
-							if (Crusade.currentCrusade.finalLife())
-							{
-								restartCrusadePartyFinalLife.update();
-
-								if (finishedQuick && Panel.win)
-									quitCrusadeParty.update();
-								else
-									quitCrusadePartyFinalLife.update();
-							}
-							else
-							{
-								restartCrusadeParty.update();
-								quitCrusadeParty.update();
-							}
-						}
-						else
-						{
-							closeMenu.update();
-							newLevel.update();
-							restart.update();
-							quitPartyGame.update();
-						}
-					}
-					else if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-					{
-						resumeLowerPos.update();
-						restartLowerPos.update();
-						back.update();
-					}
-					else if (ScreenInterlevel.tutorialInitial)
-					{
-						resumeLowerPos.update();
-						restartTutorial.update();
-					}
-					else if (ScreenInterlevel.tutorial)
-					{
-						resumeLowerPos.update();
-						restartTutorial.update();
-						quitHigherPos.update();
-					}
-					else if (Crusade.crusadeMode)
-					{
-						if (Crusade.currentCrusade.finalLife())
-						{
-							restartCrusadeFinalLife.update();
-							quitCrusadeFinalLife.update();
-						}
-						else
-						{
-							restartCrusade.update();
-							quitCrusade.update();
-						}
-
-						resumeLowerPos.update();
-					}
-					else if (name != null)
-					{
-						resume.update();
-						edit.update();
-						restart.update();
-						quit.update();
-					}
-					else
-					{
-						resume.update();
-						newLevel.update();
-						restart.update();
-						quit.update();
-					}
-				}
+				    for (Button b : pauseMenuButtons)
+                        b.update();
 			}
 
 			if (!ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)
-			{
-				return;
-			}
+                return;
 
 			Game.game.window.validPressedKeys.clear();
 			Game.game.window.pressedKeys.clear();
@@ -1856,145 +1905,60 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		ModAPI.removeMenus.clear();
 
 		if (this.tutorial != null)
-		{
-			this.tutorial.update();
-		}
+            this.tutorial.update();
 	}
 
-	public void updateFollowingCam()
-	{
-		if (Game.playerTank == null || Game.playerTank.destroy)
-			return;
+    public void addPauseMenuButtons()
+    {
+		pauseMenuButtons.clear();
+        addButtons(pauseMenuButtons,
+                ScreenPartyLobby.isClient ? new Button[]{closeMenuClient, exitParty} : null,
+                ScreenPartyHost.isServer ? getServerButtons() : null,
+                name != null ? new Button[]{resume, edit, restart, quit} : null,
+                (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames) ? new Button[]{resumeLowerPos, restartLowerPos, back} : null,
+                ScreenInterlevel.tutorialInitial ? new Button[]{resumeLowerPos, restartTutorial} : null,
+                ScreenInterlevel.tutorial ? new Button[]{resumeLowerPos, restartTutorial, quitHigherPos} : null,
+                Crusade.crusadeMode ? getCrusadeButtons() : null
+        );
+		if (pauseMenuButtons.isEmpty())
+			addButtons(pauseMenuButtons, new Button[]{resume, newLevel, restart, quit});
+    }
 
-		ItemBar b = Game.player.hotbar.itemBar;
-		selectedArcBullet = b.selected > -1 && b.slots[b.selected].item instanceof ItemBullet && ((ItemBullet) b.slots[b.selected].item).bullet instanceof BulletArc;
+    private Button[] getServerButtons()
+    {
+        if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
+        {
+            return new Button[]{closeMenuLowerPos, restartLowerPos, back};
+        }
+        else if (Crusade.crusadeMode)
+        {
+            if (Crusade.currentCrusade.finalLife())
+            {
+                return finishedQuick && Panel.win
+                        ? new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife, quitCrusadeParty}
+                        : new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife, quitCrusadePartyFinalLife};
+            }
+            else
+                return new Button[]{closeMenuLowerPos, restartCrusadeParty, quitCrusadeParty};
+        }
+        else
+            return new Button[]{closeMenu, newLevel, restart, quitPartyGame};
+    }
 
-		Game.playerTank.angle += (Drawing.drawing.getInterfaceMouseX() - prevCursorX) * sensitivity / 150;
-		Game.game.window.setCursorLocked(true);
-		if (Game.game.input.tilt.isPressed())
-			fcPitch += (Drawing.drawing.getInterfaceMouseY() - this.prevCursorY) * sensitivity * 5e-4;
-		else if (selectedArcBullet)
-			fcArcAim += (this.prevCursorY - Drawing.drawing.getInterfaceMouseY()) * (sensitivity * 3);
-		fcPitch = Math.max(0, Math.min(0.5, fcPitch));
-		Game.game.window.setCursorPos(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2);
-		updateMousePos();
+    private Button[] getCrusadeButtons()
+    {
+        if (Crusade.currentCrusade.finalLife())
+            return new Button[]{restartCrusadeFinalLife, quitCrusadeFinalLife, resumeLowerPos};
+        else
+            return new Button[]{restartCrusade, quitCrusade, resumeLowerPos};
+    }
 
-		if (selectedArcBullet)
-		{
-			Bullet bullet = ((ItemBullet) b.slots[b.selected].item).bullet;
-			fcArcAim = Math.max(bullet.getRangeMin(), Math.min(bullet.getRangeMax() > 0 ? bullet.getRangeMax() : Double.MAX_VALUE, fcArcAim));
-		}
-
-		fcZoomPressed = Game.game.input.fcZoom.isPressed();
-
-		if (fcZoomPressed)
-		{
-			if (Game.game.input.fcZoom.isValid())
-			{
-				if (System.currentTimeMillis() - fcZoomLastTap < 500)
-					fcTargetZoom = 0;
-
-				fcZoomLastTap = System.currentTimeMillis();
-				Game.game.input.fcZoom.invalidate();
-			}
-
-			if (Game.game.window.validScrollUp && fcTargetZoom < 0.9)
-			{
-				fcTargetZoom += 0.1;
-				Game.game.window.validScrollUp = false;
-			}
-
-			if (Game.game.window.validScrollDown && fcTargetZoom > 0)
-			{
-				fcTargetZoom -= 0.1;
-				Game.game.window.validScrollDown = false;
-			}
-		}
-	}
-
-	private void updateMousePos()
-	{
-		this.prevCursorX = Drawing.drawing.getInterfaceMouseX();
-		this.prevCursorY = Drawing.drawing.getInterfaceMouseY();
-	}
-
-	public void togglePerspective()
-	{
-		if (Game.game.window.shift)
-            Game.perspectiveID--;
-		else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_LEFT_CONTROL))
-			Game.perspectiveID = 0;
-		else
-			Game.perspectiveID++;
-
-		Game.perspectiveID = (Game.perspectiveID + 4) % 4;
-
-		switch (Game.perspectiveID)
-		{
-			case 0:
-				Game.angledView = false;
-				Game.followingCam = false;
-				Game.firstPerson = false;
-				break;
-			case 1:
-				Game.angledView = true;
-				Game.followingCam = false;
-				Game.firstPerson = false;
-				break;
-			case 2:
-				Game.angledView = false;
-				Game.followingCam = true;
-				Game.firstPerson = false;
-				break;
-			case 3:
-				Game.angledView = false;
-				Game.followingCam = true;
-				Game.firstPerson = true;
-				break;
-		}
-
-		if (Game.followingCam)
-		{
-			Drawing.drawing.movingCamera = true;
-			Panel.autoZoom = false;
-			Panel.zoomTarget = -1;
-		}
-
-		this.enableMargins = !Game.followingCam;
-		Game.game.input.perspective.invalidate();
-	}
-
-	public static void handleRemoveObstacles()
-	{
-		for (Obstacle o: Game.removeObstacles)
-		{
-			if (o instanceof IAvoidObject)
-				IAvoidObject.avoidances.remove(o);
-
-			o.removed = true;
-			Drawing.drawing.terrainRenderer.remove(o);
-
-			if (o.update)
-				Game.updateObstacles.remove(o);
-
-			int x = (int) (o.posX / Game.tile_size);
-			int y = (int) (o.posY / Game.tile_size);
-
-			if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-			{
-				Game.redraw(o);
-				Game.removeObstacle(o);
-				Game.removeSurfaceObstacle(o);
-			}
-
-			for (Obstacle o1 : o.getNeighbors())
-				o1.onNeighborUpdate();
-
-			Game.obstacles.remove(o);
-		}
-
-		Game.removeObstacles.clear();
-	}
+    private static void addButtons(ObjectArrayList<Button> buttons, Button[]... buttonGroups)
+    {
+        for (Button[] group : buttonGroups)
+            if (group != null)
+				buttons.addElements(0, group);
+    }
 
 	public void updateMusic(String prevMusic)
 	{
@@ -2468,7 +2432,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			Drawing.drawing.drawInterfaceText(this.centerX, this.centerY - 210 + shopOffset, "Shop");
 
 			this.exitShop.draw();
-
 			this.npcShopList.draw();
 		}
 
@@ -2776,92 +2739,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			Drawing.drawing.setColor(127, 178, 228, 64);
 			Game.game.window.shapeRenderer.fillRect(0, 0, Game.game.window.absoluteWidth + 1, Game.game.window.absoluteHeight + 1);
 
-			if (ScreenPartyLobby.isClient)
-			{
-				closeMenuClient.draw();
-				exitParty.draw();
-			}
-			else if (ScreenPartyHost.isServer)
-			{
-				if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-				{
-					closeMenuLowerPos.draw();
-					restartLowerPos.draw();
-					back.draw();
-				}
-				else if (Crusade.crusadeMode)
-				{
-					closeMenuLowerPos.draw();
-
-					if (Crusade.currentCrusade.finalLife())
-					{
-						if (Panel.win && finishedQuick)
-							quitCrusadeParty.draw();
-						else
-							quitCrusadePartyFinalLife.draw();
-
-						restartCrusadePartyFinalLife.draw();
-					}
-					else
-					{
-						quitCrusadeParty.draw();
-						restartCrusadeParty.draw();
-					}
-				}
-				else
-				{
-					closeMenu.draw();
-					newLevel.draw();
-					restart.draw();
-					quitPartyGame.draw();
-				}
-			}
-			else if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-			{
-				resumeLowerPos.draw();
-				restartLowerPos.draw();
-				back.draw();
-			}
-			else if (ScreenInterlevel.tutorialInitial)
-			{
-				resumeLowerPos.draw();
-				restartTutorial.draw();
-			}
-			else if (ScreenInterlevel.tutorial)
-			{
-				resumeLowerPos.draw();
-				restartTutorial.draw();
-				quitHigherPos.draw();
-			}
-			else if (Crusade.crusadeMode)
-			{
-				if (Crusade.currentCrusade.finalLife())
-				{
-					quitCrusadeFinalLife.draw();
-					restartCrusadeFinalLife.draw();
-				}
-				else
-				{
-					quitCrusade.draw();
-					restartCrusade.draw();
-				}
-
-				resumeLowerPos.draw();
-			}
-			else if (name != null)
-			{
-				resume.draw();
-				edit.draw();
-				restart.draw();
-				quit.draw();
-			}
-			else
-			{
-				resume.draw();
-				newLevel.draw();
-				restart.draw();
-				quit.draw();
-			}
+			for (Button b : pauseMenuButtons)
+                b.draw();
 
 			Drawing.drawing.setInterfaceFontSize(this.titleSize);
 			Drawing.drawing.setColor(0, 0, 0);
