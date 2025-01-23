@@ -912,7 +912,7 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			Movable m = Game.movables.get(i);
 
-			boolean correctTeam = (this.isSupportTank() && Team.isAllied(this, m)) || (!this.isSupportTank() && !Team.isAllied(this, m));
+			boolean correctTeam = this.isSupportTank() == Team.isAllied(this, m);
 			if (m instanceof Tank && correctTeam && !((Tank) m).hidden && ((Tank) m).targetable && m != this)
 			{
 				if (this.bullet.damage < 0 && ((Tank) m).health - ((Tank) m).baseHealth >= this.bullet.maxExtraHealth && this.bullet.maxExtraHealth > 0)
@@ -2900,7 +2900,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public boolean isSupportTank()
 	{
-		return !this.suicidal && this.bullet.damage <= 0 && this.bullet.bulletHitKnockback == 0 && this.bullet.tankHitKnockback == 0 && this.bullet.hitStun <= 0;
+		return !this.suicidal && this.bullet.damage < 0 && this.bullet.bulletHitKnockback == 0 && this.bullet.tankHitKnockback == 0 && this.bullet.hitStun <= 0;
 	}
 
 	public void setPolarAcceleration(double angle, double acceleration)

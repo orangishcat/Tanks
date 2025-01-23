@@ -5,6 +5,7 @@ import tanks.bullet.Bullet;
 import tanks.item.Item;
 import tanks.tank.*;
 
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -295,6 +296,8 @@ public final class Serializer
         }
         catch (Exception e)
         {
+            System.err.println("Failed to convert field: " + f.getName());
+            e.printStackTrace();
             return null;
         }
         return null;
