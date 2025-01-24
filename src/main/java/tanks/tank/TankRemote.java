@@ -24,22 +24,9 @@ public class TankRemote extends Tank
 
 	public double interpolationTime = 1;
 
-	public double prevKnownPosX;
-	public double prevKnownPosY;
-	public double prevKnownVX;
-	public double prevKnownVY;
-	public double prevKnownVXFinal;
-	public double prevKnownVYFinal;
-
-	public double currentKnownPosX;
-	public double currentKnownPosY;
-	public double currentKnownVX;
-	public double currentKnownVY;
-
-	public double lastAngle;
-	public double lastPitch;
-	public double currentAngle;
-	public double currentPitch;
+	public double prevKnownPosX, prevKnownPosY, prevKnownVX, prevKnownVY, prevKnownVXFinal, prevKnownVYFinal;
+	public double currentKnownPosX, currentKnownPosY, currentKnownVX, currentKnownVY;
+	public double lastAngle, lastPitch, currentAngle, currentPitch;
 
 	public double timeSinceRefresh = 0;
 

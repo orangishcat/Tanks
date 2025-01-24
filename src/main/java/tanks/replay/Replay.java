@@ -12,9 +12,11 @@ import tanks.gui.input.InputBinding;
 import tanks.gui.input.InputBindingGroup;
 import tanks.gui.screen.ScreenGame;
 import tanks.network.NetworkUtils;
-import tanks.network.event.INetworkEvent;
-import tanks.network.event.IStackableEvent;
+import tanks.network.event.*;
 import tanks.replay.ReplayEvents.*;
+import tanks.tank.Tank;
+import tanks.tank.TankPlayer;
+import tanks.tank.TankRemote;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
@@ -32,6 +34,8 @@ public class Replay
     public double age = 0;
     public int pos = 0;
     public double endTimer = 250;
+
+    public boolean playerOnly = false;
 
     public Level prevLevel;
     public String name = "test";
@@ -92,6 +96,23 @@ public class Replay
             return;
 
         frameFreq = Panel.frameFrequency;
+    }
+
+    private static boolean fromPlayer(INetworkEvent e)
+    {
+        if (e instanceof EventTankUpdate)
+            return isPlayer(((EventTankUpdate) e).tank);
+        else if (e instanceof EventShootBullet)
+            return isPlayer(((EventShootBullet) e).id);
+        else if (e instanceof EventLayMine)
+            return isPlayer(((EventLayMine) e).tank);
+        return false;
+    }
+
+    private static boolean isPlayer(int id)
+    {
+        Tank t = Tank.idMap.get(id);
+        return t instanceof TankRemote && ((TankRemote) t).tank instanceof TankPlayer;
     }
 
     public double getTickDelta()
@@ -261,10 +282,17 @@ public class Replay
             return;
 
         double now = g.gameAge;
-        if ((stackUpdateTimer -= Panel.frameFrequency) <= 0)
+        if (!playerOnly)
         {
-            eventsThisFrame.removeIf(t -> t instanceof IStackableEvent);
-            stackUpdateTimer = deltaCS;
+            if ((stackUpdateTimer -= Panel.frameFrequency) <= 0)
+            {
+                eventsThisFrame.removeIf(IStackableEvent.class::isInstance);
+                stackUpdateTimer = deltaCS;
+            }
+        }
+        else
+        {
+            eventsThisFrame.removeIf(Replay::fromPlayer);
         }
 
         if (Game.screen != prevGame && Game.screen instanceof ScreenGame)
@@ -325,15 +353,22 @@ public class Replay
     {
         isRecording = !isRecording;
         currentPlaying = null;
+
         if (isRecording)
-        {
-            currentReplay = new Replay();
-        }
+            startRecording();
         else
-        {
-            currentReplay.save();
-            currentReplay = null;
-        }
+            stopRecording();
+    }
+
+    public static void startRecording()
+    {
+        currentReplay = new Replay();
+    }
+
+    public static void stopRecording()
+    {
+        currentReplay.save();
+        currentReplay = null;
     }
 
     public static Replay read(String replayName)

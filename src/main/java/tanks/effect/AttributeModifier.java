@@ -174,4 +174,12 @@ public class AttributeModifier
 			return attributeList.isEmpty();
 		}
 	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj instanceof AttributeModifier)
+			return this.name.equals(((AttributeModifier) obj).name);
+		return false;
+	}
 }

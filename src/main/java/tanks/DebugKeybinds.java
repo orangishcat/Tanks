@@ -46,13 +46,21 @@ public class DebugKeybinds
             if (!Replay.isRecording || Game.game.window.shift)
             {
                 if (Replay.isRecording)
-                    Replay.toggleRecording();
+                    Replay.stopRecording();
                 Replay.read("test").loadAndPlay();
             }
 
             notifs.add(new ScreenElement.Notification("Recording \u00a7255200000255"
                     + (Replay.isRecording ? "started" : "stopped")));
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_R);
+        }
+
+        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_K))
+        {
+            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_K);
+            Replay.toggleRecording();
+            if (Replay.currentReplay != null)
+                Replay.currentReplay.playerOnly = true;
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_B))
