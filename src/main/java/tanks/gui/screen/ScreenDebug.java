@@ -3,6 +3,7 @@ package tanks.gui.screen;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.Button;
+import tanks.replay.Replay;
 import tanks.tank.TankPlayer;
 
 public class ScreenDebug extends Screen
@@ -191,5 +192,11 @@ public class ScreenDebug extends Screen
         fancyLighting.draw();
         destroyCheat.draw();
         back.draw();
+    }
+
+    @Override
+    public void onFilesDropped(String... filePaths)
+    {
+        Replay.read(filePaths[0].substring(filePaths[0].lastIndexOf("/"), filePaths[0].lastIndexOf("."))).loadAndPlay();
     }
 }

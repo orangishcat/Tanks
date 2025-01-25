@@ -2362,7 +2362,6 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		Game.screen = new ScreenGame(this.name);
 		Game.player.hotbar.coins = this.level.startingCoins;
-
 		Game.currentLevel.playerBuilds.get(0).clonePropertiesTo(Game.playerTank);
 	}
 
@@ -2406,11 +2405,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			}
 		}
 
-		for (Movable m : Game.movables)
-		{
-			if (m instanceof TankSpawnMarker)
-				Game.removeMovables.add(m);
-		}
+		Game.movables.removeIf(t -> t instanceof TankSpawnMarker);
 	}
 
 	public void clearSelection()

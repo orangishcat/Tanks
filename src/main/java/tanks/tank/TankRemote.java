@@ -179,45 +179,42 @@ public class TankRemote extends Tank
 	public void draw()
 	{
 		if (!this.invisible || this.localAge <= 0 || this.destroy)
-			super.draw();
-		else
 		{
-			if (!this.vanished)
-			{
-				this.vanished = true;
-				Drawing.drawing.playGlobalSound("transform.ogg", 1.2f);
-
-				if (Game.effectsEnabled)
-				{
-					for (int i = 0; i < 50 * Game.effectMultiplier; i++)
-					{
-						Effect e = Effect.createNewEffect(this.posX, this.posY, Effect.EffectType.piece);
-						double var = 50;
-						e.colR = Math.min(255, Math.max(0, this.colorR + Math.random() * var - var / 2));
-						e.colG = Math.min(255, Math.max(0, this.colorG + Math.random() * var - var / 2));
-						e.colB = Math.min(255, Math.max(0, this.colorB + Math.random() * var - var / 2));
-
-						if (Game.enable3d)
-							e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0);
-						else
-							e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
-
-						Game.effects.add(e);
-					}
-				}
-			}
-
-			for (int i = 0; i < Game.tile_size * 2 - this.localAge; i++)
-			{
-				Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, (this.size * 2 - i - this.localAge) * 2.55);
-				Drawing.drawing.fillOval(this.posX, this.posY, i, i);
-			}
+			super.draw();
+			return;
 		}
 
-		/*Drawing.drawing.setInterfaceFontSize(24);
-		Drawing.drawing.setColor(0, 0, 0);
-		Drawing.drawing.drawInterfaceText(Drawing.drawing.toInterfaceCoordsX(prevKnownPosX), Drawing.drawing.toInterfaceCoordsY(prevKnownPosY), String.format("%d, %d, %.2f", (int) posX / 50, (int) posY / 50, timeSinceRefresh));*/
-	}
+        if (!this.vanished)
+        {
+            this.vanished = true;
+            Drawing.drawing.playGlobalSound("transform.ogg", 1.2f);
+
+            if (Game.effectsEnabled)
+            {
+                for (int i = 0; i < 50 * Game.effectMultiplier; i++)
+                {
+                    Effect e = Effect.createNewEffect(this.posX, this.posY, Effect.EffectType.piece);
+                    double var = 50;
+                    e.colR = Math.min(255, Math.max(0, this.colorR + Math.random() * var - var / 2));
+                    e.colG = Math.min(255, Math.max(0, this.colorG + Math.random() * var - var / 2));
+                    e.colB = Math.min(255, Math.max(0, this.colorB + Math.random() * var - var / 2));
+
+                    if (Game.enable3d)
+                        e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0);
+                    else
+                        e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
+
+                    Game.effects.add(e);
+                }
+            }
+        }
+
+        for (int i = 0; i < Game.tile_size * 2 - this.localAge; i++)
+        {
+            Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, (this.size * 2 - i - this.localAge) * 2.55);
+            Drawing.drawing.fillOval(this.posX, this.posY, i, i);
+        }
+    }
 
 	public static double cubicInterpolationVelocity(double startPos, double startVel, double endPos, double endVel, double curTime, double totalTime)
 	{

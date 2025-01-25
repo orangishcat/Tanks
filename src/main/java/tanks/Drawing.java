@@ -200,12 +200,8 @@ public class Drawing
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 2; j++)
-			{
-				if (!isOutOfBounds(drawX + drawSizeX * i / 2, drawY + drawSizeY * j / 2))
-				{
-					inBounds = true;
-				}
-			}
+                if (!isOutOfBounds(drawX + drawSizeX * i / 2, drawY + drawSizeY * j / 2))
+                    inBounds = true;
 		}
 
 		if (!inBounds)

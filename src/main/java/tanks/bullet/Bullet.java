@@ -301,10 +301,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			if (!freeIDs.isEmpty())
 				this.networkID = freeIDs.remove(0);
 			else
-			{
-				this.networkID = currentID;
-				currentID++;
-			}
+                this.networkID = currentID++;
 
 			idMap.put(this.networkID, this);
 		}

@@ -1093,12 +1093,11 @@ public class Game
 	 * @return all the movables within a certain radius of the position */
 	public static ObjectArrayList<Movable> getMovablesInRadius(double posX, double posY, double radius)
 	{
+		movableOut.clear();
 		for (Chunk c : Chunk.getChunksInRadius(posX, posY, radius))
-		{
-			for (Movable o : c.movables)
-				if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
-					movableOut.add(o);
-		}
+            for (Movable o : c.movables)
+                if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
+                    movableOut.add(o);
 		return movableOut;
 	}
 

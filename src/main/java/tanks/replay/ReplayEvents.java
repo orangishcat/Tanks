@@ -12,7 +12,6 @@ import tanks.network.NetworkUtils;
 import tanks.network.event.INetworkEvent;
 import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
-import tanks.tank.TankPlayerController;
 import tanks.tank.TankRemote;
 
 import java.util.ArrayList;
@@ -120,25 +119,28 @@ public class ReplayEvents
         public void execute()
         {
             Game.cleanUp();
-            ScreenPartyHost.isServer = true;
-            new Level(levelString).loadLevel(true);
+            boolean remote = Replay.currentPlaying == null || !Replay.currentPlaying.forTests;
+            ScreenPartyHost.isServer = remote;
+            new Level(levelString).loadLevel(remote);
             ScreenPartyHost.isServer = false;
 
-            ArrayList<Movable> add = new ArrayList<>(), remove = new ArrayList<>();
-            for (Movable m : Game.movables)
+            if (!Replay.currentPlaying.forTests)
             {
-                if (!(m instanceof TankPlayer))
-                    continue;
+                int ind = -1;
+                for (Movable m : Game.movables)
+                {
+                    ind++;
+                    if (!(m instanceof TankPlayer))
+                        continue;
 
-                add.add(new TankRemote((Tank) m));
-                remove.add(m);
+                    TankRemote r = new TankRemote((Tank) m);
+                    r.isRemote = !Replay.currentPlaying.forTests;
+                    Game.movables.set(ind, r);
+                }
             }
-            Game.movables.addAll(add);
-            Game.movables.removeAll(remove);
 
             Game.screen = new ScreenGame();
             ((ScreenGame) Game.screen).playingReplay = true;
-            Game.playerTank.destroy = true;
         }
     }
 

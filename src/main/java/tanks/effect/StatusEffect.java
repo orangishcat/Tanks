@@ -93,21 +93,6 @@ public class StatusEffect
             this.duration = maxAge;
             this.warmupAge = warmupAge;
         }
-
-        public double getValue(double in, AttributeModifier.Type type)
-        {
-            return this.effect.getValue(in, age, type, warmupAge, deteriorationAge, duration);
-        }
-
-        public AttributeModifier getAttribute(AttributeModifier.Type type)
-        {
-            return effect.getAttribute(type);
-        }
-
-        public double getTimeLeft()
-        {
-            return duration - age;
-        }
     }
 
     public StatusEffect(String name, AttributeModifier[] modifiers)
@@ -122,42 +107,5 @@ public class StatusEffect
         this.name = name;
 
         statusEffectRegistry.put(name, this);
-    }
-
-    public AttributeModifier getAttribute(AttributeModifier.Type type)
-    {
-        for (AttributeModifier m : attributeModifiers)
-            if (m.type == type)
-                return m;
-        return null;
-    }
-
-    public double getValue(double in, double age, AttributeModifier.Type type, double warmupAge, double deteriorationAge, double duration)
-    {
-        if (age >= duration && duration > 0)
-            return in;
-
-        for (AttributeModifier a: this.attributeModifiers)
-        {
-            if (!a.type.equals(type))
-                continue;
-
-            double val;
-            if (age < warmupAge)
-                val = a.value * age / warmupAge;
-            else if (age < deteriorationAge || deteriorationAge <= 0)
-                val = a.value;
-            else
-                val = a.value * (duration - age) / (duration - deteriorationAge);
-
-            if (a.operation == AttributeModifier.Operation.add)
-                return in + val;
-            else if (a.operation == AttributeModifier.Operation.multiply)
-                return in * (val + 1);
-            else
-                return in;
-        }
-
-        return in;
     }
 }

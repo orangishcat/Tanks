@@ -18,7 +18,10 @@ import tanks.obstacle.Obstacle;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Objects;
 
 import static tanks.tank.TankPropertyCategory.*;
 
@@ -244,20 +247,15 @@ public abstract class Tank extends Movable implements ISolidObject
 			idMap.remove(this.networkID);
 
 		if (!freeIDs.contains(this.networkID))
-		{
 			freeIDs.add(this.networkID);
-		}
 	}
 
 	public static int nextFreeNetworkID()
 	{
-		if (freeIDs.size() > 0)
+		if (!freeIDs.isEmpty())
 			return freeIDs.remove(0);
 		else
-		{
-			currentID++;
-			return currentID - 1;
-		}
+			return currentID++;
 	}
 
 	public void registerNetworkID()
@@ -753,7 +751,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.posY = y;
 		this.drawTank(true, false);
 		this.posX = x1;
-		this.posY = y1;	
+		this.posY = y1;
 	}
 
 	public void drawTank(boolean forInterface, boolean in3d)
@@ -836,7 +834,6 @@ public abstract class Tank extends Movable implements ISolidObject
 			}
 		}
 
-
 		Drawing.drawing.setColor(teamColor[0], teamColor[1], teamColor[2], transparent ? 127 : 255, luminance);
 
 		if (forInterface)
@@ -853,7 +850,6 @@ public abstract class Tank extends Movable implements ISolidObject
 			else
 				drawing.drawModel(this.baseModel, this.posX, this.posY, s, s, this.orientation);
 		}
-
 
 		double dmgFlash = Math.min(1, this.damageFlashAnimation);
 		double healFlash = Math.min(1, this.healFlashAnimation);
@@ -987,14 +983,14 @@ public abstract class Tank extends Movable implements ISolidObject
 	}
 
 	public void drawAt(double x, double y)
-	{	
+	{
 		double x1 = this.posX;
 		double y1 = this.posY;
 		this.posX = x;
 		this.posY = y;
 		this.drawTank(false, false);
 		this.posX = x1;
-		this.posY = y1;	
+		this.posY = y1;
 	}
 
 	public void drawOutlineAt(double x, double y)

@@ -1,8 +1,8 @@
 package tanks.effect;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.Panel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public class AttributeModifier
 {
 	public enum Operation {add, multiply}
 
-	/**An unique name for the modifier, to prevent double effects*/
+	/** A unique name for the modifier, to prevent double effects*/
 	public String name = UUID.randomUUID().toString();
 	
 	/**Duration of the Attribute Modifier, leave at 0 for indefinite duration*/
@@ -102,14 +102,15 @@ public class AttributeModifier
 		
 		if (this.expired)
 			return in;
-		else if (this.age < this.warmupAge)
-			val = this.value * this.age / this.warmupAge;
-		else if (this.age < this.deteriorationAge || this.deteriorationAge <= 0)
-			val = this.value;
-		else
-			val = this.value * (this.duration - this.age) / (this.duration - this.deteriorationAge);
-		
-		if (this.operation == Operation.add)
+
+        if (this.age < this.warmupAge)
+            val = this.value * this.age / this.warmupAge;
+        else if (this.age < this.deteriorationAge || this.deteriorationAge <= 0)
+            val = this.value;
+        else
+            val = this.value * (this.duration - this.age) / (this.duration - this.deteriorationAge);
+
+        if (this.operation == Operation.add)
 			return in + val;
 		else if (this.operation == Operation.multiply)
 			return in * (val + 1);
@@ -117,18 +118,11 @@ public class AttributeModifier
 			return in;
 	}
 
-	public double getTimeLeft()
-	{
-		return duration - age;
-	}
-
 	public static class Instance
 	{
-
-
 		public final AttributeModifier.Type type;
 		/** All AttributeModifiers that modify 'type'. */
-		public ArrayList<AttributeModifier> attributeList = new ArrayList<>();
+		public ObjectArrayList<AttributeModifier> attributeList = new ObjectArrayList<>();
 
 		public Instance(AttributeModifier.Type type)
 		{
@@ -179,7 +173,7 @@ public class AttributeModifier
 	public boolean equals(Object obj)
 	{
 		if (obj instanceof AttributeModifier)
-			return this.name.equals(((AttributeModifier) obj).name);
-		return false;
+			return name.equals(((AttributeModifier) obj).name);
+		return super.equals(obj);
 	}
 }

@@ -13,19 +13,22 @@ import java.util.*;
 
 public class EffectManager
 {
+    private static final ObjectArrayList<String> toRemove = new ObjectArrayList<>();
+    private static final ObjectArrayList<AttributeModifier> expiredAttributes = new ObjectArrayList<>();
+    private static final ObjectArrayList<StatusEffect.Instance> expiredStatusEffects = new ObjectArrayList<>();
+    private static final BiConsumer<AttributeModifier, Boolean> empty = (a, b) -> {};
+
     public Movable movable;
 
     public Object2ObjectOpenHashMap<String, AttributeModifier> attributes = new Object2ObjectOpenHashMap<>();
     public HashSet<String> attributeImmunities = new HashSet<>();
-    private final PriorityQueue<AttributeModifier> attributeRemovalQueue =
-            new PriorityQueue<>(Comparator.comparingDouble(AttributeModifier::getTimeLeft));
+    private final ObjectCollection<AttributeModifier> attValues = attributes.values();
 
     public HashMap<AttributeModifier.Type, AttributeModifier.Instance> typeInstances = new HashMap<>();
     public Object2ObjectOpenHashMap<String, StatusEffect.Instance> statusEffects = new Object2ObjectOpenHashMap<>();
-    private final PriorityQueue<StatusEffect.Instance> statusEffectRemovalQueue =
-            new PriorityQueue<>(Comparator.comparingDouble(StatusEffect.Instance::getTimeLeft));
+    private final ObjectCollection<StatusEffect.Instance> stValues = statusEffects.values();
 
-    public BiConsumer<AttributeModifier, Boolean> addAttributeCallback;
+    public BiConsumer<AttributeModifier, Boolean> addAttributeCallback = empty;
 
     public EffectManager(Movable m)
     {
@@ -38,7 +41,7 @@ public class EffectManager
         updateStatusEffects();
     }
 
-    private final ObjectCollection<StatusEffect.Instance> stValues = statusEffects.values();
+    public long lastEventTime = 0;
 
     /**
      * Increment ages of status effects, remove them if past duration,
@@ -54,39 +57,28 @@ public class EffectManager
 
             // Check for transition into deterioration
             if (oldAge < inst.deteriorationAge && oldAge + frameFrequency >= inst.deteriorationAge
-                    && ScreenPartyHost.isServer && (movable instanceof Bullet || movable instanceof Tank))
+                    && ScreenPartyHost.isServer && (movable instanceof Bullet || movable instanceof Tank) &&
+                        System.currentTimeMillis() - lastEventTime > 100)
+            {
                 Game.eventsOut.add(new EventStatusEffectDeteriorate(movable, inst.effect, inst.duration - inst.deteriorationAge));
+                lastEventTime = System.currentTimeMillis();
+            }
 
             // Advance age
             if (inst.duration <= 0 || inst.age + frameFrequency <= inst.duration)
-            {
                 inst.age += frameFrequency;
-            }
             else
-            {
-                statusEffectRemovalQueue.add(inst);
-
-                if (movable instanceof Bullet || movable instanceof Tank)
-                    Game.eventsOut.add(new EventStatusEffectEnd(movable, inst.effect));
-            }
+                expiredStatusEffects.add(inst);
         }
 
-        // Remove any fully-expired effects
-        while (!statusEffectRemovalQueue.isEmpty())
-        {
-            StatusEffect.Instance top = statusEffectRemovalQueue.peek();
-            if (top == null)
-                break;
+       for (StatusEffect.Instance e : expiredStatusEffects)
+       {
+           removeStatusEffect(e.effect.name);
 
-            if (top.age >= top.duration && top.duration > 0)
-            {
-                statusEffectRemovalQueue.poll();
-                // remove all its attribute modifiers
-                removeStatusEffect(top.effect.name);
-            }
-            else
-                break;
-        }
+           if (movable instanceof Bullet || movable instanceof Tank)
+               Game.eventsOut.add(new EventStatusEffectEnd(movable, e.effect));
+       }
+       expiredStatusEffects.clear();
     }
 
     /**
@@ -95,7 +87,6 @@ public class EffectManager
      */
     public double getAttributeValue(AttributeModifier.Type type, double baseValue)
     {
-        // If you want the type->Instance grouping
         AttributeModifier.Instance inst = typeInstances.get(type);
         if (inst != null)
             baseValue = inst.apply(baseValue);
@@ -103,7 +94,7 @@ public class EffectManager
     }
 
     /**
-     * Retrieves the group of attributes for a given Type (if you still want that).
+     * Retrieves the group of attributes for a given Type
      */
     public AttributeModifier.Instance getAttribute(AttributeModifier.Type type)
     {
@@ -114,20 +105,32 @@ public class EffectManager
     }
 
     /**
+     * Remove attribute by name
+     */
+    public void removeAttribute(String name)
+    {
+        AttributeModifier a = attributes.remove(name);
+        if (a == null)
+            return;
+
+        typeInstances.get(a.type).attributeList.remove(a);
+    }
+
+    /**
      * Remove all attributes of a given type (both normal & status-effect attributes).
      */
     public void removeAttribute(AttributeModifier.Type type)
     {
-        List<String> toRemove = new ArrayList<>();
         for (Map.Entry<String, AttributeModifier> e : attributes.entrySet())
         {
             if (e.getValue().type == type)
                 toRemove.add(e.getKey());
         }
         for (String k : toRemove)
-            attributes.remove(k);
+            removeAttribute(k);
 
         typeInstances.remove(type);
+        toRemove.clear();
     }
 
     /**
@@ -158,9 +161,10 @@ public class EffectManager
             if (inst != null)
                 inst.attributeList.remove(old);
         }
+        else
+            addAttributeCallback.accept(m, true);
 
         attributes.put(m.name, m);
-        addAttributeCallback.accept(m, true);
         typeInstances.computeIfAbsent(m.type, AttributeModifier.Instance::new).attributeList.add(m);
     }
 
@@ -185,7 +189,7 @@ public class EffectManager
 
         // If there's an existing effect in the same "family", remove it
         StatusEffect prevEffect = null;
-        for (StatusEffect.Instance inst : this.statusEffects.values())
+        for (StatusEffect.Instance inst : stValues)
         {
             if (inst.effect.family != null && inst.effect.family.equals(s.family))
                 prevEffect = inst.effect;
@@ -229,24 +233,18 @@ public class EffectManager
         {
             // Also remove all attribute modifiers belonging to this effect
             // We know their names start with "statusEffect:<effectName>_"
-            List<String> keysToRemove = new ArrayList<>();
             for (Map.Entry<String, AttributeModifier> e : attributes.entrySet())
             {
                 if (e.getKey().startsWith("statusEffect:" + effectName + "_"))
-                    keysToRemove.add(e.getKey());
-
-                AttributeModifier.Instance inst2 = typeInstances.get(e.getValue().type);
-                inst2.attributeList.remove(e.getValue());
+                    toRemove.add(e.getKey());
             }
+            for (String k : toRemove)
+                removeAttribute(k);
 
-            for (String k : keysToRemove)
-                attributes.remove(k);
-
-            statusEffectRemovalQueue.remove(inst);
+            toRemove.clear();
         }
     }
 
-    private final ObjectCollection<AttributeModifier> attValues = attributes.values();
     /**
      * Updates normal attributes: increments age, removes if expired, etc.
      * (Status-effect-based attributes will also get updated if they override update().)
@@ -257,32 +255,35 @@ public class EffectManager
         {
             a.update();
             if (a.expired)
-                attributeRemovalQueue.add(a);
+                expiredAttributes.add(a);
         }
 
-        while (!attributeRemovalQueue.isEmpty() && attributeRemovalQueue.peek().expired)
+        for (AttributeModifier expired : expiredAttributes)
         {
-            AttributeModifier expired = attributeRemovalQueue.poll();
-            if (attributes.get(expired.name) == expired)
-            {
-                attributes.remove(expired.name);
+            if (attributes.get(expired.name) != expired)
+                continue;
 
-                // Also remove from typeInstances if present
-                AttributeModifier.Instance inst = typeInstances.get(expired.type);
-                if (inst != null)
-                    inst.attributeList.remove(expired);
-            }
+            removeAttribute(expired.name);
+
+            // Also remove from typeInstances if present
+            AttributeModifier.Instance inst = typeInstances.get(expired.type);
+            if (inst != null)
+                inst.attributeList.remove(expired);
         }
+
+        expiredAttributes.clear();
     }
 
     /**
-     * New: a subclass of AttributeModifier that is driven by a StatusEffect.Instance.
-     * This allows each effect's partial intensity to be directly updated as the effect ages.
+     * A subclass of {@linkplain AttributeModifier} that is driven by a {@linkplain StatusEffect.Instance}.<br>
+     * This allows each effect's partial intensity to be directly updated as the effect ages.<br>
+     * Mainly serves the purpose of copying the base modifier.
      */
     public static class StatusEffectAttributeModifier extends AttributeModifier
     {
         public StatusEffect.Instance instance;
-        public AttributeModifier baseModifier; // the original static data from the StatusEffect
+        /** the original modifier from the StatusEffect, none of its properties should change (other than age) */
+        public AttributeModifier baseModifier;
 
         public StatusEffectAttributeModifier(StatusEffect.Instance inst, AttributeModifier baseMod)
         {
@@ -295,44 +296,14 @@ public class EffectManager
         }
 
         @Override
-        public void update()
+        public double getValue(double in)
         {
-            super.update();
-            // Our "age" matches the status effect's age
-            this.age = instance.age;
+            baseModifier.age = instance.age;
+            baseModifier.duration = instance.duration;
+            baseModifier.deteriorationAge = instance.deteriorationAge;
+            baseModifier.warmupAge = instance.warmupAge;
 
-            // Check if effect is expired:
-            if (instance.age >= instance.duration && instance.duration > 0)
-                this.expired = true;
-            else
-            {
-                // Recompute partial intensity:
-                // The partial "value" depends on warmupAge and deteriorationAge
-                double warm = instance.warmupAge;
-                double det = instance.deteriorationAge;
-                double dur = instance.duration;
-                double a   = instance.age;
-
-                double originalVal = baseModifier.value;
-
-                double partial;
-                if (a < warm)
-                    partial = originalVal * a / warm;         // ramp up
-                else if (a < det || det <= 0)
-                    partial = originalVal;                    // full strength
-                else
-                    partial = originalVal * (dur - a) / (dur - det);  // ramp down
-
-                // Store the partial result into this.value for usage in getValue()
-                this.value = partial;
-            }
-        }
-
-        @Override
-        public double getTimeLeft()
-        {
-            // If we want to tie attribute lifetime to the effect's lifetime:
-            return instance.duration - instance.age;
+            return baseModifier.getValue(in);
         }
     }
 }

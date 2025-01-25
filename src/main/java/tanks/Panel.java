@@ -19,6 +19,7 @@ import tanks.network.event.online.IOnlineServerEvent;
 import tanks.obstacle.Obstacle;
 import tanks.rendering.*;
 import tanks.replay.Replay;
+import tanks.replay.ReplayHandler;
 import tanks.tank.*;
 
 import java.util.ArrayList;
@@ -576,14 +577,14 @@ public class Panel
 			Game.screen.onFocusChange(prevFocused);
 		}
 
-		Replay.preUpdate();
+		ReplayHandler.preUpdate();
 
 		if (!onlinePaused)
 			Game.screen.update();
 		else
 			this.onlineOverlay.update();
 
-		Replay.update();
+		ReplayHandler.update();
 
 		if (Game.game.input.fullscreen.isValid())
 		{
@@ -752,7 +753,7 @@ public class Panel
 			try
 			{
 				Game.screen.draw();
-				Replay.draw();
+				ReplayHandler.draw();
 				this.continuation = null;
 				this.continuationMusic = false;
 			}

@@ -27,7 +27,6 @@ import tanks.tank.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -1507,13 +1506,11 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			for (Effect e : Game.effects)
 				e.update();
 
-			if (Game.game.window.pressedKeys.contains(InputCodes.KEY_F3) && Game.game.window.pressedKeys.contains(InputCodes.KEY_F4))
-				Game.movables.add(new Crate(new TankPlayer(Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.angle)));
+//			if (Game.game.window.pressedKeys.contains(InputCodes.KEY_F3) && Game.game.window.pressedKeys.contains(InputCodes.KEY_F4))
+//				Game.movables.add(new Crate(new TankPlayer(Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.angle)));
 
-			for (int i = 0; i < Game.movables.size(); i++)
-			{
-				Game.movables.get(i).preUpdate();
-			}
+			for (Movable m : Game.movables)
+                m.preUpdate();
 
 			for (int i = 0; i < Game.movables.size(); i++)
 			{
@@ -1932,14 +1929,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
         }
         else if (Crusade.crusadeMode)
         {
-            if (Crusade.currentCrusade.finalLife())
-            {
-                return finishedQuick && Panel.win
-                        ? new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife, quitCrusadeParty}
-                        : new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife, quitCrusadePartyFinalLife};
-            }
-            else
-                return new Button[]{closeMenuLowerPos, restartCrusadeParty, quitCrusadeParty};
+            return new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife,
+					(finishedQuick && Panel.win) || !Crusade.currentCrusade.finalLife() ? quitCrusadeParty : quitCrusadePartyFinalLife};
         }
         else
             return new Button[]{closeMenu, newLevel, restart, quitPartyGame};
