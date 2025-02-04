@@ -7,7 +7,7 @@ import tanks.gui.Button;
 
 public class ScreenConfirmSaveCrusade extends Screen implements IBlankBackgroundScreen
 {
-    public ScreenCrusadeEditor screenCrusadeEditor;
+    public ScreenCrusadeListEditor screenCrusadeEditor;
     public Screen previous;
     public double opacity = 100;
 
@@ -26,7 +26,7 @@ public class ScreenConfirmSaveCrusade extends Screen implements IBlankBackground
             Game.screen = previous);
 
 
-    public ScreenConfirmSaveCrusade(Screen previous, ScreenCrusadeEditor s)
+    public ScreenConfirmSaveCrusade(Screen previous, ScreenCrusadeListEditor s)
     {
         this.previous = previous;
         this.screenCrusadeEditor = s;

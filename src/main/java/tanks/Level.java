@@ -71,7 +71,7 @@ public class Level
 	public int startingCoins;
 	public ArrayList<Item.ShopItem> shop = new ArrayList<>();
 	public ArrayList<Item.ItemStack<?>> startingItems = new ArrayList<>();
-	public ArrayList<TankPlayer> playerBuilds = new ArrayList<>();
+	public ArrayList<TankPlayer.ShopTankBuild> playerBuilds = new ArrayList<>();
 
 	// Saved on the client to keep track of what each item is
 	public int clientStartingCoins;
@@ -156,8 +156,12 @@ public class Level
 					}
 					else if (parsing == 5)
 					{
-						if (TankModels.tank != null)
-							this.playerBuilds.add(TankPlayer.fromString(s));
+                        if (TankModels.tank != null)
+                        {
+                            TankPlayer.ShopTankBuild t = TankPlayer.ShopTankBuild.fromString(s);
+                            t.enableTertiaryColor = true;
+                            this.playerBuilds.add(t);
+                        }
 					}
 					else
 					{
@@ -170,6 +174,12 @@ public class Level
 					}
 					break;
 			}
+		}
+
+		if (TankModels.tank != null && playerBuilds.isEmpty())
+		{
+			TankPlayer.ShopTankBuild tp = new TankPlayer.ShopTankBuild();
+			playerBuilds.add(tp);
 		}
 
 		if (ScreenPartyHost.isServer && Game.disablePartyFriendlyFire)
@@ -211,12 +221,6 @@ public class Level
 			this.startingCoins = 0;
 			this.startingItems = new ArrayList<>();
 			this.shop = new ArrayList<>();
-		}
-
-		if (TankModels.tank != null && playerBuilds.isEmpty())
-		{
-			TankPlayer tp = new TankPlayer();
-			playerBuilds.add(tp);
 		}
 	}
 
@@ -488,6 +492,9 @@ public class Level
 				t.networkID = Tank.nextFreeNetworkID();
 				Tank.idMap.put(t.networkID, t);
 
+				if (sc != null)
+					t.drawAge = 50;
+
 				if (remote)
 					Game.movables.add(new TankRemote(t));
 				else
@@ -668,6 +675,7 @@ public class Level
 					TankPlayer tank = new TankPlayer(x, y, angle);
 					this.playerBuilds.get(0).clonePropertiesTo(tank);
 					Game.playerTank = tank;
+					Game.player.buildName = tank.buildName;
 					tank.team = team;
 					tank.registerNetworkID();
 					Game.movables.add(tank);
@@ -680,6 +688,7 @@ public class Level
 			{
 				TankSpawnMarker t = new TankSpawnMarker("player", this.playerSpawnsX.get(i), this.playerSpawnsY.get(i), this.playerSpawnsAngle.get(i));
 				t.team = this.playerSpawnsTeam.get(i);
+				t.drawAge = 50;
 				Game.movables.add(t);
 
 				if (sc != null)

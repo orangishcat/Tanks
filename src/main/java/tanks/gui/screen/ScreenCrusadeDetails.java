@@ -32,7 +32,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
             Crusade.currentCrusade = crusade;
             Crusade.crusadeMode = true;
             Crusade.currentCrusade.begin();
-            Game.screen = new ScreenGame(Crusade.currentCrusade.getShop());
+            Game.screen = new ScreenGame(Crusade.currentCrusade);
         }
     });
 
@@ -44,7 +44,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
             Crusade.currentCrusade = crusade;
             Crusade.crusadeMode = true;
             Crusade.currentCrusade.loadLevel();
-            Game.screen = new ScreenGame(Crusade.currentCrusade.getShop());
+            Game.screen = new ScreenGame(Crusade.currentCrusade);
         }
     });
 
@@ -66,16 +66,16 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
             Crusade.currentCrusade = c;
             Crusade.crusadeMode = true;
             Crusade.currentCrusade.begin();
-            Game.screen = new ScreenGame(Crusade.currentCrusade.getShop());
+            Game.screen = new ScreenGame(Crusade.currentCrusade);
         }
     });
 
     public Button edit = new Button(this.centerX, this.centerY + this.objYSpace * 1.5, this.objWidth, this.objHeight, "Edit", () ->
     {
-//        if (crusade.started)
-//            Game.screen = new ScreenCrusadeEditWarning(Game.screen, crusade);
-//        else
-            Game.screen = new ScreenCrusadeEditor(crusade);
+        if (crusade.started)
+            Game.screen = new ScreenCrusadeEditWarning(Game.screen, crusade);
+        else
+            Game.screen = new ScreenCrusadeListEditor(crusade);
     });
 
     public Button delete = new Button(this.centerX, this.centerY + this.objYSpace * 2.5, this.objWidth, this.objHeight, "Delete crusade", () -> Game.screen = new ScreenConfirmDeleteCrusade(Game.screen, crusade));

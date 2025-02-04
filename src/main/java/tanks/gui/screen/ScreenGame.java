@@ -60,6 +60,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	public static boolean newItemsNotification = false;
 	public static String lastShop = "";
 	public ArrayList<Item.ShopItem> shop = new ArrayList<>();
+	public ArrayList<TankPlayer.ShopTankBuild> builds = new ArrayList<>();
 	public boolean screenshotMode = false;
 
 	public Tutorial tutorial;
@@ -428,7 +429,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Game.silentCleanUp();
 
 		Crusade.currentCrusade.loadLevel();
-		ScreenGame s = new ScreenGame(Crusade.currentCrusade.getShop());
+		ScreenGame s = new ScreenGame(Crusade.currentCrusade);
 		s.name = name;
 		Game.screen = s;
 	}
@@ -485,7 +486,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		ScreenPartyHost.includedPlayers.clear();
 
 		Crusade.currentCrusade.loadLevel();
-		Game.screen = new ScreenGame(Crusade.currentCrusade.getShop());
+		Game.screen = new ScreenGame(Crusade.currentCrusade);
 	}
 			, "Note! All players will lose a life for---restarting in the middle of a level.");
 
@@ -533,8 +534,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	{
 		this.selfBatch = false;
 		this.enableMargins = !Game.followingCam;
-
-		this.initBuilds();
 
 		introMusicEnd = Long.parseLong(Game.game.fileManager.getInternalFileContents("/music/ready_music_intro_length.txt").get(0));
 		introBattleMusicEnd = Long.parseLong(Game.game.fileManager.getInternalFileContents("/music/battle_intro_length.txt").get(0));
@@ -585,6 +584,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				shop = true;
 				this.initShop(Game.currentLevel.shop);
 			}
+
+			this.initBuilds(Game.currentLevel.playerBuilds);
 
 			if (!Game.currentLevel.startingItems.isEmpty())
 			{
@@ -642,10 +643,12 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		addPauseMenuButtons();
 	}
 
-	public ScreenGame(ArrayList<Item.ShopItem> shop)
+	public ScreenGame(Crusade c)
 	{
 		this();
+		ArrayList<Item.ShopItem> shop = c.getShop();
 		this.initShop(shop);
+		this.initBuilds(c.getBuildsShop());
 		for (int i = 0; i < this.shop.size(); i++)
             Game.currentLevel.itemNumbers.put(this.shop.get(i).itemStack.item.name, i + 1);
 	}
@@ -678,7 +681,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	public void initShop(ArrayList<Item.ShopItem> shop)
 	{
 		this.shop = shop;
-		this.viewBuilds.posY -= 60;
+
+		if (!shop.isEmpty())
+			this.viewBuilds.posY -= 60;
 
 		for (int i = 0; i < this.shop.size(); i++)
 		{
@@ -717,17 +722,20 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Game.eventsOut.add(new EventSortShopButtons());
 	}
 
-	public void initBuilds()
+	public void initBuilds(ArrayList<TankPlayer.ShopTankBuild> builds)
 	{
-		for (int i = 0; i < Game.currentLevel.playerBuilds.size(); i++)
+		this.builds = builds;
+		for (int i = 0; i < builds.size(); i++)
 		{
-			TankPlayer t = Game.currentLevel.playerBuilds.get(i);
+			TankPlayer t = builds.get(i);
 			int j = i;
 			ButtonObject b = new ButtonObject(t, 0, 0, 75, 75, () ->
 			{
 				t.clonePropertiesTo(Game.playerTank);
 				if (ScreenPartyLobby.isClient)
 					Game.eventsOut.add(new EventPlayerSetBuild(j));
+
+				Game.player.buildName = t.name;
 			}, t.description);
 			//b.text = t.name;
 			this.playerBuildButtons.add(b);
@@ -1350,7 +1358,12 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				this.exitShop.update();
 
 				if (this.buildsScreen)
+				{
+					if (Game.player.tank != null)
+                        for (int i = 0; i < this.builds.size(); i++)
+                            this.playerBuildsList.buttons.get(i).enabled = !this.builds.get(i).name.equals(Game.player.buildName);
 					this.playerBuildsList.update();
+				}
 				else if (this.shopScreen)
 				{
 					for (int i = 0; i < this.shop.size(); i++)
