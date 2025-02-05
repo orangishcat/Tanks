@@ -3,7 +3,6 @@ package tanks.obstacle;
 import tanks.*;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.leveleditor.selector.SelectorGroupID;
-import tanks.gui.screen.leveleditor.selector.SelectorStackHeight;
 import tanks.tank.Tank;
 import tanks.tank.TeleporterOrb;
 import tanks.tankson.MetadataProperty;
@@ -35,7 +34,7 @@ public class ObstacleTeleporter extends Obstacle
 		this.bulletCollision = false;
 		this.checkForObjects = true;
 		this.drawLevel = 0;
-		this.update = true;
+		setUpdate(true);
 		this.colorR = 0;
 		this.colorG = 255;
 		this.colorB = 255;
@@ -139,49 +138,45 @@ public class ObstacleTeleporter extends Obstacle
 		ArrayList<ObstacleTeleporter> teleporters = new ArrayList<>();
 		Tank t = null;
 
-		if (!ScreenGame.finished)
-		{
-			for (int i = 0; i < Game.movables.size(); i++)
-			{
-				Movable m = Game.movables.get(i);
+        if (ScreenGame.finished)
+            return;
 
-				if (m instanceof Tank && ((Tank) m).targetable && Movable.distanceBetween(this, m) < ((Tank) m).size)
-				{
-					t = (Tank) m;
+        for (Movable m : Game.movables)
+        {
+            if (m instanceof Tank && ((Tank) m).targetable && Movable.distanceBetween(this, m) < ((Tank) m).size)
+            {
+                t = (Tank) m;
 
-					if (this.cooldown > 0)
-					{
-						this.cooldown = Math.max(100, this.cooldown);
-						continue;
-					}
+                if (this.cooldown > 0)
+                {
+                    this.cooldown = Math.max(100, this.cooldown);
+                    continue;
+                }
 
-					if (!m.isRemote)
-					{
-						for (int j = 0; j < Game.obstacles.size(); j++)
-						{
-							Obstacle o = Game.obstacles.get(j);
-							if (o instanceof ObstacleTeleporter && o != this && ((ObstacleTeleporter) o).groupID == this.groupID && ((ObstacleTeleporter) o).cooldown <= 0)
-							{
-								teleporters.add((ObstacleTeleporter) o);
-							}
-						}
-					}
-				}
-			}
+                if (!m.isRemote)
+                {
+                    for (int j = 0; j < Game.obstacles.size(); j++)
+                    {
+                        Obstacle o = Game.obstacles.get(j);
+                        if (o instanceof ObstacleTeleporter && o != this && ((ObstacleTeleporter) o).groupID == this.groupID && ((ObstacleTeleporter) o).cooldown <= 0)
+                            teleporters.add((ObstacleTeleporter) o);
+                    }
+                }
+            }
+        }
 
-			this.cooldown = Math.max(0, this.cooldown - Panel.frameFrequency);
+        this.cooldown = Math.max(0, this.cooldown - Panel.frameFrequency);
 
-			if (t != null && teleporters.size() > 0 && this.cooldown <= 0)
-			{
-				int i = (int) (Math.random() * teleporters.size());
+        if (t != null && teleporters.size() > 0 && this.cooldown <= 0)
+        {
+            int i = (int) (Math.random() * teleporters.size());
 
-				ObstacleTeleporter o = teleporters.get(i);
-				o.cooldown = 500;
-				this.cooldown = 500;
-				Game.movables.add(new TeleporterOrb(t.posX, t.posY, this.posX, this.posY, o.posX, o.posY, t));
-			}
-		}
-	}
+            ObstacleTeleporter o = teleporters.get(i);
+            o.cooldown = 500;
+            this.cooldown = 500;
+            Game.movables.add(new TeleporterOrb(t.posX, t.posY, this.posX, this.posY, o.posX, o.posY, t));
+        }
+    }
 
 	@Override
 	public void refreshMetadata()

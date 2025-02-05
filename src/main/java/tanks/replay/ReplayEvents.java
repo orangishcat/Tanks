@@ -5,6 +5,7 @@ import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
 import tanks.Movable;
+import tanks.gui.screen.ScreenAutomatedTests;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.ScreenPartyHost;
 import tanks.network.NetworkEventMap;
@@ -12,7 +13,6 @@ import tanks.network.NetworkUtils;
 import tanks.network.event.INetworkEvent;
 import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
-import tanks.tank.TankRemote;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -122,25 +122,31 @@ public class ReplayEvents
             boolean remote = Replay.currentPlaying == null || !Replay.currentPlaying.forTests;
             ScreenPartyHost.isServer = remote;
             new Level(levelString).loadLevel(remote);
+            Game.currentLevel.clientStartingItems = Game.currentLevel.startingItems;
             ScreenPartyHost.isServer = false;
 
-            if (!Replay.currentPlaying.forTests)
+            int ind = -1;
+            for (Movable m : Game.movables)
             {
-                int ind = -1;
-                for (Movable m : Game.movables)
-                {
-                    ind++;
-                    if (!(m instanceof TankPlayer))
-                        continue;
+                ind++;
+                if (!(m instanceof TankPlayer))
+                    continue;
 
-                    TankRemote r = new TankRemote((Tank) m);
-                    r.isRemote = !Replay.currentPlaying.forTests;
-                    Game.movables.set(ind, r);
-                }
+                Game.movables.set(ind, new TankReplayPlayer((Tank) m));
             }
+            enterGame();
+            Drawing.drawing.terrainRenderer.reset();
+        }
 
-            Game.screen = new ScreenGame();
-            ((ScreenGame) Game.screen).playingReplay = true;
+        public static void enterGame()
+        {
+            ScreenGame g = new ScreenGame();
+            g.playingReplay = g.playing = true;
+
+            if (Game.screen instanceof ScreenAutomatedTests)
+                ((ScreenAutomatedTests) Game.screen).game = g;
+            else
+                Game.screen = g;
         }
     }
 

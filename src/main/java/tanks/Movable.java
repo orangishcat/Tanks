@@ -11,9 +11,6 @@ import tanks.obstacle.ISolidObject;
 import tanks.tank.NameTag;
 import tanks.tankson.MetadataProperty;
 
-/**
- * Shows how to add StatusEffect attributes directly into the attributes map.
- */
 public abstract class Movable extends GameObject implements IDrawableForInterface, ISolidObject
 {
 	public ObjectOpenHashSet<Chunk> prevChunks = new ObjectOpenHashSet<>();

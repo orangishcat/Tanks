@@ -1,6 +1,7 @@
 package tanks;
 
 import basewindow.InputCodes;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.extension.Extension;
 import tanks.gui.*;
 import tanks.gui.ScreenElement.CenterMessage;
@@ -104,7 +105,7 @@ public class Panel
 	protected Screen lastDrawnScreen = null;
 
 	public ArrayList<double[]> lights = new ArrayList<>();
-	HashMap<Integer, IStackableEvent> stackedEventsIn = new HashMap<>();
+	Int2ObjectOpenHashMap<IStackableEvent> stackedEventsIn = new Int2ObjectOpenHashMap<>();
 
 	public LoadingTerrainContinuation continuation = null;
 	public long continuationStartTime = 0;
@@ -1063,8 +1064,31 @@ public class Panel
 		if (ScreenPartyLobby.isClient || ScreenPartyHost.isServer)
 		{
 			Drawing.drawing.setColor(255, 227, 186);
-			Game.game.window.fontRenderer.drawString(boundary + 400, offset + (int) (Panel.windowHeight - 40 + 6), 0.4, 0.4, "Upstream: " + MessageReader.upstreamBytesPerSec / 1024 + "KB/s");
-			Game.game.window.fontRenderer.drawString(boundary + 400, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, "Downstream: " + MessageReader.downstreamBytesPerSec / 1024 + "KB/s");
+
+			String s = "Upstream: " + MessageReader.upstreamBytesPerSec / 1024 + "KB/s";
+			Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 6), 0.4, 0.4, s);
+
+			s = "Downstream: " + MessageReader.downstreamBytesPerSec / 1024 + "KB/s";
+			Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, s);
+		}
+	}
+
+	public static void setTickSprint(boolean tickSprint)
+	{
+		Panel.tickSprint = tickSprint;
+
+		if (Panel.tickSprint)
+		{
+			Game.vsync = false;
+			Game.maxFPS = 0;
+			Game.game.window.setVsync(false);
+			Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
+		}
+		else
+		{
+			ScreenOptions.loadOptions(Game.homedir);
+			Game.game.window.setVsync(Game.vsync);
+			Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
 		}
 	}
 

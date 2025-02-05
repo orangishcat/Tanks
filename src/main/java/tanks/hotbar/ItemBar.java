@@ -452,26 +452,23 @@ public class ItemBar
 
 	public void drawOverlay()
 	{
-		if (this.age - lastItemSwitch < 200)
-		{
-			if (Game.playerTank != null && !Game.playerTank.destroy)
-			{
-				double a = 1;
-				String icon = this.selectedIcon;
+        if (Game.followingCam || this.age - lastItemSwitch > 200 || Game.playerTank == null || Game.playerTank.destroy)
+            return;
 
-				if (this.selectedIcon == null)
-				{
-					a = 0.5;
-					icon = "noitem.png";
-				}
+        double a = 1;
+        String icon = this.selectedIcon;
 
-				Drawing.drawing.setColor(255, 255, 255, Math.min(1, 2 - (this.age - this.lastItemSwitch) / 100.0) * 255 * a);
+        if (this.selectedIcon == null)
+        {
+            a = 0.5;
+            icon = "noitem.png";
+        }
 
-				if (Game.enable3d)
-					Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.size, Game.tile_size, Game.tile_size);
-				else
-					Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.tile_size, Game.tile_size);
-			}
-		}
-	}
+        Drawing.drawing.setColor(255, 255, 255, Math.min(1, 2 - (this.age - this.lastItemSwitch) / 100.0) * 255 * a);
+
+        if (Game.enable3d)
+            Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.size, Game.tile_size, Game.tile_size);
+        else
+            Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.tile_size, Game.tile_size);
+    }
 }

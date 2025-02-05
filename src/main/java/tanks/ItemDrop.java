@@ -1,5 +1,6 @@
 package tanks;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.item.Item;
 import tanks.network.event.EventItemDropDestroy;
@@ -14,7 +15,7 @@ public class ItemDrop extends Movable
 {
     public static int currentID = 0;
     public static ArrayList<Integer> freeIDs = new ArrayList<>();
-    public static HashMap<Integer, ItemDrop> idMap = new HashMap<>();
+    public static Int2ObjectOpenHashMap<ItemDrop> idMap = new Int2ObjectOpenHashMap<>();
 
     public Item.ItemStack<?> item;
     public double height;

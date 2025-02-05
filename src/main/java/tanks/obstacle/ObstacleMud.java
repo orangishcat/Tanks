@@ -25,6 +25,8 @@ public class ObstacleMud extends Obstacle
         this.colorG = 30;
         this.colorB = 0;
 
+        this.unfavorability = 5;
+
         this.description = "A thick puddle of mud that slows tanks down";
 
         this.replaceTiles = true;

@@ -21,17 +21,11 @@ public class AttributeModifier
 	
 	/**Age at which the Attribute is at full strength*/
 	public double warmupAge = 0;
-	
 	public double value;
-	
 	public Operation operation;
-	
 	public double age;
-	
 	public boolean expired = false;
-	
 	public Type type;
-
 	public static HashMap<String, Type> attributeModifierTypes = new HashMap<>();
 
 	/** Changes the speed at which objects move */

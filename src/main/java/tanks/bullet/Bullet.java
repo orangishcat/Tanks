@@ -1,5 +1,6 @@
 package tanks.bullet;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.effect.AttributeModifier;
 import tanks.effect.EffectManager;
@@ -26,7 +27,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 {
 	public static int currentID = 0;
 	public static ArrayList<Integer> freeIDs = new ArrayList<>();
-	public static HashMap<Integer, Bullet> idMap = new HashMap<>();
+	public static Int2ObjectOpenHashMap<Bullet> idMap = new Int2ObjectOpenHashMap<>();
 
 	public static String bullet_class_name = "bullet";
 

@@ -171,7 +171,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
             {
                 double size = 0;
                 if (m instanceof Tank)
-                    size = ((Tank) m).size;
+                    size = ((Tank) m).size * ((Tank) m).hitboxSize;
                 else if (m instanceof Mine)
                     size = ((Mine) m).size;
                 else if (m instanceof Bullet)

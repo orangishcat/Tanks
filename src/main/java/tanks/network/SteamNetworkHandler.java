@@ -3,6 +3,7 @@ package tanks.network;
 import com.codedisaster.steamworks.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Game;
 import tanks.gui.Button;
 import tanks.gui.screen.*;
@@ -25,9 +26,9 @@ public class SteamNetworkHandler
 	public SteamID currentLobby = null;
 	protected int lastPlayerCount = -1;
 
-	protected HashMap<Integer, Long> toClose = new HashMap<>();
+	protected Int2ObjectOpenHashMap<Long> toClose = new Int2ObjectOpenHashMap<>();
 
-	public HashMap<Integer, ServerHandler> serverHandlersBySteamID = new HashMap<>();
+	public final Int2ObjectOpenHashMap<ServerHandler> serverHandlersBySteamID = new Int2ObjectOpenHashMap<>();
 
 	protected SteamAPIWarningMessageHook clMessageHook = (severity, message) -> System.err.println("[client debug message] (" + severity + ") " + message);
 
@@ -197,7 +198,8 @@ public class SteamNetworkHandler
 						if (s.steamID != null && serverHandlersBySteamID.get(s.steamID.getAccountID()) == null && !toClose.containsKey(s.steamID.getAccountID()))
 						{
 							s.channelInactive(null);
-							toClose.put(s.steamID.getAccountID(), System.currentTimeMillis());
+							Long l = System.currentTimeMillis();
+							toClose.put(s.steamID.getAccountID(), l);
 						}
 					}
 
@@ -342,7 +344,8 @@ public class SteamNetworkHandler
 		if (toClose.containsKey(remoteID))
 			return;
 
-		toClose.put(remoteID, System.currentTimeMillis());
+		Long l = System.currentTimeMillis();
+		toClose.put(remoteID, l);
 
 		synchronized (serverHandlersBySteamID)
 		{

@@ -19,6 +19,24 @@ public class ComputerFile extends BaseFile
     }
 
     @Override
+    public String read()
+    {
+        try
+        {
+            StringBuilder s = new StringBuilder();
+            scanner = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = scanner.readLine()) != null)
+                s.append(line).append("\n");
+            return s.toString();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public boolean exists()
     {
         return file.exists();

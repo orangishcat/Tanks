@@ -58,10 +58,7 @@ public class Team
 
 	protected static double[] setTeamColor(double r, double g, double b)
     {
-        teamColor[0] = r;
-        teamColor[1] = g;
-        teamColor[2] = b;
-        return teamColor;
+        return setTeamColor(teamColor, r, g, b);
     }
 
 	public static double[] getObjectColor(double[] col, double r, double g, double b, Movable m)

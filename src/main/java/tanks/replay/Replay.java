@@ -4,6 +4,8 @@ import basewindow.InputCodes;
 import tanks.Game;
 import tanks.Level;
 import tanks.Panel;
+import tanks.bullet.Bullet;
+import tanks.gui.Button;
 import tanks.gui.ScreenElement;
 import tanks.gui.TextBox;
 import tanks.gui.input.InputBinding;
@@ -42,6 +44,7 @@ public class Replay
 
     public ScreenGame prevGame;
     public Queue<Double> queue = new LinkedList<>();
+    public boolean allowControls = true;
 
     private static boolean fromPlayer(INetworkEvent e)
     {
@@ -51,7 +54,17 @@ public class Replay
             return isPlayer(((EventShootBullet) e).tank);
         else if (e instanceof EventLayMine)
             return isPlayer(((EventLayMine) e).tank);
+        else if (e instanceof EventBulletInstantWaypoint)
+            return isPlayerBullet(((EventBulletInstantWaypoint) e).bullet);
+        else if (e instanceof EventBulletDestroyed)
+            return isPlayerBullet(((EventBulletDestroyed) e).bullet);
         return false;
+    }
+
+    private static boolean isPlayerBullet(int bullet)
+    {
+        Bullet b = Bullet.idMap.get(bullet);
+        return b != null && b.tank instanceof TankPlayer;
     }
 
     private static boolean isPlayer(int id)
@@ -150,6 +163,9 @@ public class Replay
 
     public void updateControls()
     {
+        if (!allowControls)
+            return;
+
         if (left.isValid())
         {
             left.invalidate();
@@ -181,10 +197,11 @@ public class Replay
         {
             IReplayEvent event = getCurrentEvent();
             double eventCnt = 0;
-            while (event != null && age - lastAge > event.delay() * 0.1)
+            while (event != null && age - lastAge >= event.delay() * 0.1)
             {
                 eventCnt++;
                 event.execute();
+
                 lastAge += event.delay() * 0.1;
                 pos++;
                 event = getCurrentEvent();
@@ -258,13 +275,14 @@ public class Replay
     public static void stopRecording()
     {
         currentReplayToSave = currentReplay;
-        ReplayHandler.saveBox = new TextBox(0, 0, 350, 40, "Save replay", () ->
+        ReplayHandler.saveBox = new TextBox(0, 0, 350, 40, "Save replay", () -> {},
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm_ss")));
+        ReplayHandler.saveButton = new Button(0, 0, 170, 35, "Save", () ->
         {
             currentReplayToSave.save(ReplayHandler.saveBox.inputText);
-            Panel.notifs.add(new ScreenElement.Notification("Replay saved"));
             currentReplayToSave = null;
-        },
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH_mm_ss")));
+        });
+        ReplayHandler.cancel = new Button(0, 0, 170, 35, "Cancel", () -> currentReplayToSave = null);
         currentReplay = null;
     }
 

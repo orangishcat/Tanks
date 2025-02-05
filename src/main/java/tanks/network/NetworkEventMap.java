@@ -1,5 +1,6 @@
 package tanks.network;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Game;
 import tanks.network.event.INetworkEvent;
 
@@ -7,7 +8,7 @@ import java.util.HashMap;
 
 public class NetworkEventMap 
 {
-	protected static HashMap<Integer, Class<? extends INetworkEvent>> map1 = new HashMap<>();
+	protected static Int2ObjectOpenHashMap<Class<? extends INetworkEvent>> map1 = new Int2ObjectOpenHashMap<>();
 	protected static HashMap<Class<? extends INetworkEvent>, Integer> map2 = new HashMap<>();
 	protected static int id = 0;
 	

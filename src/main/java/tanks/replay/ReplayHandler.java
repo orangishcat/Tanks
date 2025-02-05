@@ -1,9 +1,9 @@
 package tanks.replay;
 
 import tanks.Drawing;
-import tanks.Game;
 import tanks.Level;
 import tanks.Panel;
+import tanks.gui.Button;
 import tanks.gui.ScreenElement;
 import tanks.gui.TextBox;
 import tanks.gui.screen.ScreenGame;
@@ -12,6 +12,7 @@ import static tanks.replay.Replay.*;
 public class ReplayHandler
 {
     static TextBox saveBox;
+    static Button saveButton, cancel;
 
     public static void draw()
     {
@@ -25,14 +26,19 @@ public class ReplayHandler
 
     private static void drawSavePopup(Replay r)
     {
-        double sX = 400, sY = 120;
-        double x = Drawing.drawing.getInterfaceEdgeX(true) - 10 - sX / 2, y = Drawing.drawing.interfaceSizeY * 0.25;
+        double sX = 400, sY = 180;
+        double x = Drawing.drawing.getInterfaceEdgeX(true) - 10 - sX / 2, y = Drawing.drawing.interfaceSizeY * 0.3;
         Drawing.drawing.setColor(0, 0, 0, 128);
-        Drawing.drawing.drawPopup(x, y, sX, sY, 5, 3);
+        Drawing.drawing.drawPopup(x, y + 20, sX, sY, 5, 3);
 
         if (saveBox != null)
         {
+            saveBox.enableCaps = true;
             saveBox.setPosition(x, y + 13);
+            saveButton.setPosition(x - 88, y + 60);
+            cancel.setPosition(x + 88, y + 60);
+            saveButton.draw();
+            cancel.draw();
             saveBox.draw();
         }
     }
@@ -100,13 +106,14 @@ public class ReplayHandler
         }
 
         if (Replay.currentReplayToSave != null)
+        {
             saveBox.update();
+            saveButton.update();
+            cancel.update();
+        }
 
         ScreenGame g = ScreenGame.getInstance();
         if (g == null)
             Replay.currentPlaying = null;
-
-        if ((g != null && g.playingReplay) && currentPlaying == null)
-            Game.exitToTitle();
     }
 }

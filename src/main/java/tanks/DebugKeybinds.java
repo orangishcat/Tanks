@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static tanks.Panel.notifs;
+import static tanks.Panel.tickSprint;
 
 public class DebugKeybinds
 {
@@ -42,13 +43,6 @@ public class DebugKeybinds
         {
             if (!Game.game.window.shift)
                 Replay.toggleRecording();
-
-            if (!Replay.isRecording || Game.game.window.shift)
-            {
-                if (Replay.isRecording)
-                    Replay.stopRecording();
-                Replay.read("test").loadAndPlay();
-            }
 
             notifs.add(new ScreenElement.Notification("Recording \u00a7255200000255"
                     + (Replay.isRecording ? "started" : "stopped")));
@@ -73,9 +67,9 @@ public class DebugKeybinds
                     + (Game.showHitboxes ? "shown" : "hidden"), 200));
         }
 
-        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_R))
+        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_V))
         {
-            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_R);
+            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_V);
             if (Game.currentLevel != null)
                 Game.currentLevel.reloadTiles();
             notifs.add(new ScreenElement.Notification(Game.currentLevel != null ? "Reloaded tiles" : "Reload tiles failed: " +
@@ -105,21 +99,7 @@ public class DebugKeybinds
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_LEFT_BRACKET))
         {
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_LEFT_BRACKET);
-            Panel.tickSprint = !Panel.tickSprint;
-
-            if (Panel.tickSprint)
-            {
-                Game.vsync = false;
-                Game.maxFPS = 0;
-                Game.game.window.setVsync(false);
-                Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
-            }
-            else
-            {
-                ScreenOptions.loadOptions(Game.homedir);
-                Game.game.window.setVsync(Game.vsync);
-                Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
-            }
+            Panel.setTickSprint(!tickSprint);
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_D))

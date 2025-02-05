@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.gui.IFixedMenu;
 import tanks.gui.Scoreboard;
@@ -51,7 +52,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
     public static int currentID = 0;
     public static ArrayList<Integer> freeIDs = new ArrayList<>();
-    public static HashMap<Integer, Mine> idMap = new HashMap<>();
+    public static Int2ObjectOpenHashMap<Mine> idMap = new Int2ObjectOpenHashMap<>();
 
     public double[] lightInfo = new double[]{0, 0, 0, 0, 0, 0, 0};
 
@@ -337,10 +338,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
     public static void drawRange2D(double posX, double posY, double size, boolean inverted)
     {
         int faces = (int) (size + 5);
-        double r = Drawing.drawing.currentColorR;
-        double g = Drawing.drawing.currentColorG;
-        double b = Drawing.drawing.currentColorB;
-        double a = Drawing.drawing.currentColorA;
+        double r = Drawing.drawing.currentColorR, g = Drawing.drawing.currentColorG, b = Drawing.drawing.currentColorB, a = Drawing.drawing.currentColorA;
 
         Game.game.window.shapeRenderer.setBatchMode(true, true, false);
         for (int f = 0; f < faces; f++)

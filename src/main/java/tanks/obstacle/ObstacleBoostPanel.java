@@ -28,7 +28,7 @@ public class ObstacleBoostPanel extends Obstacle
         this.checkForObjects = true;
 
         this.type = ObstacleType.ground;
-        this.update = true;
+        setUpdate(true);
 
         this.colorR = 255;
         this.colorG = 180;

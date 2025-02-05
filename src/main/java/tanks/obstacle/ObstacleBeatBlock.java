@@ -229,7 +229,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
         this.colorG = col[1] * 0.75 + 255 * 0.25;
         this.colorB = col[2] * 0.75 + 255 * 0.25;
 
-        this.update = true;
+        setUpdate(true);
         this.tankCollision = false;
         this.bulletCollision = false;
 

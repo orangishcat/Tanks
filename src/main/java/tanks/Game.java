@@ -161,7 +161,7 @@ public class Game
 
 	public static boolean vsync = true;
 	public static int maxFPS = 0;
-	public static int networkRate = 60;
+	public static int networkRate = 20;
 
 	public static boolean enable3d = true;
 	public static boolean enable3dBg = true;
@@ -286,11 +286,11 @@ public class Game
 	public static final String tutorialPath = directoryPath + "/tutorial.txt";
 	public static final String uuidPath = directoryPath + "/uuid";
 	public static final String levelDir = directoryPath + "/levels";
-	//public static final String modLevelDir = directoryPath + "/modlevels/";
 	public static final String crusadeDir = directoryPath + "/crusades";
 	public static final String savedCrusadePath = directoryPath + "/crusades/progress/";
 	public static final String itemDir = directoryPath + "/items";
 	public static final String tankDir = directoryPath + "/tanks";
+	public static final String buildDir = directoryPath + "/builds";
 	public static final String replaysDir = directoryPath + "/replays/";
 	public static final String extensionDir = directoryPath + "/extensions/";
 	public static final String crashesPath = directoryPath + "/crashes/";
@@ -515,7 +515,6 @@ public class Game
 		Drawing.initialize();
 		Panel.initialize();
 		Game.exitToTitle();
-		Compatibility.init();
 
 		Hotbar.toggle = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY - 20, 150, 40, "", () -> Game.player.hotbar.persistent = !Game.player.hotbar.persistent);
 
@@ -801,9 +800,6 @@ public class Game
 		o.removed = false;
 		Game.obstacles.add(o);
 		o.postOverride();
-
-		if (o.update)
-			Game.updateObstacles.add(o);
 
 		if (o instanceof IAvoidObject)
 			IAvoidObject.avoidances.add((IAvoidObject) o);
@@ -1123,6 +1119,7 @@ public class Game
 	 * @return all the obstacles within a certain radius of the position */
 	public static ObjectArrayList<Obstacle> getObstaclesInRadius(double posX, double posY, double radius)
 	{
+		obstacleOut.clear();
 		for (Chunk c : Chunk.getChunksInRadius(posX, posY, radius))
 		{
 			for (Obstacle o : c.obstacles)
@@ -1387,6 +1384,7 @@ public class Game
 		removeTracks.clear();
 		removeClouds.clear();
 		updateObstacles.clear();
+		checkUpdateObstacles.clear();
 
 		IAvoidObject.avoidances.clear();
 

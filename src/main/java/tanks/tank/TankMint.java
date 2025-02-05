@@ -32,9 +32,7 @@ public class TankMint extends TankAIControlled
 		this.bulletAvoidBehvavior = BulletAvoidBehavior.dodge;
 
 		if (Game.tankTextures)
-		{
-			this.baseModel = TankModels.diagonalStripes.base;
-		}
+            this.baseModel = TankModels.diagonalStripes.base;
 
 		this.coinValue = 2;
 

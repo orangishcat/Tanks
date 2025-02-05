@@ -3,7 +3,7 @@ package tanks.gui.screen;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.Button;
-import tanks.replay.Replay;
+import tanks.replay.ReplayIO;
 import tanks.tank.TankPlayer;
 
 public class ScreenDebug extends Screen
@@ -197,6 +197,6 @@ public class ScreenDebug extends Screen
     @Override
     public void onFilesDropped(String... filePaths)
     {
-        Replay.read(filePaths[0].substring(filePaths[0].lastIndexOf("/"), filePaths[0].lastIndexOf("."))).loadAndPlay();
+        ReplayIO.read(filePaths[0]).loadAndPlay();
     }
 }

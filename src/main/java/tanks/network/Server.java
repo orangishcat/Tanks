@@ -16,9 +16,8 @@ import tanks.network.event.EventKick;
 public class Server
 {
 	public int port;
-	public EventLoopGroup bossGroup;
-	public EventLoopGroup workerGroup;
-	public SynchronizedList<ServerHandler> connections = new SynchronizedList<>();
+	public EventLoopGroup bossGroup, workerGroup;
+	public final SynchronizedList<ServerHandler> connections = new SynchronizedList<>();
 
 	public Server instance = this;
 	public ChannelFuture channel;

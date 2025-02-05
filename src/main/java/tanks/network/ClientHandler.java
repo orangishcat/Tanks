@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Crusade;
 import tanks.Game;
 import tanks.Panel;
@@ -25,7 +26,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter
 {	
 	public String message = "";
 	public MessageReader reader = new MessageReader();
-	protected HashMap<Integer, IStackableEvent> stackedEvents = new HashMap<>();
+	protected Int2ObjectOpenHashMap<IStackableEvent> stackedEvents = new Int2ObjectOpenHashMap<>();
 	protected long lastStackedEventSend = 0;
 
 	public ChannelHandlerContext ctx;

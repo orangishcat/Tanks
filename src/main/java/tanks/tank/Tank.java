@@ -1,6 +1,7 @@
 package tanks.tank;
 
 import basewindow.Model;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.effect.AttributeModifier;
@@ -27,9 +28,10 @@ import static tanks.tank.TankPropertyCategory.*;
 
 public abstract class Tank extends Movable implements ISolidObject
 {
+	public static int updatesPerSecond = 20;
 	public static int currentID = 0;
 	public static ArrayList<Integer> freeIDs = new ArrayList<>();
-	public static HashMap<Integer, Tank> idMap = new HashMap<>();
+	public static Int2ObjectOpenHashMap<Tank> idMap = new Int2ObjectOpenHashMap<>();
 
 	public static Model health_model;
 
@@ -50,7 +52,6 @@ public abstract class Tank extends Movable implements ISolidObject
 	public boolean depthTest = true;
 
 	public boolean invulnerable = false;
-	public boolean targetable = true;
 	public double invulnerabilityTimer = 0;
 
 	public boolean disabled = false;
@@ -202,6 +203,9 @@ public abstract class Tank extends Movable implements ISolidObject
 	@TankBuildProperty @Property(category = general, id = "mandatory_kill", name = "Must be destroyed", desc="Whether the tank needs to be destroyed to clear the level")
 	public boolean mandatoryKill = true;
 
+	@TankBuildProperty @Property(category = general, id = "targetable", name = "Targetable")
+	public boolean targetable = true;
+
 	/** Used for custom tanks, see /music/tank for built-in tanks */
 	@Property(category = general, id = "music", name = "Music tracks", miscType = Property.MiscType.music)
 	public HashSet<String> musicTracks = new HashSet<>();
@@ -215,6 +219,7 @@ public abstract class Tank extends Movable implements ISolidObject
 	public Turret turret;
 
 	public boolean standardUpdateEvent = true;
+	public double stackedEventTimer = 0;
 
 	public boolean isBoss = false;
 	public Tank possessor;
@@ -637,8 +642,11 @@ public abstract class Tank extends Movable implements ISolidObject
 			}
 		}
 
-		if (this.standardUpdateEvent)
+		if (this.standardUpdateEvent && (stackedEventTimer -= Panel.frameFrequency) < -3 * networkID)
+		{
 			Game.eventsOut.add(new EventTankUpdate(this));
+			stackedEventTimer += 100. / Tank.updatesPerSecond;
+		}
 
 		this.canHide = true;
 		for (int i = 0; i < this.canHidePoints.length; i++)

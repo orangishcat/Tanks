@@ -40,7 +40,7 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 	public int drawLevel = 5;
 
 	public boolean checkForObjects = false;
-	public boolean update = false;
+	private boolean update = false;
 	public boolean bouncy = false;
 	public boolean allowBounce = true;
 	public boolean replaceTiles = true;
@@ -123,6 +123,11 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		Game.checkUpdateObstacles.add(this);
 	}
 
+	public boolean shouldUpdate()
+	{
+		return update;
+	}
+
 	@Override
 	public void drawForInterface(double x, double y)
 	{
@@ -184,13 +189,11 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 	public void update()
 	{
-		this.clipFrames--;
-		if (this.clipFrames <= 0)
+		if (this.clipFrames-- <= 0)
 		{
-			this.update = false;
+			setUpdate(false);
 			this.shouldClip = false;
 		}
-
 	}
 
 	public void onNeighborUpdate()
@@ -357,10 +360,10 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 	public void refreshHitboxes()
 	{
-		Chunk.FaceList f = Chunk.getChunk(posX, posY).staticFaces;
-		f.removeFaces(this);
-        if (tankCollision || bulletCollision)
-            f.addFaces(this);
+		Chunk c = Chunk.getChunk(posX, posY);
+		if (c == null) return;
+		c.removeObstacle(this);
+		c.addObstacle(this);
 		afterAdd();
     }
 

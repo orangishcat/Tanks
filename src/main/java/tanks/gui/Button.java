@@ -286,6 +286,23 @@ public class Button implements IDrawable, ITrigger
 			drawing.drawTooltip(dragTooltip.split("---"));
 	}
 
+	public Button fullImage(String image, double imageSizeX, double imageSizeY)
+	{
+		this.fullInfo = true;
+		this.image = image;
+		this.imageSizeX = imageSizeX;
+		this.imageSizeY = imageSizeY;
+		return this;
+	}
+
+	public Button imageOffset(double x, double y)
+	{
+		this.imageXOffset = x;
+		this.imageYOffset = y;
+		return this;
+	}
+
+
 	@Override
 	public void setPosition(double x, double y)
 	{

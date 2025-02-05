@@ -168,9 +168,7 @@ public class Chunk implements Comparable<Chunk>
             return;
 
         obstacles.remove(o);
-
-        if (o.tankCollision || o.bulletCollision)
-            staticFaces.removeFaces(o);
+        staticFaces.removeFaces(o);
     }
 
     public static ObjectArrayList<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)

@@ -1,6 +1,7 @@
 package tanks.rendering;
 
 import basewindow.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.gui.ScreenIntro;
 import tanks.gui.screen.*;
@@ -12,9 +13,9 @@ import java.util.HashMap;
 public class TerrainRenderer
 {
     public static final int section_size = 2000;
-    protected final HashMap<Class<? extends ShaderGroup>, HashMap<Integer, RegionRenderer>> renderers = new HashMap<>();
+    protected final HashMap<Class<? extends ShaderGroup>, Int2ObjectOpenHashMap<RegionRenderer>> renderers = new HashMap<>();
     protected final HashMap<IBatchRenderableObject, RegionRenderer> renderersByObj = new HashMap<>();
-    protected final HashMap<Integer, RegionRenderer> outOfBoundsRenderers = new HashMap<>();
+    protected final Int2ObjectOpenHashMap<RegionRenderer> outOfBoundsRenderers = new Int2ObjectOpenHashMap<>();
     public double age = 0;
     public boolean staged = false;
     public double offX;
@@ -95,16 +96,16 @@ public class TerrainRenderer
         }
     }
 
-    public HashMap<Integer, RegionRenderer> getRenderers(Class<? extends ShaderGroup> s)
+    public Int2ObjectOpenHashMap<RegionRenderer> getRenderers(Class<? extends ShaderGroup> s)
     {
-        this.renderers.computeIfAbsent(s, k -> new HashMap<>());
+        this.renderers.computeIfAbsent(s, k -> new Int2ObjectOpenHashMap<>());
         return renderers.get(s);
     }
 
     public RegionRenderer getRenderer(IBatchRenderableObject o, double x, double y, boolean outOfBounds)
     {
         RegionRenderer s = null;
-        HashMap<Integer, RegionRenderer> renderers = this.outOfBoundsRenderers;
+        Int2ObjectOpenHashMap<RegionRenderer> renderers = this.outOfBoundsRenderers;
 
         Class<? extends ShaderGroup> sg = ShaderGroup.class;
 
@@ -475,7 +476,7 @@ public class TerrainRenderer
 
     public void reset()
     {
-        for (HashMap<Integer, RegionRenderer> h : this.renderers.values())
+        for (Int2ObjectOpenHashMap<RegionRenderer> h : this.renderers.values())
             for (RegionRenderer r : h.values())
                 r.renderer.free();
 
@@ -490,7 +491,7 @@ public class TerrainRenderer
         this.stagedCount = 0;
     }
 
-    public void drawMap(HashMap<Integer, RegionRenderer> renderers, int xOffset, int yOffset)
+    public void drawMap(Int2ObjectOpenHashMap<RegionRenderer> renderers, int xOffset, int yOffset)
     {
         for (RegionRenderer s : renderers.values())
         {

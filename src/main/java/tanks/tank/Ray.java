@@ -87,6 +87,7 @@ public class Ray
 		this.ignoreDestructible = false;
 		this.ignoreShootThrough = false;
 
+		this.acquiredTarget = false;
 		this.tank = tank;
 
 		this.bounceX.clear();

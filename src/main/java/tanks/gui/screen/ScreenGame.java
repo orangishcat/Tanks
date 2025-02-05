@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGameScreen
 {
-	public static final double sensitivity = 1;
+	public static double sensitivity = 0.2;
 
 	public boolean playing = false;
 	public boolean paused = false;
@@ -107,7 +107,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	public boolean zoomPressed, zoomScrolled;
 
 	public static boolean fcZoomPressed = false;
-	public double fcZoomLastTap, fcZoom, fcTargetZoom, fcPitch;
+	public static double fcZoom, fcTargetZoom;
+	public double fcZoomLastTap, fcPitch;
 	public boolean selectedArcBullet = false;
 	public double fcArcAim;
 
@@ -281,9 +282,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			}
 		}
 
-		ScreenGame s = new ScreenGame();
-		s.name = name;
-		Game.screen = s;
+		Game.screen = new ScreenGame(name);
 	}
 	);
 
@@ -529,6 +528,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 	public ButtonList npcShopList = new ButtonList(new ArrayList<>(), 0, 0, (int) shopOffset, -30);
 	public double gameAge = 0;
+	public boolean playSounds = true;
 
 	public ScreenGame()
 	{
@@ -661,7 +661,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		if (Game.followingCam)
 			Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
 
-		Game.game.window.setCursorLocked(false);
 		Game.game.window.setShowCursor(!Panel.showMouseTarget);
 	}
 
@@ -669,7 +668,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	{
 		this.paused = false;
 		Game.playerTank.setBufferCooldown(20);
-		Game.game.window.setCursorLocked(Game.followingCam);
 		updateMousePos();
 
 		Game.game.window.setShowCursor(!Game.followingCam && !Panel.showMouseTarget);
@@ -809,7 +807,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			o.removed = true;
 			Drawing.drawing.terrainRenderer.remove(o);
 
-			if (o.update)
+			if (o.shouldUpdate())
 				Game.updateObstacles.remove(o);
 
 			int x = (int) (o.posX / Game.tile_size);
@@ -817,7 +815,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 			if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 			{
-				Game.redraw(o);
 				Game.removeObstacle(o);
 				Game.removeSurfaceObstacle(o);
 			}
@@ -856,6 +853,10 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		}
 
 		fcZoomPressed = Game.game.input.fcZoom.isPressed();
+		if (Math.abs(fcTargetZoom - fcZoom) < 0.05)
+			fcZoom = fcTargetZoom;
+		else
+			fcZoom += (fcTargetZoom - fcZoom) / 10;
 
 		if (fcZoomPressed)
 		{
@@ -874,7 +875,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.validScrollUp = false;
 			}
 
-			if (Game.game.window.validScrollDown && fcTargetZoom > 0)
+			if (Game.game.window.validScrollDown && fcTargetZoom > -0.9)
 			{
 				fcTargetZoom -= 0.1;
 				Game.game.window.validScrollDown = false;
@@ -933,6 +934,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		this.enableMargins = !Game.followingCam;
 		Game.game.input.perspective.invalidate();
 	}
+
+	public ObjectArrayList<Team> aliveTeams = new ObjectArrayList<>(), fullyAliveTeams = new ObjectArrayList<>();
 
 	@Override
 	public void update()
@@ -1084,14 +1087,18 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			if (!this.playedIntro)
 			{
 				this.playedIntro = true;
-				if (Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).customIntroMusic)
-					Drawing.drawing.playSound(((Minigame) Game.currentLevel).introMusic, 1f, true);
-				else if (Game.currentLevel != null && Game.currentLevel.timed)
-					Drawing.drawing.playSound("battle_timed_intro.ogg", 1f, true);
-				else if (Level.isDark())
-					Drawing.drawing.playSound("battle_night_intro.ogg", 1f, true);
-				else
-					Drawing.drawing.playSound("battle_intro.ogg", 1f, true);
+
+				if (playSounds)
+				{
+					if (Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).customIntroMusic)
+						Drawing.drawing.playSound(((Minigame) Game.currentLevel).introMusic, 1f, true);
+					else if (Game.currentLevel != null && Game.currentLevel.timed)
+						Drawing.drawing.playSound("battle_timed_intro.ogg", 1f, true);
+					else if (Level.isDark())
+						Drawing.drawing.playSound("battle_night_intro.ogg", 1f, true);
+					else
+						Drawing.drawing.playSound("battle_intro.ogg", 1f, true);
+				}
 
 				if (Game.currentLevel.beatBlocks > 0 && Game.enableLayeredMusic)
 				{
@@ -1117,7 +1124,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		if (this.playCounter * 10 >= introBattleMusicEnd)
 		{
-			Panel.forceRefreshMusic = true;
+			Panel.forceRefreshMusic = playSounds;
 			this.playCounter = -2;
 		}
 
@@ -1151,7 +1158,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			{
 				this.musicStarted = true;
 				prevMusic = this.music;
-				Panel.panel.playScreenMusic(0);
+				if (playSounds)
+					Panel.panel.playScreenMusic(0);
 			}
 
 			this.prevTankMusics.clear();
@@ -1185,20 +1193,23 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				}
 			}
 
-			for (String m : this.prevTankMusics)
+			if (playSounds)
 			{
-				if (!this.tankMusics.contains(m))
-					Drawing.drawing.removeSyncedMusic(m, 500);
-			}
-
-			for (String m : this.tankMusics)
-			{
-				if (!this.prevTankMusics.contains(m))
+				for (String m : this.prevTankMusics)
 				{
-					if (this.playCounter == -2 && m.startsWith("beatblocks/"))
-						Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 0);
-					else
-						Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 500);
+					if (!this.tankMusics.contains(m))
+						Drawing.drawing.removeSyncedMusic(m, 500);
+				}
+
+				for (String m : this.tankMusics)
+				{
+					if (!this.prevTankMusics.contains(m))
+					{
+						if (this.playCounter == -2 && m.startsWith("beatblocks/"))
+							Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 0);
+						else
+							Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 500);
+					}
 				}
 			}
 
@@ -1358,11 +1369,11 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				this.exitShop.update();
 
 				if (this.buildsScreen)
-				{
-					if (Game.player.tank != null)
+                {
+                    if (Game.player.tank != null)
                         for (int i = 0; i < this.builds.size(); i++)
                             this.playerBuildsList.buttons.get(i).enabled = !this.builds.get(i).name.equals(Game.player.buildName);
-					this.playerBuildsList.update();
+                    this.playerBuildsList.update();
 				}
 				else if (this.shopScreen)
 				{
@@ -1512,9 +1523,10 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			if ((!freecam || controlPlayer) && Game.followingCam)
 				updateFollowingCam();
 
+			aliveTeams.clear();
+			fullyAliveTeams.clear();
+
 			Obstacle.draw_size = Math.min(Game.tile_size, Obstacle.draw_size);
-			ArrayList<Team> aliveTeams = new ArrayList<>();
-			ArrayList<Team> fullyAliveTeams = new ArrayList<>();
 
 			for (Effect e : Game.effects)
 				e.update();
@@ -1548,7 +1560,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 			for (Obstacle o : Game.checkUpdateObstacles)
 			{
-				if (o.update)
+				if (o.shouldUpdate())
 					Game.updateObstacles.add(o);
 				else
 					Game.updateObstacles.remove(o);
@@ -1653,7 +1665,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			{
 				if (!ScreenGame.finishedQuick)
 				{
-					Panel.forceRefreshMusic = true;
+					Panel.forceRefreshMusic = playSounds;
 
 					if (Game.playerTank != null && (fullyAliveTeams.contains(Game.playerTank.team) || (!fullyAliveTeams.isEmpty() && fullyAliveTeams.get(0).name.equals(Game.clientID.toString()))))
 					{
@@ -1663,7 +1675,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 							restartCrusadeParty.enabled = false;
 						}
 
-						if (!ScreenPartyLobby.isClient)
+						if (!ScreenPartyLobby.isClient && playSounds)
 						{
 							Drawing.drawing.playSound("win.ogg", 1.0f, true);
 							Panel.win = true;
@@ -1671,7 +1683,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 					}
 					else
 					{
-						if (!ScreenPartyLobby.isClient)
+						if (!ScreenPartyLobby.isClient && playSounds)
 						{
 							Drawing.drawing.playSound("lose.ogg", 1.0f, true);
 
@@ -1967,13 +1979,13 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	public void updateMusic(String prevMusic)
 	{
 		if (this.music == null && prevMusic != null)
-			Panel.forceRefreshMusic = true;
+			Panel.forceRefreshMusic = playSounds;
 
 		if (this.music != null && prevMusic == null)
-			Panel.forceRefreshMusic = true;
+			Panel.forceRefreshMusic = playSounds;
 
 		if (this.music != null && !this.music.equals(prevMusic))
-			Panel.forceRefreshMusic = true;
+			Panel.forceRefreshMusic = playSounds;
 
 		if (this.musicID != null && this.musicID.equals("ready"))
 		{
@@ -2193,7 +2205,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.0575 * frac, 0.9 * frac));
 
 				if (fcZoom > 0)
-					Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, 1 - fcZoom, 0, 0, 0));
+					Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, fcZoom + 1, 0, 0, 0));
 			}
 
 			if (freecam)
@@ -2785,6 +2797,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	{
 		if (Game.screen instanceof ScreenGame)
 			return (ScreenGame) Game.screen;
+		if (Game.screen instanceof IGameOverlayScreen)
+			return ((IGameOverlayScreen) Game.screen).getGameScreen();
 		return null;
 	}
 

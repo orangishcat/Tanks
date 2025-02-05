@@ -339,6 +339,10 @@ public class TankAIControlled extends Tank implements ITankField
 
 	/** Stores directions a tank may flee from a bullet, relative to that bullet's direction */
 	protected double[] fleeDirections = new double[fleeDistances.length];
+	/** The maximum amount of empty space that the tank has in a certain direction */
+	protected double maxEmptySpace;
+	/** The angle where the tank has the maximum amount of empty space */
+	protected double bestFleeAngle;
 
 	/** Cooldown before the tank will turn again if it's running into a wall */
 	protected double gentleTurnCooldown = 0;
@@ -426,6 +430,8 @@ public class TankAIControlled extends Tank implements ITankField
 
 	/** Normally the nearest tank not on this tank's team. This is the tank that this tank will fight.*/
 	protected Movable targetEnemy;
+	/** A secondary enemy, which is targeted if {@linkplain #targetEnemy} is not in sight. */
+	protected Movable secondary;
 
 	/** True if can find an enemy*/
 	protected boolean hasTarget = true;
@@ -538,9 +544,7 @@ public class TankAIControlled extends Tank implements ITankField
 		this.shootAIType = ai;
 
 		for (int i = 0; i < fleeDirections.length; i++)
-		{
-			fleeDirections[i] = Math.PI / 4 + ((double) i * 2 / fleeDirections.length) * Math.PI / 2 + i * Math.PI / fleeDirections.length;
-		}
+            fleeDirections[i] = Math.PI / 4 + ((double) i * 2 / fleeDirections.length) * Math.PI / 2 + i * Math.PI / fleeDirections.length;
 
 		this.fromRegistry = !this.getClass().equals(TankAIControlled.class);
 	}
@@ -564,9 +568,9 @@ public class TankAIControlled extends Tank implements ITankField
 		this.baseColorB = this.colorB;
 		this.idleTimer = (this.random.nextDouble() * turretIdleTimerRandom) + turretIdleTimerBase;
 
-		if (this.targetEnemySightBehavior == TargetEnemySightBehavior.sidewind)
+		if (targetEnemySightBehavior == TargetEnemySightBehavior.sidewind)
 			this.strafeDirection /= 2;
-		else if (this.targetEnemySightBehavior == TargetEnemySightBehavior.backwind)
+		else if (targetEnemySightBehavior == TargetEnemySightBehavior.backwind)
 			this.strafeDirection *= 1.5;
 
 		if (this.random.nextDouble() < 0.5)
@@ -712,7 +716,7 @@ public class TankAIControlled extends Tank implements ITankField
 						this.shootTimer = -this.shootRoundTime / 2;
 						this.shots = 0;
 						this.fanDirection = this.random.nextDouble() < 0.5 ? 1 : -1;
-						this.fanOffset = (this.random.nextDouble() * this.aimAccuracyOffset - (this.aimAccuracyOffset / 2)) / Math.max((Movable.distanceBetween(this, this.targetEnemy) / 1000.0), 2);
+						this.fanOffset = (this.random.nextDouble() * this.aimAccuracyOffset - (this.aimAccuracyOffset / 2)) / Math.max((Movable.distanceBetween(this, targetEnemy) / 1000.0), 2);
 					}
 				}
 				else if (!arc)
@@ -721,17 +725,17 @@ public class TankAIControlled extends Tank implements ITankField
 					if (this.bullet instanceof BulletGas)
 						extra = ((BulletGas) this.bullet).endSize / 2;
 
-					if (this.targetEnemy instanceof Tank)
-						extra += ((Tank) this.targetEnemy).size / 2;
+					if (targetEnemy instanceof Tank)
+						extra += ((Tank) targetEnemy).size / 2;
 
-					boolean inRange = (range <= 0) || (Movable.distanceBetween(this, this.targetEnemy) <= range + extra);
+					boolean inRange = (range <= 0) || (Movable.distanceBetween(this, targetEnemy) <= range + extra);
 					if (!inRange)
 						return;
 
 					double an = this.angle;
 
-					if (this.targetEnemy != null && this.enablePredictiveFiring && this.shootAIType == ShootAI.straight)
-						an = this.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY);
+					if (targetEnemy != null && this.enablePredictiveFiring && this.shootAIType == ShootAI.straight)
+						an = this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY);
 
 					Ray a2 = Ray.newRay(this.posX, this.posY, an, this.bullet.bounces, this);
 					a2.size = this.bullet.size;
@@ -813,7 +817,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 		Movable m = a.getTarget();
 
-		if (this.isSupportTank() || (!Team.isAllied(this, m) && this.isTargetSafe(a.posX, a.posY)))
+		if ((this.isSupportTank() == Team.isAllied(this, m) || m instanceof Mine) && this.isTargetSafe(a.posX, a.posY, m) && this.isTargetSafe(a.posX, a.posY, targetEnemy))
 		{
 			this.shotOffset = offset;
 			this.bulletItem.attemptUse(this);
@@ -850,18 +854,25 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 	}
 
-	public boolean isTargetSafe(double posX, double posY)
+	public boolean isTargetSafe(double posX, double posY, Movable hit)
 	{
+		double r = 0;
+
 		if (this.bullet.hitExplosion != null)
+			r = bullet.hitExplosion.radius;
+		if (hit instanceof Mine)
+			r = Math.max(r, ((Mine) hit).getRadius() * mineAvoidSensitivity * 0.8);
+
+		if (r >= 0)
 		{
-			for (Movable m2 : Game.movables)
+			for (Movable m2 : Game.getMovablesInRadius(posX, posY, r))
 			{
-				if (Team.isAllied(m2, this) && m2 instanceof Tank && !((Tank) m2).resistExplosions && (this.team == null || this.team.friendlyFire) && Math.pow(m2.posX - posX, 2) + Math.pow(m2.posY - posY, 2) <= Math.pow(Mine.mine_size, 2))
+				if (Team.isAllied(m2, this) && m2 instanceof Tank && !((Tank) m2).resistExplosions && (this.team == null || this.team.friendlyFire))
 					return false;
 			}
 		}
 
-		return true;
+        return true;
 	}
 
 	/** Actually fire a bullet*/
@@ -933,13 +944,26 @@ public class TankAIControlled extends Tank implements ITankField
 					lowPriority = lowP;
 				}
 			}
+			else if (m instanceof Mine && ((Mine) m).tank == this && this.shootAIType == ShootAI.straight)
+                secondary = m;
 		}
 
-		if (this.targetEnemy != nearest)
+		if (secondary != null && secondary.destroy)
+		{
+			if (secondary instanceof Mine)
+				seekPause = Math.max(0, seekPause - ((Mine) secondary).timer);
+			secondary = null;
+		}
+
+		if (targetEnemy != nearest)
 			this.cooldownStacks = 0;
 
-		this.targetEnemy = nearest;
-	}
+        if (secondary == null || nearest == null ||
+                Ray.newRay(posX, posY, getAngleInDirection(nearest.posX, nearest.posY), 0, this).getTarget() == nearest)
+            targetEnemy = nearest;
+		else
+			targetEnemy = secondary;
+    }
 
 	public boolean updateTargetMimic()
 	{
@@ -969,10 +993,10 @@ public class TankAIControlled extends Tank implements ITankField
 			}
 		}
 
-		this.targetEnemy = nearest;
-		this.canCurrentlyMimic = this.targetEnemy != null;
+		targetEnemy = nearest;
+		this.canCurrentlyMimic = targetEnemy != null;
 
-		return this.targetEnemy != null;
+		return targetEnemy != null;
 	}
 
 	public void updateMotionAI()
@@ -990,7 +1014,7 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			fleeDirection = -fleeDirection;
 
-			if (this.targetEnemy != null && this.seesTargetEnemy && this.enableTargetEnemyReaction && this.enableLookingAtTargetEnemy)
+			if (targetEnemy != null && this.seesTargetEnemy && this.enableTargetEnemyReaction && this.enableLookingAtTargetEnemy)
 			{
 				if (this.currentlySeeking)
 				{
@@ -1013,7 +1037,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void reactToTargetEnemySight()
 	{
-		if (this.targetEnemy == null)
+		if (targetEnemy == null)
 			return;
 
 		this.overrideDirection = true;
@@ -1021,23 +1045,23 @@ public class TankAIControlled extends Tank implements ITankField
 		if (this.stopSeekingOnSight)
 			this.currentlySeeking = false;
 
-		if (this.suicidal || this.targetEnemySightBehavior == TargetEnemySightBehavior.approach)
-			this.setAccelerationInDirection(targetEnemy.posX, targetEnemy.posY, this.acceleration);
-		else if (this.targetEnemySightBehavior == TargetEnemySightBehavior.flee)
-			this.setAccelerationAwayFromDirection(targetEnemy.posX, targetEnemy.posY, this.acceleration);
-		else if (this.targetEnemySightBehavior == TargetEnemySightBehavior.strafe || this.targetEnemySightBehavior == TargetEnemySightBehavior.sidewind || this.targetEnemySightBehavior == TargetEnemySightBehavior.backwind)
+		if (this.suicidal || targetEnemySightBehavior == TargetEnemySightBehavior.approach)
+			this.setAccelInDir(targetEnemy.posX, targetEnemy.posY, this.acceleration);
+		else if (targetEnemySightBehavior == TargetEnemySightBehavior.flee)
+			this.setAccelAwayFromDir(targetEnemy.posX, targetEnemy.posY, this.acceleration);
+		else if (targetEnemySightBehavior == TargetEnemySightBehavior.strafe || targetEnemySightBehavior == TargetEnemySightBehavior.sidewind || targetEnemySightBehavior == TargetEnemySightBehavior.backwind)
 		{
 			if (this.random.nextDouble() < this.strafeDirectionChangeChance * Panel.frameFrequency)
 				strafeDirection = -strafeDirection;
 
-			this.setAccelerationInDirectionWithOffset(this.targetEnemy.posX, this.targetEnemy.posY, this.acceleration * 2, strafeDirection);
+			this.setAccelInDirWithOffset(targetEnemy.posX, targetEnemy.posY, this.acceleration * 2, strafeDirection);
 		}
-		else if (this.targetEnemySightBehavior == TargetEnemySightBehavior.keep_distance)
+		else if (targetEnemySightBehavior == TargetEnemySightBehavior.keep_distance)
 		{
-			if (Movable.distanceBetween(this, this.targetEnemy) < this.targetSightDistance)
-				this.setAccelerationAwayFromDirection(targetEnemy.posX, targetEnemy.posY, this.acceleration);
+			if (Movable.distanceBetween(this, targetEnemy) < this.targetSightDistance)
+				this.setAccelAwayFromDir(targetEnemy.posX, targetEnemy.posY, this.acceleration);
 			else
-				this.setAccelerationInDirection(targetEnemy.posX, targetEnemy.posY, this.acceleration);
+				this.setAccelInDir(targetEnemy.posX, targetEnemy.posY, this.acceleration);
 		}
 	}
 
@@ -1084,7 +1108,7 @@ public class TankAIControlled extends Tank implements ITankField
 		t.angle = this.angle;
 		t.pitch = this.pitch;
 		t.team = this.team;
-		t.health = this.health;
+		t.health = Math.min(t.baseHealth, this.health);
 		t.orientation = this.orientation;
 		t.drawAge = this.drawAge;
 		t.possessor = this;
@@ -1205,7 +1229,7 @@ public class TankAIControlled extends Tank implements ITankField
 			if (!this.parent.destroy && Math.sqrt(Math.pow(this.posX - this.parent.posX, 2) + Math.pow(this.posY - this.parent.posY, 2)) > this.maxDistanceFromParent)
 			{
 				this.overrideDirection = true;
-				this.setAccelerationInDirection(this.parent.posX, this.parent.posY, this.acceleration);
+				this.setAccelInDir(this.parent.posX, this.parent.posY, this.acceleration);
 			}
 		}
 	}
@@ -1301,9 +1325,7 @@ public class TankAIControlled extends Tank implements ITankField
 		this.seekTimer -= Panel.frameFrequency;
 
 		/*for (Tile t: this.path)
-		{
-			Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser));
-		}*/
+            Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser));*/
 
 		if (this.path.isEmpty())
 		{
@@ -1312,32 +1334,30 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 
 		Tile t = this.path.get(0);
+		this.setAccelInDirWithOffset(t.shiftedX, t.shiftedY, this.acceleration, (seekTimerBase - seekTimer) % 100 < 50 ? 0.2 : -0.2);
 
-		//double frac = Math.max(Math.min(1, (seekTimerBase - seekTimer) / seekTurnBase), 0);
-
-		//double pvX = this.vX;
-		//double pvY = this.vY;
-
-		this.setAccelerationInDirection(t.shiftedX, t.shiftedY, this.acceleration);
-		//this.vX = this.vX * frac + pvX * (1 - frac);
-		//this.vY = this.vY * frac + pvY * (1 - frac);
-
-		double mul = 1;
-
-		if (!this.path.isEmpty() && this.path.get(0).type == Tile.Type.destructible)
-			mul = 3;
-		else if (this.path.size() > 1 && this.path.get(1).type == Tile.Type.destructible)
-			mul = 2;
-
-		if (Math.pow(t.shiftedX - this.posX, 2) + Math.pow(t.shiftedY - this.posY, 2) <= Math.pow(Game.tile_size / 2 * mul, 2))
+        if (Math.pow(t.shiftedX - this.posX, 2) + Math.pow(t.shiftedY - this.posY, 2) <= Math.pow(size * 1.2, 2))
 		{
 			this.seekTimer = this.seekTimerBase;
 
 			if (this.path.get(0).type == Tile.Type.destructible)
 			{
-				this.mineItem.attemptUse(this);
-				this.seekTimer = this.seekTimerBase * 2;
-				this.seekPause = this.mine.timer;
+				boolean found = false;
+				for (Obstacle o : Game.getObstaclesInRadius(posX, posY, size * 1.2))
+				{
+                    if (o.destructible)
+                    {
+                        found = true;
+                        break;
+                    }
+				}
+
+				if (found)
+				{
+					this.mineItem.attemptUse(this);
+					this.seekTimer = this.seekTimerBase * 2;
+					this.seekPause = mine.timer;
+				}
 			}
 
 			this.path.remove(0);
@@ -1487,7 +1507,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (this.enableMovement)
 		{
 			if (!Movable.withinRange(this, nearest, Game.tile_size * 4) && avoidanceSeekOpenSpaces)
-                seekOpenSpaces(nearest);
+                seekOpenSpaces(nearest.getPolarDirection());
 			else
                 dodgeBullet(nearest, nearestTarget);
 		}
@@ -1543,24 +1563,23 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 	}
 
-	public void seekOpenSpaces(Bullet nearest)
+	public void seekOpenSpaces(double objDir)
 	{
 		if ((seekSpaceTimer -= Panel.frameFrequency) > 0)
 			return;
 
 		seekSpaceTimer = 25;
 
-		double bulletDir = nearest.getPolarDirection();
 		int count = fleeDistances.length;
 		double[] d = fleeDistances;
 
 		for (int dir = 0; dir < count; dir++)
 		{
-			Ray r = Ray.newRay(this.posX, this.posY, bulletDir + fleeDirections[dir], 0, this, Game.tile_size).setMaxChunks(4);
+			Ray r = Ray.newRay(this.posX, this.posY, objDir + fleeDirections[dir], 0, this, Game.tile_size).setMaxChunks(4);
 			r.size = Game.tile_size * this.hitboxSize - 1;
 
-			boolean b = this.targetEnemy != null && this.bulletAvoidBehvavior == BulletAvoidBehavior.aggressive_dodge &&
-					Movable.absoluteAngleBetween(fleeDirections[dir] + bulletDir, this.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY)) > Math.PI * 0.5;
+			boolean b = targetEnemy != null && this.bulletAvoidBehvavior == BulletAvoidBehavior.aggressive_dodge &&
+					Movable.absoluteAngleBetween(fleeDirections[dir] + objDir, this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY)) > Math.PI * 0.5;
 			double dist = r.getDist();
 			d[dir] = dist;
 			if (b) d[dir] = Math.min(d[dir] - Game.tile_size, Game.tile_size * 3);
@@ -1578,7 +1597,7 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 
 		if (gValue < Game.tile_size * 4)
-			this.avoidDirection = bulletDir + fleeDirections[greatest];
+			this.avoidDirection = objDir + fleeDirections[greatest];
 		else if (this.avoidTimer <= 0)
 		{
 			// randomly pick one >= 3 tiles
@@ -1587,7 +1606,7 @@ public class TankAIControlled extends Tank implements ITankField
 				int c = (int) (this.random.nextDouble() * count);
 				if (d[c] >= Game.tile_size * 4)
 				{
-					this.avoidDirection = bulletDir + fleeDirections[greatest];
+					this.avoidDirection = objDir + fleeDirections[greatest];
 					break;
 				}
 			}
@@ -1644,7 +1663,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateTurretFan()
 	{
-		if (this.shootTimer <= -this.shootRoundTime / 2 && this.targetEnemy != null)
+		if (this.shootTimer <= -this.shootRoundTime / 2 && targetEnemy != null)
 		{
 			double a = this.aimAngle;
 
@@ -1753,6 +1772,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateTurretStraight()
 	{
+
 		if (this.avoidTimer > 0 && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy && (this.enableMovement || this.nearestBulletDeflectDist <= this.bulletThreatCount * Math.max(Math.max(this.cooldownBase, this.bulletItem.item.cooldownBase), 50) * 1.5))
 		{
 			double a = this.nearestBulletDeflect.getAngleInDirection(this.posX + Game.tile_size / this.bullet.speed * this.nearestBulletDeflect.vX, this.posY + Game.tile_size / this.bullet.speed * this.nearestBulletDeflect.vY);
@@ -1770,7 +1790,7 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 		else
 		{
-			if (this.hasTarget && this.targetEnemy != null)
+			if (this.hasTarget && targetEnemy != null)
 			{
 				if (this.bullet instanceof BulletArc)
 					this.setAimAngleArc();
@@ -1779,7 +1799,7 @@ public class TankAIControlled extends Tank implements ITankField
 			}
 		}
 
-		if (!this.hasTarget || this.targetEnemy == null)
+		if (!this.hasTarget || targetEnemy == null)
 			return;
 
 		if (this.bullet instanceof BulletArc)
@@ -1813,25 +1833,26 @@ public class TankAIControlled extends Tank implements ITankField
 		else
 			this.angle = this.aimAngle;
 
-		if (this.seesTargetEnemy && this.targetEnemy != null && Movable.distanceBetween(this, this.targetEnemy) < Game.tile_size * 6 && !chargeUp)
+		if (this.seesTargetEnemy && Movable.distanceBetween(this, targetEnemy) < Game.tile_size * 6 && !chargeUp)
 			this.cooldown -= Panel.frameFrequency;
 	}
 
 	public void setAimAngleStraight()
 	{
-		if (this.enablePredictiveFiring && this.targetEnemy instanceof Tank && (this.targetEnemy.vX != 0 || this.targetEnemy.vY != 0))
+
+		if (this.enablePredictiveFiring && targetEnemy instanceof Tank && (targetEnemy.vX != 0 || targetEnemy.vY != 0))
 		{
-			Ray r = Ray.newRay(targetEnemy.posX, targetEnemy.posY, targetEnemy.getLastPolarDirection(), 0, (Tank) targetEnemy);
+			Ray r = Ray.newRay(targetEnemy.posX, targetEnemy.posY, targetEnemy.getLastPolarDirection(), 1, (Tank) targetEnemy);
 			r.ignoreDestructible = this.aimIgnoreDestructible;
 			r.ignoreShootThrough = true;
 			r.size = Game.tile_size * this.hitboxSize - 1;
 			r.enableBounciness = false;
 			this.disableOffset = false;
 
-			double a = this.targetEnemy.getAngleInDirection(this.posX, this.posY);
-			double speed = this.targetEnemy.getLastMotionInDirection(a + Math.PI / 2);
+			double a = targetEnemy.getAngleInDirection(this.posX, this.posY);
+			double speed = targetEnemy.getLastMotionInDirection(a + Math.PI / 2);
 
-			double distBtwn = Movable.distanceBetween(this, this.targetEnemy);
+			double distBtwn = Movable.distanceBetween(this, targetEnemy);
 			double time = distBtwn / Math.sqrt(this.bullet.speed * this.bullet.speed - speed * speed);
 
 			double distSq = Math.pow(targetEnemy.lastFinalVX * time, 2) + Math.pow(targetEnemy.lastFinalVY * time, 2);
@@ -1852,20 +1873,20 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void setAimAngleArc()
 	{
-		if (this.targetEnemy == null)
+		if (targetEnemy == null)
 			return;
 
-		if (this.enablePredictiveFiring && this.targetEnemy instanceof Tank && (this.targetEnemy.vX != 0 || this.targetEnemy.vY != 0))
+		if (this.enablePredictiveFiring && targetEnemy instanceof Tank && (targetEnemy.vX != 0 || targetEnemy.vY != 0))
 		{
 			Ray r = Ray.newRay(targetEnemy.posX, targetEnemy.posY, targetEnemy.getLastPolarDirection(), 0, (Tank) targetEnemy);
 			r.size = Game.tile_size * this.hitboxSize - 1;
 			r.enableBounciness = false;
 			this.disableOffset = false;
 
-			double a = this.targetEnemy.getAngleInDirection(this.posX, this.posY);
-			double speed = this.targetEnemy.getLastMotionInDirection(a + Math.PI / 2);
+			double a = targetEnemy.getAngleInDirection(this.posX, this.posY);
+			double speed = targetEnemy.getLastMotionInDirection(a + Math.PI / 2);
 
-			double distBtwn = Movable.distanceBetween(this, this.targetEnemy);
+			double distBtwn = Movable.distanceBetween(this, targetEnemy);
 			double time = distBtwn / Math.sqrt(this.bullet.speed * this.bullet.speed - speed * speed);
 
 			double distSq = Math.pow(targetEnemy.lastFinalVX * time, 2) + Math.pow(targetEnemy.lastFinalVY * time, 2);
@@ -1879,7 +1900,7 @@ public class TankAIControlled extends Tank implements ITankField
 				double c = Math.cos(Movable.absoluteAngleBetween(targetEnemy.getLastPolarDirection(), this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY)));
 
 				double a1 = Math.pow(this.bullet.speed, 2) - Math.pow(targetEnemy.getLastSpeed(), 2);
-				double b1 = -2 * targetEnemy.getLastSpeed() * Movable.distanceBetween(this, this.targetEnemy) * c;
+				double b1 = -2 * targetEnemy.getLastSpeed() * Movable.distanceBetween(this, targetEnemy) * c;
 				double c1 = -Math.pow(Movable.distanceBetween(this, targetEnemy), 2);
 				double t = (-b1 + Math.sqrt(b1 * b1 - 4 * a1 * c1)) / (2 * a1);
 
@@ -1900,16 +1921,15 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 	}
 
-
 	public void checkAndShoot()
 	{
 		Movable m = null;
 
 		boolean arc = this.bullet instanceof BulletArc;
 
-		if (this.targetEnemy != null && !arc)
+		if (targetEnemy != null && !arc)
 		{
-			Ray r = Ray.newRay(this.posX, this.posY, this.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY), 0, this);
+			Ray r = Ray.newRay(this.posX, this.posY, this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY), 0, this);
 			r.moveOut(this.size / 10);
 			r.size = this.bullet.size;
 			r.ignoreDestructible = this.aimIgnoreDestructible;
@@ -1918,16 +1938,16 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 
 		if (Movable.absoluteAngleBetween(this.angle, this.aimAngle) <= this.aimThreshold)
-			if ((arc && this.targetEnemy != null) || (m != null && m.equals(this.targetEnemy) || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy)))
+			if ((arc && targetEnemy != null) || (m != null && m.equals(targetEnemy) || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy)))
 				this.shoot();
 	}
 
 	public void updateTurretReflect()
 	{
-		if (this.seesTargetEnemy && this.targetEnemy != null && Movable.distanceBetween(this, this.targetEnemy) <= Game.tile_size * 6 && !chargeUp)
+		if (this.seesTargetEnemy && targetEnemy != null && Movable.distanceBetween(this, targetEnemy) <= Game.tile_size * 6 && !chargeUp)
 		{
 			aim = true;
-			this.aimAngle = this.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY);
+			this.aimAngle = this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY);
 			this.cooldown -= Panel.frameFrequency;
 		}
 
@@ -2019,9 +2039,9 @@ public class TankAIControlled extends Tank implements ITankField
 
 		Movable target = ray.getTarget();
 
-		if (target == null && this.shootAIType == ShootAI.homing && this.targetEnemy != null)
+		if (target == null && this.shootAIType == ShootAI.homing && targetEnemy != null)
 		{
-			Ray ray2 = Ray.newRay(ray.posX, ray.posY, ray.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY), 0, this);
+			Ray ray2 = Ray.newRay(ray.posX, ray.posY, ray.getAngleInDirection(targetEnemy.posX, targetEnemy.posY), 0, this);
 			ray2.moveOut(this.size / 50);
 			ray2.size = this.bullet.size;
 			ray2.ignoreDestructible = this.aimIgnoreDestructible;
@@ -2030,9 +2050,9 @@ public class TankAIControlled extends Tank implements ITankField
 			target = ray2.getTarget();
 		}
 
-		if (target != null && !(target instanceof TankNPC) && target.equals(this.targetEnemy) || (target instanceof Tank && !((Tank) target).hidden && !Team.isAllied(target, this)))
+		if (target != null && target.equals(targetEnemy) || (target instanceof Tank && !((Tank) target).hidden && !Team.isAllied(target, this)))
 		{
-			this.targetEnemy = target;
+			targetEnemy = target;
 			this.lockedAngle = searchAngle;
 			this.searchPhase = RotationPhase.aiming;
 			this.aim = true;
@@ -2044,12 +2064,10 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void lookAtTargetEnemy()
 	{
-		if (!this.hasTarget || this.targetEnemy == null || !frameTimerTriggered)
+		if (!this.hasTarget || targetEnemy == null || !frameTimerTriggered)
 			return;
 
-		double a;
-
-		a = this.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY);
+        double a = this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY);
 
 		Ray rayToTarget = Ray.newRay(this.posX, this.posY, a, 0, this);
 		rayToTarget.size = this.bullet.size;
@@ -2059,7 +2077,7 @@ public class TankAIControlled extends Tank implements ITankField
 		Movable target = rayToTarget.getTarget();
 
 		if (target != null)
-			this.seesTargetEnemy = target.equals(this.targetEnemy);
+			this.seesTargetEnemy = target.equals(targetEnemy);
 		else
 			this.seesTargetEnemy = false;
 
@@ -2067,7 +2085,7 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			if (target != null)
 			{
-				if (target.equals(this.targetEnemy))
+				if (target.equals(targetEnemy))
 					this.aimAngle = a;
 				else
 					this.straightShoot = false;
@@ -2161,7 +2179,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (this.transformMimic)
 			return m instanceof Tank && !(m.getClass().equals(this.getClass())) && ((Tank) m).size == this.size;
 		else if (this.isSupportTank())
-			return m instanceof Tank && Team.isAllied(m, this) && m != this
+			return m instanceof Tank && Team.isAllied(m, this) && m != this && ((Tank) m).targetable
 					&& (((Tank) m).health - ((Tank) m).baseHealth < this.bullet.maxExtraHealth || this.bullet.damage >= 0 || this.bullet.maxExtraHealth <= 0)
 					&& !(m.getClass().equals(this.getClass()));
 		else
@@ -2177,7 +2195,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (this.mineTimer == -1)
 			this.mineTimer = (this.random.nextDouble() * mineTimerRandom + mineTimerBase);
 
-		Object nearest = null;
+		IAvoidObject nearest = null;
 
 		if (!laidMine && mineFleeTimer <= 0)
 		{
@@ -2211,14 +2229,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (nearest != null)
 		{
 			if (this.enableMineAvoidance && this.enableMovement)
-			{
-				if (nearest instanceof Movable)
-					this.setAccelerationAwayFromDirection(((Movable) nearest).posX, ((Movable) nearest).posY, acceleration);
-				else
-					this.setAccelerationAwayFromDirection(((Obstacle) nearest).posX, ((Obstacle) nearest).posY, acceleration);
-
-				this.overrideDirection = true;
-			}
+                avoidObject(nearest);
 		}
 		else
 		{
@@ -2258,6 +2269,33 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 	}
 
+	public void avoidObject(IAvoidObject nearest)
+	{
+		double avoidAngle = getAngleInDirection(((GameObject) nearest).posX, ((GameObject) nearest).posY);
+
+		if (frameTimerTriggered && frameTimerTriggeredCnt % 3 == 0)
+		{
+			int count = fleeDistances.length;
+			maxEmptySpace = 0;
+			for (double dir = 0; dir < 1; dir += 1. / count)
+			{
+				double angle = dir * Math.PI * 2;
+				double dist = Ray.newRay(this.posX, this.posY, angle, 0, this, Game.tile_size).getDist();
+				if (dist >= maxEmptySpace && (dist < nearest.getRadius() || Movable.absoluteAngleBetween(angle, avoidAngle) > Math.PI / 3))
+				{
+					maxEmptySpace = dist;
+					bestFleeAngle = angle;
+				}
+			}
+		}
+
+		if (this.enableMovement) // Otherwise stationary tanks will take off when they lay mines :P
+		{
+			this.setPolarAcceleration(bestFleeAngle + 0.2 * (age % 100) / 100, acceleration);
+			this.overrideDirection = true;
+		}
+	}
+
 	public void layMine(Mine m)
 	{
 		Drawing.drawing.playGlobalSound("lay_mine.ogg", (float) (Mine.mine_size / m.size));
@@ -2265,39 +2303,9 @@ public class TankAIControlled extends Tank implements ITankField
 		Game.eventsOut.add(new EventLayMine(m));
 		Game.movables.add(m);
 		this.mineTimer = (this.random.nextDouble() * mineTimerRandom + mineTimerBase);
+		this.mineFleeTimer = 100 * 1.5 / maxSpeed;
 
-		int count = fleeDistances.length;
-		double[] d = fleeDistances;
-		this.mineFleeTimer = 100;
-
-		int k = 0;
-		for (double dir = 0; dir < 4; dir += 4.0 / count)
-		{
-			Ray r = Ray.newRay(this.posX, this.posY, dir * Math.PI / 2, 0, this, Game.tile_size);
-			r.size = Game.tile_size * this.hitboxSize - 1;
-
-			double dist = r.getDist();
-
-			d[k] = dist;
-			k++;
-		}
-
-		int greatest = -1;
-		double gValue = -1;
-		for (int i = 0; i < d.length; i++)
-		{
-			if (d[i] > gValue)
-			{
-				gValue = d[i];
-				greatest = i;
-			}
-		}
-
-		if (this.enableMovement) // Otherwise stationary tanks will take off when they lay mines :P
-		{
-			this.setPolarAcceleration(greatest * 2.0 / count * Math.PI, acceleration);
-			this.overrideDirection = true;
-		}
+		avoidObject(m);
 
 		laidMine = true;
 	}
@@ -2310,9 +2318,7 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			this.readyForInitialSpawn = false;
 			for (int i = 0; i < this.spawnedInitialCount; i++)
-			{
-				spawnTank();
-			}
+                spawnTank();
 		}
 
 		if (this.random.nextDouble() < this.spawnChance * Panel.frameFrequency && this.spawnedTanks.size() < this.spawnedMaxCount && !this.destroy && !ScreenGame.finishedQuick)
@@ -2434,7 +2440,7 @@ public class TankAIControlled extends Tank implements ITankField
 			for (int i = 0; i < Game.movables.size(); i++)
 			{
 				Movable m = Game.movables.get(i);
-				if (m != this && m.team == this.team && m.dealsDamage && !m.destroy)
+				if (m != this && Team.isAllied(this, m) && m.dealsDamage && !m.destroy)
 				{
 					die = false;
 					break;
@@ -2519,13 +2525,13 @@ public class TankAIControlled extends Tank implements ITankField
 
 		if (this.transformTank.targetEnemy != null)
 		{
-			this.targetEnemy = this.transformTank.targetEnemy;
+			targetEnemy = this.transformTank.targetEnemy;
 			m = Ray.newRay(this.transformTank.posX, this.transformTank.posY,
-					this.transformTank.getAngleInDirection(this.targetEnemy.posX, this.targetEnemy.posY),
+					this.transformTank.getAngleInDirection(targetEnemy.posX, targetEnemy.posY),
 					0, this).moveOut(5).getTarget();
 		}
 
-		if (this.targetEnemy == null || m != this.targetEnemy || this.targetEnemy.destroy)
+		if (targetEnemy == null || m != targetEnemy || targetEnemy.destroy)
 			this.transformRevertTimer -= Panel.frameFrequency;
 		else
 			this.transformRevertTimer = this.sightTransformRevertTime;
@@ -2541,7 +2547,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.setEffectManager(sightTransformTank.em());
 			this.possessingTank = null;
 			this.currentlyVisible = true;
-			this.targetEnemy = null;
+			targetEnemy = null;
 			this.cooldown = Math.min(this.cooldownBase, this.sightTransformTank.cooldown);
 			Drawing.drawing.playGlobalSound("slowdown.ogg", 0.75f);
 			Game.eventsOut.add(new EventTankTransformPreset(this, false, true));
@@ -2573,11 +2579,11 @@ public class TankAIControlled extends Tank implements ITankField
 		this.vY = this.possessingTank.vY;
 		this.angle = this.possessingTank.angle;
 
-		if (this.targetEnemy != null)
+		if (targetEnemy != null)
 		{
 			Ray r = Ray.newRay(this.possessingTank.posX, this.possessingTank.posY, 0, 0, this);
-			r.vX = this.targetEnemy.posX - this.possessingTank.posX;
-			r.vY = this.targetEnemy.posY - this.possessingTank.posY;
+			r.vX = targetEnemy.posX - this.possessingTank.posX;
+			r.vY = targetEnemy.posY - this.possessingTank.posY;
 
 			double ma = Math.sqrt(r.vX * r.vX + r.vY * r.vY) / r.speed;
 			r.vX /= ma;
@@ -2585,18 +2591,18 @@ public class TankAIControlled extends Tank implements ITankField
 
 			r.moveOut(5);
 
-			m = r.getTarget(2, (Tank) this.targetEnemy);
+			m = r.getTarget(2, (Tank) targetEnemy);
 
-			if (((Tank) this.targetEnemy).possessor != null)
-				c = ((Tank) this.targetEnemy).getTopLevelPossessor().getClass();
+			if (((Tank) targetEnemy).possessor != null)
+				c = ((Tank) targetEnemy).getTopLevelPossessor().getClass();
 			else
-				c = this.targetEnemy.getClass();
+				c = targetEnemy.getClass();
 
 			if (c == TankPlayer.class || c == TankPlayerRemote.class)
 				c = TankPlayerMimic.class;
 		}
 
-		if (this.targetEnemy == null || m != this.targetEnemy || this.targetEnemy.destroy || c != this.possessingTank.getClass() || Movable.distanceBetween(this, this.targetEnemy) > this.mimicRange)
+		if (targetEnemy == null || m != targetEnemy || targetEnemy.destroy || c != this.possessingTank.getClass() || Movable.distanceBetween(this, targetEnemy) > this.mimicRange)
 			this.mimicRevertCounter -= Panel.frameFrequency;
 		else
 			this.mimicRevertCounter = this.mimicRevertTime;
@@ -2609,7 +2615,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.orientation = t.orientation;
 			this.drawAge = t.drawAge;
 			this.setEffectManager(t.em());
-			this.targetEnemy = null;
+			targetEnemy = null;
 
 			if (t instanceof TankAIControlled)
 				this.cooldown = Math.min(this.cooldownBase, ((TankAIControlled) t).cooldown);
@@ -2625,13 +2631,13 @@ public class TankAIControlled extends Tank implements ITankField
 			this.tryPossess();
 		}
 
-		if (this.targetEnemy != null && !this.targetEnemy.destroy && !t.destroy && this.canCurrentlyMimic && !this.positionLock)
+		if (targetEnemy != null && !targetEnemy.destroy && !t.destroy && this.canCurrentlyMimic && !this.positionLock)
 		{
-			this.laser = new Laser(t.posX, t.posY, t.size / 2, this.targetEnemy.posX, this.targetEnemy.posY, ((Tank)this.targetEnemy).size / 2,
-					(this.mimicRange - Movable.distanceBetween(t, this.targetEnemy)) / this.mimicRange * 10, this.targetEnemy.getAngleInDirection(t.posX, t.posY),
-					((Tank) this.targetEnemy).colorR, ((Tank) this.targetEnemy).colorG, ((Tank) this.targetEnemy).colorB);
+			this.laser = new Laser(t.posX, t.posY, t.size / 2, targetEnemy.posX, targetEnemy.posY, ((Tank)targetEnemy).size / 2,
+					(this.mimicRange - Movable.distanceBetween(t, targetEnemy)) / this.mimicRange * 10, targetEnemy.getAngleInDirection(t.posX, t.posY),
+					((Tank) targetEnemy).colorR, ((Tank) targetEnemy).colorG, ((Tank) targetEnemy).colorB);
 			Game.movables.add(this.laser);
-			Game.eventsOut.add(new EventTankMimicLaser(t, (Tank) this.targetEnemy, this.mimicRange));
+			Game.eventsOut.add(new EventTankMimicLaser(t, (Tank) targetEnemy, this.mimicRange));
 		}
 		else
 			Game.eventsOut.add(new EventTankMimicLaser(t, null, this.mimicRange));
@@ -2639,28 +2645,28 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void tryPossess()
 	{
-		if (!this.seesTargetEnemy || !this.hasTarget || !(this.targetEnemy instanceof Tank) || this.destroy || !this.canCurrentlyMimic)
+		if (!this.seesTargetEnemy || !this.hasTarget || !(targetEnemy instanceof Tank) || this.destroy || !this.canCurrentlyMimic)
 			return;
 
 		try
 		{
 			this.mimicRevertCounter = this.mimicRevertTime;
 
-			Class<? extends Movable> c = this.targetEnemy.getClass();
+			Class<? extends Movable> c = targetEnemy.getClass();
 			Tank ct;
 
-			ct = (Tank) this.targetEnemy;
+			ct = (Tank) targetEnemy;
 
-			if (((Tank) this.targetEnemy).possessor != null)
+			if (((Tank) targetEnemy).possessor != null)
 			{
-				ct = ((Tank) this.targetEnemy).getTopLevelPossessor();
+				ct = ((Tank) targetEnemy).getTopLevelPossessor();
 				c = ct.getClass();
 			}
 
 			boolean player = false;
 
 			if (c.equals(TankRemote.class))
-				c = ((TankRemote) this.targetEnemy).tank.getClass();
+				c = ((TankRemote) targetEnemy).tank.getClass();
 
 			if (c.equals(TankPlayer.class) || c.equals(TankPlayerRemote.class))
 			{
@@ -2718,13 +2724,13 @@ public class TankAIControlled extends Tank implements ITankField
 
 			if (player)
 			{
-				this.possessingTank.colorR = ((Tank) this.targetEnemy).colorR;
-				this.possessingTank.colorG = ((Tank) this.targetEnemy).colorG;
-				this.possessingTank.colorB = ((Tank) this.targetEnemy).colorB;
+				this.possessingTank.colorR = ((Tank) targetEnemy).colorR;
+				this.possessingTank.colorG = ((Tank) targetEnemy).colorG;
+				this.possessingTank.colorB = ((Tank) targetEnemy).colorB;
 
-				this.possessingTank.secondaryColorR = ((Tank) this.targetEnemy).secondaryColorR;
-				this.possessingTank.secondaryColorG = ((Tank) this.targetEnemy).secondaryColorG;
-				this.possessingTank.secondaryColorB = ((Tank) this.targetEnemy).secondaryColorB;
+				this.possessingTank.secondaryColorR = ((Tank) targetEnemy).secondaryColorR;
+				this.possessingTank.secondaryColorG = ((Tank) targetEnemy).secondaryColorG;
+				this.possessingTank.secondaryColorB = ((Tank) targetEnemy).secondaryColorB;
 			}
 
 			for (RegistryTank.TankEntry e: Game.registryTank.tankEntries)
@@ -2735,7 +2741,7 @@ public class TankAIControlled extends Tank implements ITankField
 				}
 			}
 
-			Game.eventsOut.add(new EventTankMimicTransform(this, (Tank) this.targetEnemy));
+			Game.eventsOut.add(new EventTankMimicTransform(this, (Tank) targetEnemy));
 
 			if (Game.effectsEnabled)
 			{
@@ -2780,7 +2786,11 @@ public class TankAIControlled extends Tank implements ITankField
 	public void setPathfindingTileProperties(Tile t, Obstacle o)
 	{
 		if (o != null)
+		{
 			t.unfavorability = o.unfavorability;
+			if (o.destructible)
+				t.unfavorability = Math.max(t.unfavorability, 10);
+		}
 
 		if (o == null || !o.tankCollision)
 			t.type = Tile.Type.empty;
@@ -2902,7 +2912,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public boolean isSupportTank()
 	{
-		return !this.suicidal && this.bullet.damage < 0 && this.bullet.bulletHitKnockback == 0 && this.bullet.tankHitKnockback == 0 && this.bullet.hitStun <= 0;
+		return !this.suicidal && (this.bullet.damage < 0 || (this.bullet.damage == 0 && this.bullet.boosting)) && this.bullet.bulletHitKnockback == 0 && this.bullet.tankHitKnockback == 0 && this.bullet.hitStun <= 0;
 	}
 
 	public void setPolarAcceleration(double angle, double acceleration)
@@ -2915,62 +2925,26 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void addPolarAcceleration(double angle, double acceleration)
 	{
-		double accX = acceleration * Math.cos(angle);
-		double accY = acceleration * Math.sin(angle);
-		this.aX += accX;
-		this.aY += accY;
+		this.aX += acceleration * Math.cos(angle);
+		this.aY += acceleration * Math.sin(angle);
 	}
 
-	public void setAccelerationInDirection(double x, double y, double accel)
+	public void setAccelInDir(double x, double y, double accel)
 	{
-		x -= this.posX;
-		y -= this.posY;
-
-		double angle = 0;
-		if (x > 0)
-			angle = Math.atan(y/x);
-		else if (x < 0)
-			angle = Math.atan(y/x) + Math.PI;
-		else
-		{
-			if (y > 0)
-				angle = Math.PI / 2;
-			else if (y < 0)
-				angle = Math.PI * 3 / 2;
-		}
-		double accX = accel * Math.cos(angle);
-		double accY = accel * Math.sin(angle);
-		this.aX = accX;
-		this.aY = accY;
+		setAccelInDirWithOffset(x, y, accel, 0);
 	}
 
-	public void setAccelerationAwayFromDirection(double x, double y, double accel)
+	public void setAccelAwayFromDir(double x, double y, double accel)
 	{
-		this.setAccelerationInDirectionWithOffset(x, y, accel, Math.PI);
+		this.setAccelInDirWithOffset(x, y, accel, Math.PI);
 	}
 
-	public void setAccelerationInDirectionWithOffset(double x, double y, double accel, double a)
+	public void setAccelInDirWithOffset(double x, double y, double accel, double a)
 	{
-		x -= this.posX;
-		y -= this.posY;
-
-		double angle = 0;
-		if (x > 0)
-			angle = Math.atan(y/x);
-		else if (x < 0)
-			angle = Math.atan(y/x) + Math.PI;
-		else
-		{
-			if (y > 0)
-				angle = Math.PI / 2;
-			else if (y < 0)
-				angle = Math.PI * 3 / 2;
-		}
+		double angle = getAngleInDirection(x, y);
 		angle += a;
-		double accX = accel * Math.cos(angle);
-		double accY = accel * Math.sin(angle);
-		this.aX = accX;
-		this.aY = accY;
+		this.aX = accel * Math.cos(angle);
+		this.aY = accel * Math.sin(angle);
 	}
 
 	@Override
