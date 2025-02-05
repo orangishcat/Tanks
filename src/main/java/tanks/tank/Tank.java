@@ -1,8 +1,11 @@
 package tanks.tank;
 
 import basewindow.Model;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.bullet.Bullet;
+import tanks.effect.AttributeModifier;
+import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.gui.screen.leveleditor.selector.SelectorRotation;
@@ -16,15 +19,19 @@ import tanks.obstacle.Obstacle;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Objects;
 
 import static tanks.tank.TankPropertyCategory.*;
 
 public abstract class Tank extends Movable implements ISolidObject
 {
+	public static int updatesPerSecond = 20;
 	public static int currentID = 0;
 	public static ArrayList<Integer> freeIDs = new ArrayList<>();
-	public static HashMap<Integer, Tank> idMap = new HashMap<>();
+	public static Int2ObjectOpenHashMap<Tank> idMap = new Int2ObjectOpenHashMap<>();
 
 	public static Model health_model;
 
@@ -45,7 +52,6 @@ public abstract class Tank extends Movable implements ISolidObject
 	public boolean depthTest = true;
 
 	public boolean invulnerable = false;
-	public boolean targetable = true;
 	public double invulnerabilityTimer = 0;
 
 	public boolean disabled = false;
@@ -112,11 +118,11 @@ public abstract class Tank extends Movable implements ISolidObject
 	/** Time this tank has been invisible for*/
 	public double timeInvisible = 0;
 
-	@Property(category = appearanceBody, id = "color_r", name = "Red", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceBody, id = "color_r", name = "Red", miscType = Property.MiscType.color)
 	public double colorR;
-	@Property(category = appearanceBody, id = "color_g", name = "Green", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceBody, id = "color_g", name = "Green", miscType = Property.MiscType.color)
 	public double colorG;
-	@Property(category = appearanceBody, id = "color_b", name = "Blue", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceBody, id = "color_b", name = "Blue", miscType = Property.MiscType.color)
 	public double colorB;
 
 	@TankBuildProperty @Property(category = appearanceGlow, id = "glow_intensity", name = "Aura intensity", minValue = 0.0)
@@ -133,11 +139,11 @@ public abstract class Tank extends Movable implements ISolidObject
 	/** Important: this option only is useful for the tank editor. Secondary color will be treated independently even if disabled. */
 	@Property(category = appearanceTurretBarrel, id = "enable_color2", name = "Custom color", miscType = Property.MiscType.color)
 	public boolean enableSecondaryColor = false;
-	@Property(category = appearanceTurretBarrel, id = "color_r2", name = "Red", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "color_r2", name = "Red", miscType = Property.MiscType.color)
 	public double secondaryColorR;
-	@Property(category = appearanceTurretBarrel, id = "color_g2", name = "Green", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "color_g2", name = "Green", miscType = Property.MiscType.color)
 	public double secondaryColorG;
-	@Property(category = appearanceTurretBarrel, id = "color_b2", name = "Blue", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "color_b2", name = "Blue", miscType = Property.MiscType.color)
 	public double secondaryColorB;
 	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "turret_size", name = "Turret thickness", minValue = 0.0)
 	public double turretSize = 8;
@@ -149,11 +155,11 @@ public abstract class Tank extends Movable implements ISolidObject
 	/** Important: tertiary color values will not be used unless this option is set to true! */
 	@Property(category = appearanceTurretBase, id = "enable_color3", name = "Custom color", miscType = Property.MiscType.color)
 	public boolean enableTertiaryColor = false;
-	@Property(category = appearanceTurretBase, id = "color_r3", name = "Red", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBase, id = "color_r3", name = "Red", miscType = Property.MiscType.color)
 	public double tertiaryColorR;
-	@Property(category = appearanceTurretBase, id = "color_g3", name = "Green", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBase, id = "color_g3", name = "Green", miscType = Property.MiscType.color)
 	public double tertiaryColorG;
-	@Property(category = appearanceTurretBase, id = "color_b3", name = "Blue", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceTurretBase, id = "color_b3", name = "Blue", miscType = Property.MiscType.color)
 	public double tertiaryColorB;
 
 	@TankBuildProperty @Property(category = appearanceTracks, id = "enable_tracks", name = "Lays tracks")
@@ -176,11 +182,11 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	@TankBuildProperty @Property(category = appearanceEmblem, id = "emblem", name = "Tank emblem", miscType = Property.MiscType.emblem)
 	public String emblem = null;
-	@Property(category = appearanceEmblem, id = "emblem_r", name = "Red", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceEmblem, id = "emblem_r", name = "Red", miscType = Property.MiscType.color)
 	public double emblemR;
-	@Property(category = appearanceEmblem, id = "emblem_g", name = "Green", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceEmblem, id = "emblem_g", name = "Green", miscType = Property.MiscType.color)
 	public double emblemG;
-	@Property(category = appearanceEmblem, id = "emblem_b", name = "Blue", miscType = Property.MiscType.color)
+	@TankBuildProperty @Property(category = appearanceEmblem, id = "emblem_b", name = "Blue", miscType = Property.MiscType.color)
 	public double emblemB;
 
 	@MetadataProperty(id = "rotation", name = "Rotation", selector = SelectorRotation.selector_name, image = "rotate_tank.png", keybind = "editor.rotate")
@@ -188,7 +194,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public double hitboxSize = 0.95;
 
-	@Property(category = general, id = "explode_on_destroy", name = "Destroy explosion", desc="When destroyed, the tank will explode with this explosion.", nullable = true)
+	@TankBuildProperty @Property(category = general, id = "explode_on_destroy", name = "Destroy explosion", desc="When destroyed, the tank will explode with this explosion.", nullable = true)
 	public Explosion explodeOnDestroy = null;
 
 	public boolean droppedFromCrate = false;
@@ -196,6 +202,9 @@ public abstract class Tank extends Movable implements ISolidObject
 	/** Whether this tank needs to be destroyed before the level ends. */
 	@TankBuildProperty @Property(category = general, id = "mandatory_kill", name = "Must be destroyed", desc="Whether the tank needs to be destroyed to clear the level")
 	public boolean mandatoryKill = true;
+
+	@TankBuildProperty @Property(category = general, id = "targetable", name = "Targetable")
+	public boolean targetable = true;
 
 	/** Used for custom tanks, see /music/tank for built-in tanks */
 	@Property(category = general, id = "music", name = "Music tracks", miscType = Property.MiscType.music)
@@ -210,6 +219,7 @@ public abstract class Tank extends Movable implements ISolidObject
 	public Turret turret;
 
 	public boolean standardUpdateEvent = true;
+	public double stackedEventTimer = 0;
 
 	public boolean isBoss = false;
 	public Tank possessor;
@@ -242,20 +252,15 @@ public abstract class Tank extends Movable implements ISolidObject
 			idMap.remove(this.networkID);
 
 		if (!freeIDs.contains(this.networkID))
-		{
 			freeIDs.add(this.networkID);
-		}
 	}
 
 	public static int nextFreeNetworkID()
 	{
-		if (freeIDs.size() > 0)
+		if (!freeIDs.isEmpty())
 			return freeIDs.remove(0);
 		else
-		{
-			currentID++;
-			return currentID - 1;
-		}
+			return currentID++;
 	}
 
 	public void registerNetworkID()
@@ -522,9 +527,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		}
 
 		if (this.resistFreeze)
-		{
-			this.attributeImmunities.addAll(Arrays.asList("ice_slip", "ice_accel", "ice_max_speed", "freeze"));
-		}
+            getEffectManager().addImmunities("ice_slip", "ice_accel", "ice_max_speed", "freeze");
 
 		this.damageFlashAnimation = Math.max(0, this.damageFlashAnimation - 0.05 * Panel.frameFrequency);
 		this.healFlashAnimation = Math.max(0, this.healFlashAnimation - 0.05 * Panel.frameFrequency);
@@ -581,29 +584,20 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.maxSpeedModifier = 1;
 
 		double boost = 0;
-		for (int i = 0; i < this.attributes.size(); i++)
-		{
-			AttributeModifier a = this.attributes.get(i);
 
-			if (a.name.equals("healray"))
-			{
-				if (this.health < this.baseHealth)
-				{
-					this.attributes.remove(a);
-					i--;
-				}
-			}
-		}
+		EffectManager em = getEffectManager();
+		AttributeModifier.Instance a = em.getAttribute(AttributeModifier.healray);
+		if (a != null && health < baseHealth)
+			em.removeAttribute(AttributeModifier.healray);
 
-
-		this.accelerationModifier = this.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
+		this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
 
 		if (!(this instanceof TankAIControlled))
-			this.frictionModifier = this.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
+			this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
 
-		this.maxSpeedModifier = this.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
+		this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
 
-		boost = this.getAttributeValue(AttributeModifier.ember_effect, boost);
+		boost = em.getAttributeValue(AttributeModifier.ember_effect, boost);
 
 		if (Math.random() * Panel.frameFrequency < boost * Game.effectMultiplier && Game.effectsEnabled && !ScreenGame.finishedQuick)
 		{
@@ -648,8 +642,11 @@ public abstract class Tank extends Movable implements ISolidObject
 			}
 		}
 
-		if (this.standardUpdateEvent)
+		if (this.standardUpdateEvent && (stackedEventTimer -= Panel.frameFrequency) < -3 * networkID)
+		{
 			Game.eventsOut.add(new EventTankUpdate(this));
+			stackedEventTimer += 100. / Tank.updatesPerSecond;
+		}
 
 		this.canHide = true;
 		for (int i = 0; i < this.canHidePoints.length; i++)
@@ -762,7 +759,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.posY = y;
 		this.drawTank(true, false);
 		this.posX = x1;
-		this.posY = y1;	
+		this.posY = y1;
 	}
 
 	public void drawTank(boolean forInterface, boolean in3d)
@@ -772,8 +769,8 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public void drawTank(boolean forInterface, boolean in3d, boolean transparent)
 	{
-		double luminance = this.getAttributeValue(AttributeModifier.glow, this.luminance);
-		double glow = this.getAttributeValue(AttributeModifier.glow, 1);
+		double luminance = em().getAttributeValue(AttributeModifier.glow, this.luminance);
+		double glow = em().getAttributeValue(AttributeModifier.glow, 1);
 
 		double s = (this.size * (Game.tile_size - destroyTimer) / Game.tile_size) * Math.min(this.drawAge / Game.tile_size, 1);
 		double sizeMod = 1;
@@ -796,9 +793,9 @@ public abstract class Tank extends Movable implements ISolidObject
 			if (forInterface)
 				Drawing.drawing.fillInterfaceGlow(this.posX, this.posY, size, size);
 			else if (!in3d)
-				Drawing.drawing.fillGlow(this.posX, this.posY, size, size);
+				Drawing.drawing.fillLargeGlow(this.posX, this.posY, size, size, false, false);
 			else
-				Drawing.drawing.fillGlow(this.posX, this.posY, Math.max(this.size / 4, 11), size, size,true, false);
+				Drawing.drawing.fillLargeGlow(this.posX, this.posY, Math.max(this.size / 4, 11), size, size, true, false, false, false);
 		}
 
 		if (this.lightIntensity > 0 && this.lightSize > 0 && !transparent)
@@ -816,7 +813,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 				if (forInterface)
 					Drawing.drawing.fillInterfaceGlow(this.posX, this.posY, size, size, false, true);
-				else if (!(forInterface && !in3d))
+				else
 					Drawing.drawing.fillLargeGlow(this.posX, this.posY, 0, size, size, false, false, false, true);
 
 				i--;
@@ -826,31 +823,24 @@ public abstract class Tank extends Movable implements ISolidObject
 		if (this.fullBrightness)
 			luminance = 1;
 
-		if (!forInterface)
+		if (!forInterface && em().getAttribute(AttributeModifier.healray) != null)
 		{
-            for (AttributeModifier a : this.attributes)
-            {
-                if (a.name.equals("healray"))
-                {
-                    double mod = 1 + 0.4 * Math.min(1, this.health - this.baseHealth);
+			double mod = 1 + 0.4 * Math.min(1, this.health - this.baseHealth);
 
-                    if (this.health > this.baseHealth)
-                    {
-                        if (!in3d)
-                        {
-                            Drawing.drawing.setColor(0, 255, 0, 255, 1);
-                            drawing.drawModel(this.baseModel, this.posX, this.posY, s * mod, s * mod, this.orientation);
-                        }
-                        else
-                        {
-                            Drawing.drawing.setColor(0, 255, 0, 127, 1);
-                            drawing.drawModel(this.baseModel, this.posX, this.posY, this.posZ, s * mod, s * mod, s - 2, this.orientation);
-                        }
-                    }
-                }
-            }
+			if (this.health > this.baseHealth)
+			{
+				if (!in3d)
+				{
+					Drawing.drawing.setColor(0, 255, 0, 255, 1);
+					drawing.drawModel(this.baseModel, this.posX, this.posY, s * mod, s * mod, this.orientation);
+				}
+				else
+				{
+					Drawing.drawing.setColor(0, 255, 0, 127, 1);
+					drawing.drawModel(this.baseModel, this.posX, this.posY, this.posZ, s * mod, s * mod, s - 2, this.orientation);
+				}
+			}
 		}
-
 
 		Drawing.drawing.setColor(teamColor[0], teamColor[1], teamColor[2], transparent ? 127 : 255, luminance);
 
@@ -868,7 +858,6 @@ public abstract class Tank extends Movable implements ISolidObject
 			else
 				drawing.drawModel(this.baseModel, this.posX, this.posY, s, s, this.orientation);
 		}
-
 
 		double dmgFlash = Math.min(1, this.damageFlashAnimation);
 		double healFlash = Math.min(1, this.healFlashAnimation);
@@ -979,7 +968,19 @@ public abstract class Tank extends Movable implements ISolidObject
 		}
 	}
 
-	public void drawOutline() 
+	@Override
+	public void initEffectManager(EffectManager em)
+	{
+		em.addAttributeCallback = this::sendEvent;
+	}
+
+	public void sendEvent(AttributeModifier m, boolean unduplicate)
+	{
+		if (!this.isRemote)
+			Game.eventsOut.add(new EventTankAddAttributeModifier(this, m, unduplicate));
+	}
+
+	public void drawOutline()
 	{
 		drawAge = Game.tile_size;
 
@@ -990,14 +991,14 @@ public abstract class Tank extends Movable implements ISolidObject
 	}
 
 	public void drawAt(double x, double y)
-	{	
+	{
 		double x1 = this.posX;
 		double y1 = this.posY;
 		this.posX = x;
 		this.posY = y;
 		this.drawTank(false, false);
 		this.posX = x1;
-		this.posY = y1;	
+		this.posY = y1;
 	}
 
 	public void drawOutlineAt(double x, double y)
@@ -1009,24 +1010,6 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.drawOutline();
 		this.posX = x1;
 		this.posY = y1;
-	}
-
-	@Override
-	public void addAttribute(AttributeModifier m)
-	{
-		super.addAttribute(m);
-
-		if (!this.isRemote)
-			Game.eventsOut.add(new EventTankAddAttributeModifier(this, m, false));
-	}
-
-	@Override
-	public void addUnduplicateAttribute(AttributeModifier m)
-	{
-		super.addUnduplicateAttribute(m);
-
-		if (!this.isRemote)
-			Game.eventsOut.add(new EventTankAddAttributeModifier(this, m, true));
 	}
 
 	public void onDestroy()
@@ -1050,14 +1033,8 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		if (this.health <= 1)
 		{
-			for (int i = 0; i < this.attributes.size(); i++)
-			{
-				if (this.attributes.get(i).type.name.equals("healray"))
-				{
-					this.attributes.remove(i);
-					i--;
-				}
-			}
+			AttributeModifier.Instance a = em().getAttribute(AttributeModifier.healray);
+			if (a != null) em().removeAttribute(AttributeModifier.healray);
 		}
 
 		Game.eventsOut.add(new EventTankUpdateHealth(this));
@@ -1213,7 +1190,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 				if (dist > farthestInSight)
 				{
-					Ray r = new Ray(this.posX, this.posY, 0, 0, this);
+					Ray r = Ray.newRay(this.posX, this.posY, 0, 0, this);
 					r.vX = m.posX - this.posX;
 					r.vY = m.posY - this.posY;
 

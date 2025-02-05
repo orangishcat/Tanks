@@ -2,6 +2,7 @@ package lwjglwindow;
 
 import basewindow.BaseShapeRenderer;
 import org.lwjgl.opengl.GL11;
+import tanks.Game;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -382,6 +383,9 @@ public class ImmediateModeShapeRenderer extends BaseShapeRenderer
 
     public void fillRect(double x, double y, double sX, double sY)
     {
+        if (Game.game.window.drawingShadow)
+            return;
+
         glBegin(GL_TRIANGLE_FAN);
 
         glVertex2d(x, y);

@@ -1,6 +1,7 @@
 package tanks.obstacle;
 
 import tanks.*;
+import tanks.effect.StatusEffect;
 import tanks.gui.screen.ScreenGame;
 import tanks.rendering.ShaderMud;
 import tanks.tank.Tank;
@@ -24,6 +25,8 @@ public class ObstacleMud extends Obstacle
         this.colorG = 30;
         this.colorB = 0;
 
+        this.unfavorability = 5;
+
         this.description = "A thick puddle of mud that slows tanks down";
 
         this.replaceTiles = true;
@@ -41,7 +44,7 @@ public class ObstacleMud extends Obstacle
     public void onObjectEntry(Movable m)
     {
         if (m instanceof Tank)
-            m.addStatusEffect(StatusEffect.mud, 0, 20, 30);
+            m.em().addStatusEffect(StatusEffect.mud, 0, 20, 30);
 
         this.onObjectEntryLocal(m);
     }

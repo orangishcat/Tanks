@@ -7,8 +7,6 @@ import tanks.gui.screen.leveleditor.selector.SelectorColorAndNoise;
 import tanks.rendering.ShaderGroundColor;
 import tanks.tankson.MetadataProperty;
 
-import java.util.Arrays;
-
 public class ObstacleGroundPaint extends Obstacle
 {
     @MetadataProperty(id = "color", name = "Color", selector = SelectorColorAndNoise.selector_name, image = "color.png", keybind = "editor.groupID")
@@ -26,7 +24,7 @@ public class ObstacleGroundPaint extends Obstacle
         this.checkForObjects = true;
 
         this.type = ObstacleType.ground;
-        this.update = true;
+        setUpdate(true);
 
         this.replaceTiles = true;
         this.tileRenderer = ShaderGroundColor.class;

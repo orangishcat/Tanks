@@ -4,7 +4,6 @@ import tanks.*;
 import tanks.gui.Button;
 import tanks.item.ItemBullet;
 import tanks.minigames.Minigame;
-import tanks.obstacle.Face;
 import tanks.obstacle.Obstacle;
 import tanks.tank.*;
 
@@ -17,15 +16,9 @@ public class ScreenTitle extends Screen implements ISeparateBackgroundScreen
 
 	public int chain;
 
-	public double lCenterX;
-	public double lCenterY;
+	public double lCenterX, lCenterY;
+	public double rCenterX, rCenterY;
 
-	public double rCenterX;
-	public double rCenterY;
-
-	public Face[] horizontalFaces;
-	public Face[] verticalFaces;
-	
 	protected int[] inputs = new int[11];
 	protected int inputCount = 0;
 
@@ -123,14 +116,6 @@ public class ScreenTitle extends Screen implements ISeparateBackgroundScreen
 
 		languages.imageSizeX = this.objHeight;
 		languages.imageSizeY = this.objHeight;
-
-		this.horizontalFaces = new Face[2];
-		this.horizontalFaces[0] = new Face(null, 0, 0, Game.currentSizeX * Game.tile_size, 0, true, false, true, true);
-		this.horizontalFaces[1] = new Face(null, 0, Game.currentSizeY * Game.tile_size, Game.currentSizeX * Game.tile_size, Game.currentSizeY * Game.tile_size, true, true,true, true);
-
-		this.verticalFaces = new Face[2];
-		this.verticalFaces[0] = new Face(null, 0, 0,0, Game.currentSizeY * Game.tile_size, false, false,true, true);
-		this.verticalFaces[1] = new Face(null, Game.currentSizeX * Game.tile_size, 0, Game.currentSizeX * Game.tile_size, Game.currentSizeY * Game.tile_size, false, true, true, true);
 	}
 	
 	@Override
@@ -425,9 +410,7 @@ public class ScreenTitle extends Screen implements ISeparateBackgroundScreen
 	public void drawPostMouse()
 	{
 		if (!this.controlPlayer && (Game.game.window.pressedKeys.contains(KEY_LEFT_SHIFT) || Game.game.window.pressedKeys.contains(KEY_RIGHT_SHIFT)) && Drawing.drawing.interfaceScaleZoom == 1)
-		{
-			this.logo.draw();
-		}
+            this.logo.draw();
 	}
 
 	@Override

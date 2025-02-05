@@ -15,7 +15,7 @@ public class ObstacleText extends Obstacle
 	{
 		super(name, posX, posY);
 
-		this.update = true;
+		setUpdate(true);
 		this.replaceTiles = false;
 		this.drawLevel = 1;
 		this.destructible = false;

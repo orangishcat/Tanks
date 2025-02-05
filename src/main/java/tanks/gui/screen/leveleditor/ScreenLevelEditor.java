@@ -383,9 +383,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			{
 				this.currentPlaceable = Placeable.playerTank;
 				this.setMousePlaceable();
-				mousePlaceable.setMetadata(t.getMetadata());
-
-				((TankPlayer) mousePlaceable).setDefaultColor();
+				((TankPlayer) mousePlaceable).setDefaultColor().setMetadata(t.getMetadata());
 				return true;
 			}
 			else
@@ -1444,7 +1442,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 						{
 							if (!validRight)
 							{
-								if (m.getClass() == mousePlaceable.getClass() || (mousePlaceable instanceof Obstacle && !Obstacle.canPlaceOn(((Obstacle) mousePlaceable).type, m.type)))
+								if (m.getClass() == mousePlaceable.getClass() || (!(mousePlaceable instanceof Obstacle) && m.type == Obstacle.ObstacleType.full) || (mousePlaceable instanceof Obstacle && !Obstacle.canPlaceOn(((Obstacle) mousePlaceable).type, m.type)))
 								{
 									skip = true;
 									break;
@@ -2122,6 +2120,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			else
 				selectSquareToggle.image = "icons/square_unlocked.png";
 		}
+
+		Chunk.drawDebugStuff();
 	}
 
 	public void changeMetadata(int add)
@@ -2360,8 +2360,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		Game.screen = new ScreenGame(this.name);
 		Game.player.hotbar.coins = this.level.startingCoins;
-
 		Game.currentLevel.playerBuilds.get(0).clonePropertiesTo(Game.playerTank);
+		Game.player.buildName = Game.currentLevel.playerBuilds.get(0).buildName;
 	}
 
 	public void replaceSpawns()
@@ -2404,11 +2404,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			}
 		}
 
-		for (Movable m : Game.movables)
-		{
-			if (m instanceof TankSpawnMarker)
-				Game.removeMovables.add(m);
-		}
+		Game.movables.removeIf(t -> t instanceof TankSpawnMarker);
 	}
 
 	public void clearSelection()
@@ -2619,14 +2615,9 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			mousePlaceable = t;
 		}
 		else if (this.currentPlaceable == Placeable.obstacle)
-		{
-			this.mousePlaceable = Game.registryObstacle.getEntry(obstacleNum).getObstacle(0, 0);
-		}
+            this.mousePlaceable = Game.registryObstacle.getEntry(obstacleNum).getObstacle(0, 0);
 		else if (this.currentPlaceable == Placeable.playerTank)
-		{
-			this.mousePlaceable = new TankPlayer(0, 0, 0);
-			((TankPlayer) mousePlaceable).setDefaultColor();
-		}
+            this.mousePlaceable = new TankPlayer(0, 0, 0).setDefaultColor();
 
 		this.buttons.bottomRight.removeAll(this.shortcutButtons);
 		this.shortcutButtons.clear();

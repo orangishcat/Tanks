@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Game;
 import tanks.Player;
 import tanks.gui.ChatMessage;
@@ -19,8 +20,8 @@ import java.util.UUID;
 public class ServerHandler extends ChannelInboundHandlerAdapter
 {
 	public MessageReader reader = new MessageReader();
-	public SynchronizedList<INetworkEvent> events = new SynchronizedList<>();
-	protected HashMap<Integer, IStackableEvent> stackedEvents = new HashMap<>();
+	public final SynchronizedList<INetworkEvent> events = new SynchronizedList<>();
+	protected Int2ObjectOpenHashMap<IStackableEvent> stackedEvents = new Int2ObjectOpenHashMap<>();
 	protected long lastStackedEventSend = 0;
 
 	public ChannelHandlerContext ctx;
@@ -112,20 +113,19 @@ public class ServerHandler extends ChannelInboundHandlerAdapter
 		synchronized (this.events)
 		{
 			INetworkEvent prev = null;
-			for (int i = 0; i < this.events.size(); i++)
-			{
-				INetworkEvent e = this.events.get(i);
-
-				if (e instanceof IStackableEvent && ((IStackableEvent) e).isStackable())
-					this.stackedEvents.put(IStackableEvent.f(NetworkEventMap.get(e.getClass()) + IStackableEvent.f(((IStackableEvent) e).getIdentifier())), (IStackableEvent) e);
-				else
+            for (INetworkEvent e : this.events)
+            {
+                if (e instanceof IStackableEvent && ((IStackableEvent) e).isStackable())
 				{
-					if (prev != null)
-						this.sendEvent(prev,false);
-
-					prev = e;
+					this.stackedEvents.put(IStackableEvent.f(NetworkEventMap.get(e.getClass()) + IStackableEvent.f(((IStackableEvent) e).getIdentifier())), (IStackableEvent) e);
 				}
-			}
+                else
+                {
+                    if (prev != null)
+                        this.sendEvent(prev, false);
+                    prev = e;
+                }
+            }
 
 			long time = System.currentTimeMillis() * Game.networkRate / 1000;
 			if (time != lastStackedEventSend)

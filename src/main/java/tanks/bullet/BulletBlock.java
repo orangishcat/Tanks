@@ -91,7 +91,7 @@ public class BulletBlock extends BulletArc
             o.stackColorB[i] = this.originalOutlineColorB;
         }
 
-        o.update = true;
+        o.setUpdate(true);
         o.shouldClip = true;
         o.clipFrames = 2;
 

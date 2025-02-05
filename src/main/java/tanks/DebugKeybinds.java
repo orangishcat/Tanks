@@ -3,6 +3,7 @@ package tanks;
 import basewindow.BaseWindow;
 import basewindow.InputCodes;
 import basewindow.ShaderGroup;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.gui.ChatMessage;
 import tanks.gui.ScreenElement;
 import tanks.gui.screen.ScreenCrusadeDetails;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static tanks.Panel.notifs;
+import static tanks.Panel.tickSprint;
 
 public class DebugKeybinds
 {
@@ -42,12 +44,19 @@ public class DebugKeybinds
             if (!Game.game.window.shift)
                 Replay.toggleRecording();
 
-            if (!Replay.isRecording || Game.game.window.shift)
-                Replay.read("test").loadAndPlay();
-
             notifs.add(new ScreenElement.Notification("Recording \u00a7255200000255"
                     + (Replay.isRecording ? "started" : "stopped")));
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_R);
+        }
+
+        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_L))
+        {
+            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_L);
+            Replay.toggleRecording();
+            if (Replay.currentReplay != null)
+                Replay.currentReplay.forTests = true;
+            notifs.add(new ScreenElement.Notification("Recording \u00a7255200000255"
+                    + (Replay.isRecording ? "started" : "stopped") + " \n \u00a7150200255255(player only)"));
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_B))
@@ -58,9 +67,9 @@ public class DebugKeybinds
                     + (Game.showHitboxes ? "shown" : "hidden"), 200));
         }
 
-        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_R))
+        if (Game.game.window.pressedKeys.contains(InputCodes.KEY_V))
         {
-            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_R);
+            Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_V);
             if (Game.currentLevel != null)
                 Game.currentLevel.reloadTiles();
             notifs.add(new ScreenElement.Notification(Game.currentLevel != null ? "Reloaded tiles" : "Reload tiles failed: " +
@@ -90,21 +99,7 @@ public class DebugKeybinds
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_LEFT_BRACKET))
         {
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_LEFT_BRACKET);
-            Panel.tickSprint = !Panel.tickSprint;
-
-            if (Panel.tickSprint)
-            {
-                Game.vsync = false;
-                Game.maxFPS = 0;
-                Game.game.window.setVsync(false);
-                Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
-            }
-            else
-            {
-                ScreenOptions.loadOptions(Game.homedir);
-                Game.game.window.setVsync(Game.vsync);
-                Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
-            }
+            Panel.setTickSprint(!tickSprint);
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_D))
@@ -208,7 +203,7 @@ public class DebugKeybinds
 
             if (Game.game.window.pressedKeys.contains(InputCodes.KEY_1))
             {
-                Chunk c = Chunk.getChunk(posX, posY, true);
+                Chunk c = Chunk.getChunk(posX, posY);
                 Chunk.Tile t1 = Chunk.getTile(posX, posY);
 
                 if (c != null)
@@ -239,7 +234,7 @@ public class DebugKeybinds
             }
             else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_2))
             {
-                ArrayList<Movable> v = Game.getInRadius(mx, my, 50, c -> c.movables);
+                ObjectArrayList<Movable> v = Game.getMovablesInRadius(mx, my, 50);
                 if (!v.isEmpty())
                     text = v.get(0).getMetadata();
             }

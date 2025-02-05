@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.gui.IFixedMenu;
 import tanks.gui.Scoreboard;
@@ -51,7 +52,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
     public static int currentID = 0;
     public static ArrayList<Integer> freeIDs = new ArrayList<>();
-    public static HashMap<Integer, Mine> idMap = new HashMap<>();
+    public static Int2ObjectOpenHashMap<Mine> idMap = new Int2ObjectOpenHashMap<>();
 
     public double[] lightInfo = new double[]{0, 0, 0, 0, 0, 0, 0};
 
@@ -216,17 +217,14 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
         boolean enemyNear = false;
         boolean allyNear = false;
-        for (Movable m: Game.getInRadius(posX, posY, explosion.radius, c -> c.movables))
+        for (Movable m: Game.getMovablesInRadius(posX, posY, explosion.radius))
         {
-            if (Math.pow(Math.abs(m.posX - this.posX), 2) + Math.pow(Math.abs(m.posY - this.posY), 2) < Math.pow(this.explosion.radius, 2))
+            if (m instanceof Tank && !m.destroy && ((Tank) m).targetable)
             {
-                if (m instanceof Tank && !m.destroy && ((Tank) m).targetable)
-                {
-                    if (Team.isAllied(m, this.tank))
-                        allyNear = true;
-                    else
-                        enemyNear = true;
-                }
+                if (Team.isAllied(m, this.tank))
+                    allyNear = true;
+                else
+                    enemyNear = true;
             }
         }
 
@@ -340,10 +338,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
     public static void drawRange2D(double posX, double posY, double size, boolean inverted)
     {
         int faces = (int) (size + 5);
-        double r = Drawing.drawing.currentColorR;
-        double g = Drawing.drawing.currentColorG;
-        double b = Drawing.drawing.currentColorB;
-        double a = Drawing.drawing.currentColorA;
+        double r = Drawing.drawing.currentColorR, g = Drawing.drawing.currentColorG, b = Drawing.drawing.currentColorB, a = Drawing.drawing.currentColorA;
 
         Game.game.window.shapeRenderer.setBatchMode(true, true, false);
         for (int f = 0; f < faces; f++)

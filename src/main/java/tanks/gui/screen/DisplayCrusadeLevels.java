@@ -4,6 +4,7 @@ import basewindow.transformation.RotationAboutPoint;
 import basewindow.transformation.ScaleAboutPoint;
 import basewindow.transformation.Transformation;
 import basewindow.transformation.Translation;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.obstacle.Obstacle;
 import tanks.rendering.StaticTerrainRenderer;
@@ -39,7 +40,7 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
     protected ScaleAboutPoint shadowScale = new ScaleAboutPoint(Game.game.window, shadowScaleNum, shadowScaleNum, 1.0, 0.5, 0.5, 0.5);
 
     protected ArrayList<ScreenLevel> levels = new ArrayList<>();
-    protected HashMap<Integer, ScreenLevel> levelsPos = new HashMap<>();
+    protected Int2ObjectOpenHashMap<ScreenLevel> levelsPos = new Int2ObjectOpenHashMap<>();
     protected ArrayList<TankSpawnMarker> spawns = new ArrayList<>();
     protected double age = 360;
     protected boolean initialized = false;

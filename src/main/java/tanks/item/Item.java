@@ -217,22 +217,17 @@ public abstract class Item extends GameObject
 		{
 			if (this.player == null)
 				return null;
-			else if (this.player == Game.player)
-			{
-				return Game.playerTank;
-			}
-			else
-			{
-				for (Movable m: Game.movables)
-				{
-					if (m instanceof TankPlayerRemote && ((TankPlayerRemote) m).player.clientID.equals(this.player.clientID))
-					{
-						return (Tank) m;
-					}
-				}
-			}
 
-			return null;
+            if (this.player == Game.player)
+                return Game.playerTank;
+
+			for (Movable m: Game.movables)
+            {
+                if (m instanceof TankPlayerRemote && ((TankPlayerRemote) m).player.clientID.equals(this.player.clientID))
+                    return (Tank) m;
+            }
+
+            return null;
 		}
 
 		public void updateCooldown(double reload)

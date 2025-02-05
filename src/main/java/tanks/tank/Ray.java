@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import tanks.Chunk;
 import tanks.Effect;
 import tanks.Game;
@@ -10,11 +11,14 @@ import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
 
-import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.Arrays;
 
 public class Ray
 {
+	public static int chunksAdded;
+	public static Chunk[] chunkCache = new Chunk[40];
+	public static Ray cacheRay = new Ray();
+
 	public double size = 10;
 	public double tankHitSizeMul = 1;
 
@@ -31,7 +35,6 @@ public class Ray
 
 	public boolean trace = Game.traceAllRays;
 	public boolean dotted = false;
-	public TreeSet<Chunk> chunksToCheck = new TreeSet<>();
 
 	public double speed = 10;
 
@@ -41,19 +44,30 @@ public class Ray
 	public Tank tank, targetTank;
 	public double targetTankSizeMul = 0;
 
-	public ArrayList<Double> bounceX = new ArrayList<>();
-	public ArrayList<Double> bounceY = new ArrayList<>();
+	public DoubleArrayList bounceX = new DoubleArrayList();
+	public DoubleArrayList bounceY = new DoubleArrayList();
 
-	public double targetX;
-	public double targetY;
+	public double targetX, targetY;
 	public boolean acquiredTarget = false;
 
-	public Ray(double x, double y, double angle, int bounces, Tank tank)
+	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank)
 	{
-		this(x, y, angle, bounces, tank, 10);
+		return newRay(x, y, angle, bounces, tank, 10);
 	}
 
-	public Ray(double x, double y, double angle, int bounces, Tank tank, double speed)
+	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank, double speed)
+	{
+		return cacheRay.set(x, y, angle, bounces, tank, speed);
+	}
+
+	public Ray copy()
+	{
+		return new Ray().set(posX, posY, angle, bounces, tank, speed);
+	}
+
+	private Ray() {}
+
+	public Ray set(double x, double y, double angle, int bounces, Tank tank, double speed)
 	{
 		this.vX = speed * Math.cos(angle);
 		this.vY = speed * Math.sin(angle);
@@ -62,8 +76,24 @@ public class Ray
 		this.posX = this.startX = x;
 		this.posY = this.startY = y;
 		this.bounces = bounces;
+		this.bouncyBounces = 100;
+		setSize(10).setMaxChunks(12);
 
+		this.trace = Game.traceAllRays;
+		this.dotted = false;
+		this.enableBounciness = true;
+		this.ignoreTanks = false;
+		this.ignoreBullets = true;
+		this.ignoreDestructible = false;
+		this.ignoreShootThrough = false;
+
+		this.acquiredTarget = false;
 		this.tank = tank;
+
+		this.bounceX.clear();
+		this.bounceY.clear();
+
+		return this;
 	}
 
 	public Movable getTarget(double mul, Tank targetTank)
@@ -147,7 +177,7 @@ public class Ray
 				double moveX = moveXBase * chunksChecked, moveXPrev = moveXBase * Math.max(0, chunksChecked - 1);
 				double moveY = moveYBase * chunksChecked, moveYPrev = moveYBase * Math.max(0, chunksChecked - 1);
 
-				chunksToCheck.clear();
+				chunksAdded = 0;
 				Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
 				addChunks(current, mid);
 
@@ -157,11 +187,14 @@ public class Ray
 							Chunk.getChunk(posX + moveX, posY + moveYPrev)
 					);
 
-				if (chunksToCheck.isEmpty())
+				if (chunksAdded == 0)
 					break;
 
-				for (Chunk chunk : chunksToCheck)
+				Arrays.sort(chunkCache, 0, chunksAdded);
+
+				for (int i = 0; i < chunksAdded; i++)
 				{
+					Chunk chunk = chunkCache[i];
 					if (chunk == null)
 						continue;
 
@@ -455,8 +488,8 @@ public class Ray
 
 	public double getDist()
 	{
-		this.bounceX.add(0, this.posX);
-		this.bounceY.add(0, this.posY);
+		this.bounceX.add(this.posX);
+		this.bounceY.add(this.posY);
 
 		if (!acquiredTarget)
 			this.getTarget();
@@ -484,7 +517,7 @@ public class Ray
 	{
 		double dist = 0;
 		for (int i = 0; i < this.bounceX.size() - 1; i++)
-            dist += Math.pow(this.bounceX.get(i + 1) - this.bounceX.get(i), 2) + Math.pow(this.bounceY.get(i + 1) - this.bounceY.get(i), 2);
+            dist += Math.pow(this.bounceX.getDouble(i + 1) - this.bounceX.getDouble(i), 2) + Math.pow(this.bounceY.getDouble(i + 1) - this.bounceY.getDouble(i), 2);
 
 		if (this.bounces >= 0)
 			dist += Chunk.chunkToPixel(maxChunkCheck);
@@ -500,7 +533,7 @@ public class Ray
 				continue;
 
 			c.compareTo = compare;
-			chunksToCheck.add(c);
+			chunkCache[chunksAdded++] = c;
 		}
 	}
 
@@ -525,11 +558,11 @@ public class Ray
 		return angle;
 	}
 
-	public static boolean isInsideObstacle(double x, double y)
+	public boolean isInsideObstacle(double x, double y)
 	{
-		int ox = (int) (x / Game.tile_size);
-		int oy = (int) (y / Game.tile_size);
-
-		return !(ox >= 0 && ox < Game.currentSizeX && oy >= 0 && oy < Game.currentSizeY) || Game.isSolid(ox, oy);
+		Obstacle o = Game.getObstacle(x, y);
+		if (o == null)
+			return false;
+		return o.bulletCollision && !(ignoreShootThrough && o.shouldShootThrough) && !(ignoreDestructible && o.destructible);
 	}
 }

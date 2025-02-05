@@ -6,6 +6,7 @@ import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.bullet.BulletAirStrike;
 import tanks.bullet.BulletArc;
+import tanks.effect.AttributeModifier;
 import tanks.gui.Button;
 import tanks.gui.IFixedMenu;
 import tanks.gui.Joystick;
@@ -17,14 +18,16 @@ import tanks.gui.screen.ScreenTitle;
 import tanks.gui.screen.leveleditor.selector.SelectorTeam;
 import tanks.hotbar.Hotbar;
 import tanks.hotbar.ItemBar;
-import tanks.item.*;
+import tanks.item.Item;
+import tanks.item.ItemBullet;
+import tanks.item.ItemRemote;
 import tanks.network.event.EventLayMine;
 import tanks.network.event.EventShootBullet;
-import tanks.tankson.*;
+import tanks.tankson.Property;
+import tanks.tankson.Serializer;
+import tanks.tankson.TanksONable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import static tanks.tank.TankPropertyCategory.general;
 
 /**
  * A tank that is controlled by the player. TankPlayerController is used instead if we are connected to a party as a client.
@@ -61,6 +64,10 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 	public double mouseX;
 	public double mouseY;
+
+	public static int[] default_primary_color = new int[]{0, 150, 255};
+	public static int[] default_secondary_color = new int[]{(int) Turret.calculateSecondaryColor(0), (int) Turret.calculateSecondaryColor(150), (int) Turret.calculateSecondaryColor(255)};
+	public static int[] default_tertiary_color = new int[]{(default_primary_color[0] + default_secondary_color[0]) / 2, (default_primary_color[1] + default_secondary_color[1]) / 2, (default_primary_color[2] + default_secondary_color[2]) / 2};
 
 	public static final int max_abilities = 5;
 
@@ -102,6 +109,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 		this.emblemR = this.secondaryColorR;
 		this.emblemG = this.secondaryColorG;
 		this.emblemB = this.secondaryColorB;
+		this.saveColors();
 
 		if (enableDestroyCheat)
 		{
@@ -222,11 +230,11 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 				a = 3 * Math.PI / 4;
 			else if (x == -1 && y == 0)
 				a = Math.PI;
-			else if (x == -1 && y == -1)
+			else if (x == -1)
 				a = 5 * Math.PI / 4;
 			else if (x == 0 && y == -1)
 				a = 3 * Math.PI / 2;
-			else if (x == 1 && y == -1)
+			else if (x == 1)
 				a = 7 * Math.PI / 4;
 
 			double intensity = 1;
@@ -239,7 +247,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 					a = controlStick.inputAngle;
 			}
 
-			if (a >= 0 && intensity >= 0.2)
+			if (a >= 0)
 			{
 				if (Game.followingCam)
 					a += this.angle + Math.PI / 2;
@@ -265,23 +273,17 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 				this.setPolarMotion(this.getPolarDirection(), maxVelocity);
 		}
 
-		double reload = this.getAttributeValue(AttributeModifier.reload, 1);
+		double reload = em().getAttributeValue(AttributeModifier.reload, 1);
 
-		for (Item.ItemStack s: this.abilities)
-		{
-			s.updateCooldown(reload);
-		}
+		for (Item.ItemStack<?> s: this.abilities)
+            s.updateCooldown(reload);
 
 		Hotbar h = Game.player.hotbar;
 		if (h.enabledItemBar)
 		{
-			for (Item.ItemStack<?> i: h.itemBar.slots)
-			{
+			for (Item.ItemStack<?> i : h.itemBar.slots)
 				if (i != null && !i.isEmpty)
-				{
 					i.updateCooldown(reload);
-				}
-			}
 		}
 
 		boolean shoot = !Game.game.window.touchscreen && Game.game.input.shoot.isPressed();
@@ -338,7 +340,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 					{
 						InputPoint p = Game.game.window.touchPoints.get(i);
 
-						if (!p.tag.equals("") && !p.tag.equals("aim") && !p.tag.equals("shoot"))
+						if (!p.tag.isEmpty() && !p.tag.equals("aim") && !p.tag.equals("shoot"))
 							continue;
 
 						if (Game.screen instanceof ScreenGame)
@@ -421,9 +423,9 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			double lifespan = -1;
 			double rangeMin = -1;
 			double rangeMax = -1;
-			boolean showTrace = true;
+			boolean showTrace;
 
-			Ray r = new Ray(this.posX, this.posY, this.angle, 1, this);
+			Ray r = Ray.newRay(this.posX, this.posY, this.angle, 1, this);
 			ItemBullet.ItemStackBullet i = null;
 
 			if (this.getPrimaryAbility() instanceof ItemBullet.ItemStackBullet)
@@ -433,9 +435,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			{
 				Item.ItemStack<?> is = h.itemBar.slots[h.itemBar.selected];
 				if (is instanceof ItemBullet.ItemStackBullet)
-				{
-					i = (ItemBullet.ItemStackBullet) is;
-				}
+                    i = (ItemBullet.ItemStackBullet) is;
 			}
 
 			if (i != null)
@@ -448,7 +448,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 				showTrace = b.showTrace;
 
 				if (lifespan > 0)
-					lifespan *= this.getAttributeValue(AttributeModifier.bullet_speed, 1);
+					lifespan *= em().getAttributeValue(AttributeModifier.bullet_speed, 1);
 			}
 			else
 				showTrace = false;
@@ -533,7 +533,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 		b.setPolarMotion(this.angle + offset, speed);
 		b.speed = Math.abs(speed);
-		this.addPolarMotion(b.getPolarDirection() + Math.PI, 25.0 / 32.0 * b.recoil * this.getAttributeValue(AttributeModifier.recoil, 1) * b.frameDamageMultipler);
+		this.addPolarMotion(b.getPolarDirection() + Math.PI, 25.0 / 32.0 * b.recoil * em().getAttributeValue(AttributeModifier.recoil, 1) * b.frameDamageMultipler);
 
 		if (b.recoil != 0)
 		{
@@ -681,6 +681,57 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 					i.cooldown = Math.max(i.cooldown, value);
 				}
 			}
+		}
+	}
+
+	@TanksONable("shop_build")
+	public static class ShopTankBuild extends TankPlayer
+	{
+		@TankBuildProperty @Property(id = "price", name = "Price", category = general)
+		public int price;
+
+		public ShopTankBuild()
+		{
+
+		}
+
+		public ShopTankBuild(TankPlayable p)
+		{
+			p.copyPropertiesTo(this);
+		}
+
+		public static ShopTankBuild fromString(String s)
+		{
+			Object o = Serializer.fromTanksON(s);
+			if (o instanceof ShopTankBuild)
+				return (ShopTankBuild) o;
+			else
+				return new ShopTankBuild((TankPlayable) o);
+		}
+	}
+
+	@TanksONable("crusade_shop_build")
+	public static class CrusadeShopTankBuild extends ShopTankBuild
+	{
+		@TankBuildProperty @Property(id = "unlock_level", name = "Unlocks after level", category = general)
+		public int levelUnlock;
+
+		public CrusadeShopTankBuild()
+		{
+
+		}
+		public CrusadeShopTankBuild(TankPlayable p)
+		{
+			p.copyPropertiesTo(this);
+		}
+
+		public static CrusadeShopTankBuild fromString(String s)
+		{
+			Object o = Serializer.fromTanksON(s);
+			if (o instanceof CrusadeShopTankBuild)
+				return (CrusadeShopTankBuild) o;
+			else
+				return new CrusadeShopTankBuild((TankPlayable) o);
 		}
 	}
 }

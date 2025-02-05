@@ -1,6 +1,7 @@
 package tanks.tank;
 
 import tanks.*;
+import tanks.effect.AttributeModifier;
 import tanks.gui.screen.ScreenGame;
 import tanks.tankson.Property;
 
@@ -23,22 +24,9 @@ public class TankRemote extends Tank
 
 	public double interpolationTime = 1;
 
-	public double prevKnownPosX;
-	public double prevKnownPosY;
-	public double prevKnownVX;
-	public double prevKnownVY;
-	public double prevKnownVXFinal;
-	public double prevKnownVYFinal;
-
-	public double currentKnownPosX;
-	public double currentKnownPosY;
-	public double currentKnownVX;
-	public double currentKnownVY;
-
-	public double lastAngle;
-	public double lastPitch;
-	public double currentAngle;
-	public double currentPitch;
+	public double prevKnownPosX, prevKnownPosY, prevKnownVX, prevKnownVY, prevKnownVXFinal, prevKnownVYFinal;
+	public double currentKnownPosX, currentKnownPosY, currentKnownVX, currentKnownVY;
+	public double lastAngle, lastPitch, currentAngle, currentPitch;
 
 	public double timeSinceRefresh = 0;
 
@@ -140,11 +128,13 @@ public class TankRemote extends Tank
 
 		double pvx = this.prevKnownVXFinal;
 		double pvy = this.prevKnownVYFinal;
-		double cvx = this.getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
-		double cvy = this.getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+		double cvx = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+		double cvy = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
 
 		this.posX = cubicInterpolationVelocity(this.prevKnownPosX, pvx, this.currentKnownPosX, cvx, this.timeSinceRefresh, this.interpolationTime);
 		this.posY = cubicInterpolationVelocity(this.prevKnownPosY, pvy, this.currentKnownPosY, cvy, this.timeSinceRefresh, this.interpolationTime);
+//		this.posX = this.currentKnownPosX;
+//		this.posY = this.currentKnownPosY;
 		double frac = Math.min(1, this.timeSinceRefresh / this.interpolationTime);
 		this.vX = (1 - frac) * this.prevKnownVX + frac * this.currentKnownVX;
 		this.vY = (1 - frac) * this.prevKnownVY + frac * this.currentKnownVY;
@@ -189,45 +179,42 @@ public class TankRemote extends Tank
 	public void draw()
 	{
 		if (!this.invisible || this.localAge <= 0 || this.destroy)
-			super.draw();
-		else
 		{
-			if (!this.vanished)
-			{
-				this.vanished = true;
-				Drawing.drawing.playGlobalSound("transform.ogg", 1.2f);
-
-				if (Game.effectsEnabled)
-				{
-					for (int i = 0; i < 50 * Game.effectMultiplier; i++)
-					{
-						Effect e = Effect.createNewEffect(this.posX, this.posY, Effect.EffectType.piece);
-						double var = 50;
-						e.colR = Math.min(255, Math.max(0, this.colorR + Math.random() * var - var / 2));
-						e.colG = Math.min(255, Math.max(0, this.colorG + Math.random() * var - var / 2));
-						e.colB = Math.min(255, Math.max(0, this.colorB + Math.random() * var - var / 2));
-
-						if (Game.enable3d)
-							e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0);
-						else
-							e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
-
-						Game.effects.add(e);
-					}
-				}
-			}
-
-			for (int i = 0; i < Game.tile_size * 2 - this.localAge; i++)
-			{
-				Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, (this.size * 2 - i - this.localAge) * 2.55);
-				Drawing.drawing.fillOval(this.posX, this.posY, i, i);
-			}
+			super.draw();
+			return;
 		}
 
-		/*Drawing.drawing.setInterfaceFontSize(24);
-		Drawing.drawing.setColor(0, 0, 0);
-		Drawing.drawing.drawInterfaceText(Drawing.drawing.toInterfaceCoordsX(prevKnownPosX), Drawing.drawing.toInterfaceCoordsY(prevKnownPosY), String.format("%d, %d, %.2f", (int) posX / 50, (int) posY / 50, timeSinceRefresh));*/
-	}
+        if (!this.vanished)
+        {
+            this.vanished = true;
+            Drawing.drawing.playGlobalSound("transform.ogg", 1.2f);
+
+            if (Game.effectsEnabled)
+            {
+                for (int i = 0; i < 50 * Game.effectMultiplier; i++)
+                {
+                    Effect e = Effect.createNewEffect(this.posX, this.posY, Effect.EffectType.piece);
+                    double var = 50;
+                    e.colR = Math.min(255, Math.max(0, this.colorR + Math.random() * var - var / 2));
+                    e.colG = Math.min(255, Math.max(0, this.colorG + Math.random() * var - var / 2));
+                    e.colB = Math.min(255, Math.max(0, this.colorB + Math.random() * var - var / 2));
+
+                    if (Game.enable3d)
+                        e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0);
+                    else
+                        e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
+
+                    Game.effects.add(e);
+                }
+            }
+        }
+
+        for (int i = 0; i < Game.tile_size * 2 - this.localAge; i++)
+        {
+            Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, (this.size * 2 - i - this.localAge) * 2.55);
+            Drawing.drawing.fillOval(this.posX, this.posY, i, i);
+        }
+    }
 
 	public static double cubicInterpolationVelocity(double startPos, double startVel, double endPos, double endVel, double curTime, double totalTime)
 	{

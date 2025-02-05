@@ -1,6 +1,7 @@
 package tanks;
 
 import basewindow.InputCodes;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.extension.Extension;
 import tanks.gui.*;
 import tanks.gui.ScreenElement.CenterMessage;
@@ -19,6 +20,7 @@ import tanks.network.event.online.IOnlineServerEvent;
 import tanks.obstacle.Obstacle;
 import tanks.rendering.*;
 import tanks.replay.Replay;
+import tanks.replay.ReplayHandler;
 import tanks.tank.*;
 
 import java.util.ArrayList;
@@ -103,7 +105,7 @@ public class Panel
 	protected Screen lastDrawnScreen = null;
 
 	public ArrayList<double[]> lights = new ArrayList<>();
-	HashMap<Integer, IStackableEvent> stackedEventsIn = new HashMap<>();
+	Int2ObjectOpenHashMap<IStackableEvent> stackedEventsIn = new Int2ObjectOpenHashMap<>();
 
 	public LoadingTerrainContinuation continuation = null;
 	public long continuationStartTime = 0;
@@ -576,14 +578,14 @@ public class Panel
 			Game.screen.onFocusChange(prevFocused);
 		}
 
-		Replay.preUpdate();
+		ReplayHandler.preUpdate();
 
 		if (!onlinePaused)
 			Game.screen.update();
 		else
 			this.onlineOverlay.update();
 
-		Replay.update();
+		ReplayHandler.update();
 
 		if (Game.game.input.fullscreen.isValid())
 		{
@@ -752,7 +754,7 @@ public class Panel
 			try
 			{
 				Game.screen.draw();
-				Replay.draw();
+				ReplayHandler.draw();
 				this.continuation = null;
 				this.continuationMusic = false;
 			}
@@ -1029,8 +1031,6 @@ public class Panel
 		Drawing.drawing.setInterfaceFontSize(12);
 
 		double boundary = Game.game.window.getEdgeBounds();
-		double rightEdge = Panel.windowWidth - 5;
-		double bottomEdge = Panel.windowHeight;
 
 		if (Game.framework == Game.Framework.libgdx)
 			boundary += 40;
@@ -1042,6 +1042,7 @@ public class Panel
 		Drawing.drawing.setColor(255, 227, 186);
 
 		Game.game.window.fontRenderer.drawString(boundary + 2, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, "FPS: " + lastFPS);
+
 		Game.game.window.fontRenderer.drawString(boundary + 600, offset + (int) (Panel.windowHeight - 40 + 10), 0.6, 0.6, Game.screen.screenHint);
 
 		long free = Runtime.getRuntime().freeMemory();
@@ -1063,16 +1064,31 @@ public class Panel
 		if (ScreenPartyLobby.isClient || ScreenPartyHost.isServer)
 		{
 			Drawing.drawing.setColor(255, 227, 186);
-			if (ScreenPartyLobby.isClient || ScreenPartyHost.isServer)
-			{
-				Drawing.drawing.setColor(255, 227, 186);
 
-				String s = "Upstream: " + MessageReader.upstreamBytesPerSec / 1024 + "KB/s";
-				Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 6), 0.4, 0.4, s);
+			String s = "Upstream: " + MessageReader.upstreamBytesPerSec / 1024 + "KB/s";
+			Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 6), 0.4, 0.4, s);
 
-				s = "Downstream: " + MessageReader.downstreamBytesPerSec / 1024 + "KB/s";
-				Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, s);
-			}
+			s = "Downstream: " + MessageReader.downstreamBytesPerSec / 1024 + "KB/s";
+			Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, s);
+		}
+	}
+
+	public static void setTickSprint(boolean tickSprint)
+	{
+		Panel.tickSprint = tickSprint;
+
+		if (Panel.tickSprint)
+		{
+			Game.vsync = false;
+			Game.maxFPS = 0;
+			Game.game.window.setVsync(false);
+			Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
+		}
+		else
+		{
+			ScreenOptions.loadOptions(Game.homedir);
+			Game.game.window.setVsync(Game.vsync);
+			Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
 		}
 	}
 

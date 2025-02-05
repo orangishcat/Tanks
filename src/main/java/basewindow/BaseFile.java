@@ -13,6 +13,8 @@ public abstract class BaseFile
         this.path = path;
     }
 
+    public abstract String read();
+
     public abstract boolean exists();
 
     public abstract boolean create() throws IOException;

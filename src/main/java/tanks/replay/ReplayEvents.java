@@ -5,6 +5,7 @@ import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
 import tanks.Movable;
+import tanks.gui.screen.ScreenAutomatedTests;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.ScreenPartyHost;
 import tanks.network.NetworkEventMap;
@@ -12,8 +13,6 @@ import tanks.network.NetworkUtils;
 import tanks.network.event.INetworkEvent;
 import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
-import tanks.tank.TankPlayerController;
-import tanks.tank.TankRemote;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -120,25 +119,34 @@ public class ReplayEvents
         public void execute()
         {
             Game.cleanUp();
-            ScreenPartyHost.isServer = true;
-            new Level(levelString).loadLevel(true);
+            boolean remote = Replay.currentPlaying == null || !Replay.currentPlaying.forTests;
+            ScreenPartyHost.isServer = remote;
+            new Level(levelString).loadLevel(remote);
+            Game.currentLevel.clientStartingItems = Game.currentLevel.startingItems;
             ScreenPartyHost.isServer = false;
 
-            ArrayList<Movable> add = new ArrayList<>(), remove = new ArrayList<>();
+            int ind = -1;
             for (Movable m : Game.movables)
             {
-                if (!(m instanceof TankPlayerController || m instanceof TankPlayer))
+                ind++;
+                if (!(m instanceof TankPlayer))
                     continue;
 
-                add.add(new TankRemote((Tank) m));
-                remove.add(m);
+                Game.movables.set(ind, new TankReplayPlayer((Tank) m));
             }
-            Game.movables.addAll(add);
-            Game.movables.removeAll(remove);
+            enterGame();
+            Drawing.drawing.terrainRenderer.reset();
+        }
 
-            Game.screen = new ScreenGame();
-            ((ScreenGame) Game.screen).playingReplay = true;
-            Game.playerTank.destroy = true;
+        public static void enterGame()
+        {
+            ScreenGame g = new ScreenGame();
+            g.playingReplay = g.playing = true;
+
+            if (Game.screen instanceof ScreenAutomatedTests)
+                ((ScreenAutomatedTests) Game.screen).game = g;
+            else
+                Game.screen = g;
         }
     }
 

@@ -1,12 +1,15 @@
 package tanks;
 
 import basewindow.IBatchRenderableObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectAVLTreeSet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @SuppressWarnings("UnusedReturnValue")
 public class Chunk implements Comparable<Chunk>
@@ -16,15 +19,16 @@ public class Chunk implements Comparable<Chunk>
     public static final Tile emptyTile = new Tile();
     public static boolean debug = false;
 
-    public static HashMap<Integer, Chunk> chunks = new HashMap<>();
-    public static ArrayList<Chunk> chunkList = new ArrayList<>();
+    public static Int2ObjectOpenHashMap<Chunk> chunks = new Int2ObjectOpenHashMap<>();
+    public static ObjectArrayList<Chunk> chunkList = new ObjectArrayList<>();
+    private static final ObjectArrayList<Chunk> chunkCache = new ObjectArrayList<>();
     public static int chunkSize = 8;
 
     public final Level level;
     public final int chunkX, chunkY;
     public Face[] borderFaces = new Face[4];
-    public final HashSet<Obstacle> obstacles = new HashSet<>();
-    public final HashSet<Movable> movables = new HashSet<>();
+    public final ObjectOpenHashSet<Obstacle> obstacles = new ObjectOpenHashSet<>();
+    public final ObjectOpenHashSet<Movable> movables = new ObjectOpenHashSet<>();
     public final FaceList faces = new FaceList();
     public final FaceList staticFaces = new FaceList();
     public final FaceList[] faceLists = {faces, staticFaces};
@@ -81,22 +85,24 @@ public class Chunk implements Comparable<Chunk>
         return !Chunk.chunkList.isEmpty();
     }
 
-    public static ArrayList<Chunk> iterateOutwards(double posX, double posY, int maxDist)
+    /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
+     * @return the chunks within the range */
+    public static ObjectArrayList<Chunk> iterateOutwards(double posX, double posY, int maxChunks)
     {
-        return iterateOutwards((int) (posX / Game.tile_size), (int) (posY / Game.tile_size), maxDist);
+        return iterateOutwards((int) (posX / Game.tile_size), (int) (posY / Game.tile_size), maxChunks);
     }
 
-    public static ArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxDist)
+    /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
+     * @return the chunks within the range */
+    public static ObjectArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxChunks)
     {
-        ArrayList<Chunk> out = new ArrayList<>();
+        chunkCache.clear();
         ArrayDeque<Chunk> queue = new ArrayDeque<>();
-        HashSet<Chunk> visited = new HashSet<>();
+        ObjectOpenHashSet<Chunk> visited = new ObjectOpenHashSet<>();
 
-        Chunk start = Chunk.getChunk(tileX, tileY, true);
-        if (start == null)
-            return out;
-
-        queue.add(start);
+        Chunk start = Chunk.getChunk(tileX, tileY);
+        if (start != null)
+            queue.add(start);
 
         while (!queue.isEmpty())
         {
@@ -105,16 +111,16 @@ public class Chunk implements Comparable<Chunk>
             {
                 int newX = c.chunkX + Game.dirX[i];
                 int newY = c.chunkY + Game.dirY[i];
-                Chunk next = Chunk.getChunk(newX, newY);
-                if (next != null && start.manhattanDist(next) < maxDist && visited.add(next))
+                Chunk next = Chunk.getChunkCoords(newX, newY);
+                if (next != null && start.manhattanDist(next) < maxChunks && visited.add(next))
                 {
-                    out.add(next);
+                    chunkCache.add(next);
                     queue.add(next);
                 }
             }
         }
 
-        return out;
+        return chunkCache;
     }
 
     public static double chunkToPixel(double chunkPos)
@@ -162,22 +168,26 @@ public class Chunk implements Comparable<Chunk>
             return;
 
         obstacles.remove(o);
-
-        if (o.tankCollision || o.bulletCollision)
-            staticFaces.removeFaces(o);
+        staticFaces.removeFaces(o);
     }
 
-    public static Stream<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)
+    public static ObjectArrayList<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)
     {
         return getChunksInRange((int) (x1 / Game.tile_size), (int) (y1 / Game.tile_size),
                 (int) (x2 / Game.tile_size), (int) (y2 / Game.tile_size));
     }
 
-    public static Stream<Chunk> getChunksInRange(int tx1, int ty1, int tx2, int ty2)
+    public static ObjectArrayList<Chunk> getChunksInRange(int tx1, int ty1, int tx2, int ty2)
     {
         int x1 = tx1 / chunkSize, y1 = ty1 / chunkSize, x2 = tx2 / chunkSize, y2 = ty2 / chunkSize;
-        return chunkList.stream().filter(chunk -> Game.isOrdered(true, x1, chunk.chunkX, x2)
-                && Game.isOrdered(true, y1, chunk.chunkY, y2));
+        chunkCache.clear();
+        for (Chunk c : chunkList)
+        {
+            if (Game.isOrdered(true, x1, c.chunkX, x2)
+                    && Game.isOrdered(true, y1, c.chunkY, y2))
+                chunkCache.add(c);
+        }
+        return chunkCache;
     }
 
     public static Optional<Tile> getTileOptional(int tileX, int tileY)
@@ -191,17 +201,22 @@ public class Chunk implements Comparable<Chunk>
     }
 
     /** Expects all pixel coordinates. */
-    public static Stream<Chunk> getChunksInRadius(double x1, double y1, double radius)
+    public static ObjectArrayList<Chunk> getChunksInRadius(double x1, double y1, double radius)
     {
         return getChunksInRadius((int) (x1 / Game.tile_size), (int) (y1 / Game.tile_size), (int) (radius / Game.tile_size));
     }
 
     /** Expects all tile coordinates. */
-    public static Stream<Chunk> getChunksInRadius(int tx1, int ty1, int radius)
+    public static ObjectArrayList<Chunk> getChunksInRadius(int tx1, int ty1, int radius)
     {
         double x1 = (double) tx1 / chunkSize, y1 = (double) ty1 / chunkSize, cRad = Math.ceil((double) radius / chunkSize) + 1;
-        return chunkList.stream().filter(chunk -> (chunk.chunkX - x1) * (chunk.chunkX - x1) +
-                (chunk.chunkY - y1) * (chunk.chunkY - y1) <= cRad * cRad);
+        for (Chunk chunk : chunkList)
+        {
+            if ((chunk.chunkX - x1) * (chunk.chunkX - x1) +
+                    (chunk.chunkY - y1) * (chunk.chunkY - y1) <= cRad * cRad)
+                chunkCache.add(chunk);
+        }
+        return chunkCache;
     }
 
     public static Tile setTileColor(Level l, Random r, Tile t)
@@ -303,7 +318,7 @@ public class Chunk implements Comparable<Chunk>
     /** Expects tile coordinates. */
     public static Tile getTile(int tileX, int tileY)
     {
-        Chunk c = getChunk(tileX / chunkSize, tileY / chunkSize);
+        Chunk c = getChunk(tileX, tileY);
         if (c == null)
             return null;
         return c.getChunkTile(tileX, tileY);
@@ -349,14 +364,22 @@ public class Chunk implements Comparable<Chunk>
 
     public static class FaceList
     {
-        /** dynamic x, static y */
-        public final TreeSet<Face> topFaces = new TreeSet<>();
-        /** dynamic x, static y */
-        public final TreeSet<Face> bottomFaces = new TreeSet<>(Comparator.reverseOrder());
-        /** static x, dynamic y */
-        public final TreeSet<Face> leftFaces = new TreeSet<>();
-        /** static x, dynamic y */
-        public final TreeSet<Face> rightFaces = new TreeSet<>(Comparator.reverseOrder());
+        /**
+         * dynamic x, static y
+         */
+        public final ObjectAVLTreeSet<Face> topFaces = new ObjectAVLTreeSet<>();
+        /**
+         * dynamic x, static y
+         */
+        public final ObjectAVLTreeSet<Face> bottomFaces = new ObjectAVLTreeSet<>(Comparator.reverseOrder());
+        /**
+         * static x, dynamic y
+         */
+        public final ObjectAVLTreeSet<Face> leftFaces = new ObjectAVLTreeSet<>();
+        /**
+         * static x, dynamic y
+         */
+        public final ObjectAVLTreeSet<Face> rightFaces = new ObjectAVLTreeSet<>(Comparator.reverseOrder());
 
         public void addFaces(ISolidObject s)
         {
@@ -415,7 +438,7 @@ public class Chunk implements Comparable<Chunk>
             }
         }
 
-        public TreeSet<Face> getSide(int side)
+        public ObjectAVLTreeSet<Face> getSide(int side)
         {
             switch (side)
             {
@@ -498,23 +521,20 @@ public class Chunk implements Comparable<Chunk>
                 addChunk(x + startX, y + startY, new Chunk(l, r, x, y));
     }
 
+    /** Expects pixel coordinates. */
     public static Chunk getChunk(double posX, double posY)
     {
-        return getChunk(posX, posY, false);
+        return getChunk((int) (posX / Game.tile_size), (int) (posY / Game.tile_size));
     }
 
-    public static Chunk getChunk(double posX, double posY, boolean isTileCoords)
+    /** Expects tile coordinates. */
+    public static Chunk getChunk(int tileX, int tileY)
     {
-        if (!isTileCoords)
-        {
-            posX = posX / Game.tile_size;
-            posY = posY / Game.tile_size;
-        }
-
-        return getChunk((int) (posX / chunkSize), (int) (posY / chunkSize));
+        return getChunkCoords(tileX / Chunk.chunkSize, tileY / Chunk.chunkSize);
     }
 
-    public static Chunk getChunk(int chunkX, int chunkY)
+    /** Expects chunk coordinates. */
+    public static Chunk getChunkCoords(int chunkX, int chunkY)
     {
         if (prevChunk != null && prevChunk.chunkX == chunkX && prevChunk.chunkY == chunkY)
             return prevChunk;

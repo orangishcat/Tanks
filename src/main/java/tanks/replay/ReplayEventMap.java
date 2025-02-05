@@ -1,10 +1,12 @@
 package tanks.replay;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+
 import java.util.HashMap;
 
 public class ReplayEventMap
 {
-    public static HashMap<Integer, Class<? extends ReplayEvents.IReplayEvent>> replayEventMap = new HashMap<>();
+    public static Int2ObjectOpenHashMap<Class<? extends ReplayEvents.IReplayEvent>> replayEventMap = new Int2ObjectOpenHashMap<>();
     public static HashMap<Class<? extends ReplayEvents.IReplayEvent>, Integer> replayIDMap = new HashMap<>();
     static
     {
@@ -20,7 +22,7 @@ public class ReplayEventMap
         replayIDMap.put(event, p);
     }
 
-    public static Class<? extends ReplayEvents.IReplayEvent> get(Integer id)
+    public static Class<? extends ReplayEvents.IReplayEvent> get(int id)
     {
         return replayEventMap.get(id);
     }

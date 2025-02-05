@@ -71,8 +71,8 @@ public class ScreenPlaySavedLevels extends Screen
 				{
 					if (Game.loadLevel(file))
 					{
-						Game.screen = new ScreenGame();
 						ScreenInterlevel.fromSavedLevels = true;
+						Game.screen = new ScreenGame();
 					}
 				}, (file) -> "Last modified---" + Game.timeInterval(file.lastModified(), System.currentTimeMillis()) + " ago");
 

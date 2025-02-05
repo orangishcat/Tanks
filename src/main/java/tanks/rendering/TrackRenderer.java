@@ -2,6 +2,7 @@ package tanks.rendering;
 
 import basewindow.BaseShapeBatchRenderer;
 import basewindow.IBatchRenderableObject;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.screen.ScreenGame;
@@ -13,7 +14,7 @@ public class TrackRenderer
 {
     public static final int section_size = 2000;
 
-    protected final HashMap<Integer, RegionRenderer> renderers = new HashMap<>();
+    protected final Int2ObjectOpenHashMap<RegionRenderer> renderers = new Int2ObjectOpenHashMap<>();
     protected final HashMap<IBatchRenderableObject, RegionRenderer> renderersByObj = new HashMap<>();
     public IBatchRenderableObject[][] tiles;
     public ShaderTracks shader;
@@ -94,7 +95,7 @@ public class TrackRenderer
         this.renderers.clear();
     }
 
-    public void drawMap(HashMap<Integer, RegionRenderer> renderers, int xOffset, int yOffset)
+    public void drawMap(Int2ObjectOpenHashMap<RegionRenderer> renderers, int xOffset, int yOffset)
     {
         for (RegionRenderer s: renderers.values())
         {

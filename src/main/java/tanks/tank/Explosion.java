@@ -171,7 +171,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
             {
                 double size = 0;
                 if (m instanceof Tank)
-                    size = ((Tank) m).size;
+                    size = ((Tank) m).size * ((Tank) m).hitboxSize;
                 else if (m instanceof Mine)
                     size = ((Mine) m).size;
                 else if (m instanceof Bullet)
@@ -287,7 +287,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
 
         if (this.destroysObstacles && !ScreenPartyLobby.isClient)
         {
-            for (Obstacle o: Game.getInRadius(posX, posY, radius, c -> c.obstacles))
+            for (Obstacle o: Game.getObstaclesInRadius(posX, posY, radius))
             {
                 if (Math.pow(Math.abs(o.posX - this.posX), 2) + Math.pow(Math.abs(o.posY - this.posY), 2) < Math.pow(radius + Game.tile_size / 2, 2) && o.destructible && !Game.removeObstacles.contains(o))
                 {

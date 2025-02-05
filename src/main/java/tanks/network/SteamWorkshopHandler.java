@@ -2,6 +2,7 @@ package tanks.network;
 
 import basewindow.BaseFile;
 import com.codedisaster.steamworks.*;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.Crusade;
 import tanks.Game;
 import tanks.Level;
@@ -30,7 +31,7 @@ public class SteamWorkshopHandler
     public String searchText = null;
     public boolean searchByScore = false;
 
-    public HashMap<Integer, SteamUGCDetails> publishedFiles = new HashMap<>();
+    public Int2ObjectOpenHashMap<SteamUGCDetails> publishedFiles = new Int2ObjectOpenHashMap<>();
 
     public SteamUGCQuery currentQuery = null;
     public HashSet<Integer> pagesQueried = new HashSet<>();

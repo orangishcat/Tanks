@@ -126,18 +126,16 @@ public class BulletInstant extends Bullet
 			this.saveTarget();
 
 			for (int i = 0; i < this.xTargets.size(); i++)
-			{
-				Game.eventsOut.add(new EventBulletInstantWaypoint(this, this.xTargets.get(i), this.yTargets.get(i)));
-			}
+                Game.eventsOut.add(new EventBulletInstantWaypoint(this, this.xTargets.get(i), this.yTargets.get(i)));
 
 			Game.eventsOut.add(new EventBulletDestroyed(this));
 		}
 
-		freeIDs.add(this.networkID);
-		idMap.remove(this.networkID);
-
 		if (this.affectsMaxLiveBullets && this.reboundSuccessor == null && !this.failedRebound)
 			this.item.liveBullets--;
+
+		if (!this.isRemote)
+			this.onDestroy();
 
 		this.addDestroyEffect();
 		this.expired = true;
@@ -217,6 +215,12 @@ public class BulletInstant extends Bullet
 
 	public void remoteShoot()
 	{
+		if (!tank.isRemote)
+		{
+			shoot();
+			return;
+		}
+
 		for (int i = 0; i < xTargets.size() - 1; i++)
 		{
 			double iX = xTargets.get(i);
@@ -276,16 +280,24 @@ public class BulletInstant extends Bullet
 		}
 
 		if (finished)
+		{
 			Game.removeMovables.add(this);
+			freeIDs.add(this.networkID);
+			idMap.remove(this.networkID);
+		}
 	}
 
 	@Override
 	public void draw()
 	{
 		for (Laser s: this.segments)
-		{
-			s.draw();
-		}
+            s.draw();
+	}
+
+	@Override
+	public boolean disableRayCollision()
+	{
+		return true;
 	}
 
 	public void superUpdate()

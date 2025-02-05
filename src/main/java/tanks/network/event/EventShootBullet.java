@@ -94,9 +94,7 @@ public class EventShootBullet extends PersonalEvent
 			b.vZ = vZ;
 
 			sb.item.bullet.clonePropertiesTo(b);
-
 			b.speed = speed;
-
 			b.setColorFromTank();
 
 			if (sb.item.cooldownBase <= 0)

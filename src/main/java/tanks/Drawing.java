@@ -200,12 +200,8 @@ public class Drawing
 		for (int i = 0; i < 2; i++)
 		{
 			for (int j = 0; j < 2; j++)
-			{
-				if (!isOutOfBounds(drawX + drawSizeX * i / 2, drawY + drawSizeY * j / 2))
-				{
-					inBounds = true;
-				}
-			}
+                if (!isOutOfBounds(drawX + drawSizeX * i / 2, drawY + drawSizeY * j / 2))
+                    inBounds = true;
 		}
 
 		if (!inBounds)
@@ -1258,7 +1254,6 @@ public class Drawing
 	{
 		fillInterfaceRect(x, y, sX - borderWidth * 2, sY - borderWidth * 2, borderRadius * (1.0 - (borderWidth / borderRadius)));
 		fillInterfaceRect(x, y, sX, sY, borderRadius);
-		Drawing.drawing.setColor(255, 255, 255);
 	}
 
 	public void playMusic(String sound, float volume, boolean looped, String id, long fadeTime)

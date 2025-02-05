@@ -2,7 +2,6 @@ package tanks.network;
 
 import java.util.ArrayList;
 
-@SuppressWarnings("serial")
 public class SynchronizedList<T> extends ArrayList<T>
 {
 	public boolean add(T e)
