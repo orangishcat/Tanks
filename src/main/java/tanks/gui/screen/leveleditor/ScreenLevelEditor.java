@@ -2571,7 +2571,6 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		}
 
 		clipboard.updateParams();
-
 		this.clearSelection();
 
 		if (cut)

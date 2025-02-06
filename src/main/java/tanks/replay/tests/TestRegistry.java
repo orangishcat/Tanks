@@ -1,8 +1,6 @@
 package tanks.replay.tests;
 
-import tanks.replay.tests.test.TestAttribute;
-import tanks.replay.tests.test.TestBullet;
-import tanks.replay.tests.test.TestPathfinding;
+import tanks.replay.tests.test.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -20,10 +18,9 @@ public class TestRegistry
     public void registerTests()
     {
         registerTest(TestBullet.class);
+        registerTest(TestExplosion.class);
         registerTest(TestAttribute.class);
-        registerTest(TestPathfinding.class);
-        registerTest(TestBullet.class);
-        registerTest(TestAttribute.class);
+        registerTest(TestSupportTank.class);
         registerTest(TestPathfinding.class);
     }
 
