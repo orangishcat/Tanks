@@ -1,10 +1,11 @@
-package tanks.replay.tests.test;
+package tanks.replay.testing.tests;
 
 import tanks.Game;
 import tanks.Movable;
 import tanks.effect.AttributeModifier;
 import tanks.effect.StatusEffect;
-import tanks.replay.tests.Test;
+import tanks.replay.testing.Test;
+import tanks.replay.testing.TestType;
 import tanks.tank.TankPlayer;
 
 import java.util.Arrays;
@@ -17,7 +18,7 @@ public class TestAttribute extends Test
 
     public TestAttribute()
     {
-        super("attribute test");
+        super("attribute test", TestType.REPLAY);
 
         this.name = "Attribute test";
 

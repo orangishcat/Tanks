@@ -1,10 +1,8 @@
-package tanks.replay.tests;
+package tanks.replay.testing;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.gui.screen.ScreenGame;
-import tanks.replay.Replay;
-import tanks.replay.ReplayEvents;
 import tanks.replay.TankReplayPlayer;
 import tanks.tank.TankPlayer;
 
@@ -16,12 +14,10 @@ public abstract class Test
     public static TestRegistry registry;
     public static TestRunner runner;
 
-    public Replay replay;
-    public String replayName;
-    public Level level;
-    public String levelName;
     public final ArrayList<TestFunction> expectOnce = new ArrayList<>();
     public final ArrayList<TestFunction> expectAtEnd = new ArrayList<>();
+    public final TestType testType;
+    public final String testResource;
     public boolean oncePassed = false, passed;
     public boolean loaded = false;
 
@@ -33,17 +29,10 @@ public abstract class Test
     public boolean finished = false;
     protected int passedEndCases, totalCases;
 
-    public Test(String path, boolean isReplay)
+    public Test(String name, TestType type)
     {
-        if (isReplay)
-            this.replayName = path;
-        else
-            this.levelName = path;
-    }
-
-    public Test(String path)
-    {
-        this(path, true);
+        this.testResource = name;
+        this.testType = type;
     }
 
     public static void reset()
@@ -62,19 +51,7 @@ public abstract class Test
         if (fixedFPS)
             Panel.setTickSprint(true);
 
-        if (replayName != null)
-        {
-            (replay = Replay.read(replayName)).loadAndPlay();
-            replay.allowControls = false;
-        }
-        else
-        {
-            Game.cleanUp();
-            Drawing.drawing.terrainRenderer.reset();
-            Drawing.drawing.trackRenderer.reset();
-            (level = new Level(Game.game.fileManager.getFile(Game.homedir + Game.levelDir + "/" + levelName + ".tanks").read())).loadLevel();
-            ReplayEvents.LevelChange.enterGame();
-        }
+        testType.load(this, testResource);
     }
 
     /** @return true if test completed */

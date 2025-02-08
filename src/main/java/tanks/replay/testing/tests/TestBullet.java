@@ -1,12 +1,13 @@
-package tanks.replay.tests.test;
+package tanks.replay.testing.tests;
 
-import tanks.replay.tests.Test;
+import tanks.replay.testing.Test;
+import tanks.replay.testing.TestType;
 
 public class TestBullet extends Test
 {
     public TestBullet()
     {
-        super("bullet test");
+        super("bullet test", TestType.REPLAY);
         this.name = "Bullet test";
         this.maximumTime = 60 * 100;
         this.fixedFPS = true;

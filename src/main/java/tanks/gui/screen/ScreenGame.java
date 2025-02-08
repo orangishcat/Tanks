@@ -544,6 +544,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		this.drawDarkness = false;
 
 		Game.clouds.clear();
+		for (int i = 0; i < (Game.currentSizeX + Game.currentSizeY) / 2; i++)
+			Game.clouds.add(new Cloud((Math.random() - 0.5) * Game.currentSizeX * 1.5 * Game.tile_size, (Math.random() - 0.5) * Game.currentSizeY * 1.5 * Game.tile_size));
 
 		if (Game.currentLevel instanceof Minigame && !(Game.currentLevel instanceof Tutorial))
 		{
@@ -1531,6 +1533,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			for (Effect e : Game.effects)
 				e.update();
 
+			for (Cloud c : Game.clouds)
+				c.update();
+
 //			if (Game.game.window.pressedKeys.contains(InputCodes.KEY_F3) && Game.game.window.pressedKeys.contains(InputCodes.KEY_F4))
 //				Game.movables.add(new Crate(new TankPlayer(Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.angle)));
 
@@ -1899,6 +1904,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Game.clouds.removeAll(Game.removeClouds);
 		ModAPI.menuGroup.removeAll(ModAPI.removeMenus);
 
+		if (Game.clouds.size() < 10)
+			Game.clouds.add(new Cloud(0, Math.random() * Game.currentSizeY * Game.tile_size));
+
 		handleRemoveObstacles();
 
 		for (Effect e: Game.removeEffects)
@@ -2224,14 +2232,16 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	{
         this.setPerspective();
 
-		Drawing.drawing.setColor(174, 92, 16);
-
 		double mul = 1;
 		if (Game.angledView)
 			mul = 2;
 
-		Drawing.drawing.fillShadedInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2,
-				mul * Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, mul * Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
+		if (!Game.followingCam)
+		{
+			Drawing.drawing.setColor(174, 92, 16);
+			Drawing.drawing.fillShadedInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2,
+					mul * Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, mul * Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
+		}
 
 		this.drawDefaultBackground();
 
@@ -2255,9 +2265,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		for (Effect e: Game.effects)
             drawables[e.drawLevel].add(e);
-
-		for (Cloud c: Game.clouds)
-            drawables[c.drawLevel].add(c);
 
 		if (Game.game.window.touchscreen)
 		{
@@ -2339,6 +2346,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 			drawables[i].clear();
 		}
+
+		for (Cloud c : Game.clouds)
+			c.draw();
 
 		if (isUpdatingGame())
 		{

@@ -2,7 +2,7 @@ package tanks;
 
 import java.util.ArrayList;
 
-public class Cloud extends Movable
+public class Cloud implements IDrawable
 {
     public ArrayList<Double> posX = new ArrayList<>();
     public ArrayList<Double> posY = new ArrayList<>();
@@ -11,10 +11,8 @@ public class Cloud extends Movable
 
     public Cloud(double x, double y)
     {
-        super(x, y);
-
-        this.drawLevel = 8;
-        for (int i = 0; i < 5; i++)
+        int parts = (int) (Math.random() * 5) + 1;
+        for (int i = 0; i < parts; i++)
         {
             this.posX.add(x + Math.random() * 100);
             this.posY.add(y + Math.random() * 100);
@@ -29,21 +27,18 @@ public class Cloud extends Movable
 
         for (int i = 0; i < this.posY.size(); i++)
         {
-            Drawing.drawing.setColor(255 * Level.currentLightIntensity, 255 * Level.currentLightIntensity, 255 * Level.currentLightIntensity, 255);
+            Drawing.drawing.setColor(255 * Level.currentLightIntensity, 255 * Level.currentLightIntensity, 255 * Level.currentLightIntensity, 128);
             Drawing.drawing.fillBox(this.posX.get(i), this.posY.get(i), this.posZ, size, size, 30, (byte) 0);
         }
     }
 
-    @Override
     public void update()
     {
-        ArrayList<Double> newXs = new ArrayList<>();
+        int i = 0;
         for (double x : this.posX)
-            newXs.add(x - Panel.frameFrequency / 2);
+            posX.set(i++, x + Panel.frameFrequency / 2);
 
-        this.posX = newXs;
-
-        if (this.posX.get(0) < 0 || this.posX.get(0) > Game.currentSizeX * 50)
+        if (this.posX.get(0) < -0.5 * Game.currentSizeX * Game.tile_size || this.posX.get(0) > Game.currentSizeX * 1.5 * Game.tile_size)
             Game.removeClouds.add(this);
     }
 }

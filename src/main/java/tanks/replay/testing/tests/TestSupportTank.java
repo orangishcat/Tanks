@@ -1,8 +1,9 @@
-package tanks.replay.tests.test;
+package tanks.replay.testing.tests;
 
 import tanks.Game;
 import tanks.Movable;
-import tanks.replay.tests.Test;
+import tanks.replay.testing.Test;
+import tanks.replay.testing.TestType;
 import tanks.tank.TankAIControlled;
 
 import java.util.HashMap;
@@ -13,7 +14,7 @@ public class TestSupportTank extends Test
 {
     public TestSupportTank()
     {
-        super("support_tank_test", false);
+        super("support_tank_test", TestType.LEVEL);
         this.name = "Support tank test";
         this.maximumTime = 50;
 

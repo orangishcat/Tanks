@@ -1,4 +1,4 @@
-package tanks.replay.tests;
+package tanks.replay.testing;
 
 import java.util.Arrays;
 

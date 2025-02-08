@@ -1,6 +1,9 @@
 package tanks;
 
-import basewindow.*;
+import basewindow.BaseFile;
+import basewindow.BaseFileManager;
+import basewindow.BaseWindow;
+import basewindow.ShaderGroup;
 import com.codedisaster.steamworks.SteamMatchmaking;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.bullet.*;
@@ -22,7 +25,9 @@ import tanks.item.Item;
 import tanks.item.ItemBullet;
 import tanks.item.ItemMine;
 import tanks.item.ItemShield;
-import tanks.minigames.*;
+import tanks.minigames.ArcadeBeatBlocks;
+import tanks.minigames.ArcadeClassic;
+import tanks.minigames.Minigame;
 import tanks.network.Client;
 import tanks.network.NetworkEventMap;
 import tanks.network.SteamNetworkHandler;
@@ -35,9 +40,11 @@ import tanks.rendering.ShaderGroundIntro;
 import tanks.rendering.ShaderGroundOutOfBounds;
 import tanks.rendering.ShaderTracks;
 import tanks.tank.*;
-import tanks.tankson.Compatibility;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -1350,11 +1357,7 @@ public class Game
             b = 255 * 6 - col;
         }
 
-        color[0] = r;
-        color[1] = g;
-        color[2] = b;
-
-        return color;
+        return Team.setTeamColor(color, r, g, b);
     }
 
 	public static void exitToTitle()
@@ -1368,8 +1371,8 @@ public class Game
 	public static void cleanUp()
 	{
 		resetTiles();
-		silentCleanUp();
 		Game.currentLevel = null;
+		silentCleanUp();
 	}
 
 	public static void silentCleanUp()

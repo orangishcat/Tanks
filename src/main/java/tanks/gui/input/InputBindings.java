@@ -72,6 +72,7 @@ public class InputBindings
     public InputBindingGroup editorCircle = new InputBindingGroup("editor.circle", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_N));
     public InputBindingGroup editorLine = new InputBindingGroup("editor.line", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_F));
     public InputBindingGroup editorWand = new InputBindingGroup("editor.wand", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_W));
+    public InputBindingGroup editorWandDiscontiguous = new InputBindingGroup("editor.wand_discontiguous", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_D));
 
     public InputBindingGroup editorNextObj = new InputBindingGroup("editor.nextObject", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_RIGHT), new InputBinding(InputBinding.InputType.mouse, InputCodes.MOUSE_BUTTON_5));
     public InputBindingGroup editorPrevObj = new InputBindingGroup("editor.prevObject", new InputBinding(InputBinding.InputType.keyboard, InputCodes.KEY_LEFT), new InputBinding(InputBinding.InputType.mouse, InputCodes.MOUSE_BUTTON_4));

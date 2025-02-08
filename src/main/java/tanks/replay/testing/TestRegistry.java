@@ -1,6 +1,6 @@
-package tanks.replay.tests;
+package tanks.replay.testing;
 
-import tanks.replay.tests.test.*;
+import tanks.replay.testing.tests.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

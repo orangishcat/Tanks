@@ -6,8 +6,8 @@ import tanks.Game;
 import tanks.Panel;
 import tanks.gui.Button;
 import tanks.replay.Replay;
-import tanks.replay.tests.Test;
-import tanks.replay.tests.TestRunner;
+import tanks.replay.testing.Test;
+import tanks.replay.testing.TestRunner;
 
 import java.util.ArrayList;
 
@@ -131,7 +131,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         hoveredInd = -1;
         for (int i = Math.max(0, Test.runner.pos - 8); i <= Math.min(Test.registry.size() - 1, Test.runner.pos + 6); i++)
         {
-            if (i == Test.runner.pos && testOngoing) continue;
+            if (i + 1 == Test.runner.pos && testOngoing) continue;
             double lineY = getTestDrawY(i);
             if (Game.isOrdered(isx * 0.7 + 10, Drawing.drawing.getInterfaceMouseX(), isx - 10) &&
                     Game.isOrdered(lineY - 20, Drawing.drawing.getInterfaceMouseY(), lineY + 20))

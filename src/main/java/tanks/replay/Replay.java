@@ -6,13 +6,14 @@ import tanks.Level;
 import tanks.Panel;
 import tanks.bullet.Bullet;
 import tanks.gui.Button;
-import tanks.gui.ScreenElement;
 import tanks.gui.TextBox;
 import tanks.gui.input.InputBinding;
 import tanks.gui.input.InputBindingGroup;
 import tanks.gui.screen.ScreenGame;
 import tanks.network.event.*;
-import tanks.replay.ReplayEvents.*;
+import tanks.replay.ReplayEvents.IReplayEvent;
+import tanks.replay.ReplayEvents.LevelChange;
+import tanks.replay.ReplayEvents.Tick;
 import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
 
@@ -44,6 +45,13 @@ public class Replay
 
     public ScreenGame prevGame;
     public Queue<Double> queue = new LinkedList<>();
+
+    public Replay allowControls(boolean allowControls)
+    {
+        this.allowControls = allowControls;
+        return this;
+    }
+
     public boolean allowControls = true;
 
     private static boolean fromPlayer(INetworkEvent e)
