@@ -232,6 +232,9 @@ public abstract class TankPlayable extends Tank implements ICopyable<TankPlayabl
 
     public Item.ItemStack<?> getSecondaryAbility()
     {
+        if (abilities == null)
+            return null;
+
         if (selectedSecondaryAbility < this.abilities.size() && selectedSecondaryAbility >= 0 && this.abilities.get(this.selectedSecondaryAbility).item.rightClick)
             return this.abilities.get(this.selectedSecondaryAbility);
         else

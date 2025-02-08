@@ -95,7 +95,6 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			this.player.tank = this;
 
 		this.addDefaultAbilities();
-
 		this.setPlayerColor();
 
 		if (enableDestroyCheat)

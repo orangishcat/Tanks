@@ -42,11 +42,10 @@ public class EventTankCreate extends PersonalEvent
 	@Override
 	public void execute()
 	{
-		if (this.clientID != null)
+		if (this.clientID != null || Game.currentLevel == null)
 			return;
 
 		Tank t = Game.registryTank.getEntry(type).getTank(posX, posY, angle);
-
 		Team tm = Game.currentLevel.teamsMap.get(team);
 		
 		if (this.team.equals("**"))

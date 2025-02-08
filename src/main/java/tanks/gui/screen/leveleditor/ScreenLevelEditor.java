@@ -2113,9 +2113,18 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			{
 				for (int j = 0; j < selectedTiles[i].length; j++)
 				{
-					if (selectedTiles[i][j])
-						Drawing.drawing.fillRect((i + 0.5) * Game.tile_size, (j + 0.5) * Game.tile_size, Game.tile_size, Game.tile_size);
-				}
+                    if (!selectedTiles[i][j])
+                        continue;
+
+					Obstacle o = Game.getObstacle(i, j);
+					o = o != null ? o : Game.getSurfaceObstacle(i, j);
+					o = o != null ? o : Game.getExtraObstacle(i, j);
+
+					if (o != null)
+						o.draw3dOutline(255, 255, 255, 128 + extra);
+					else
+                    	Drawing.drawing.fillRect((i + 0.5) * Game.tile_size, (j + 0.5) * Game.tile_size, Game.tile_size, Game.tile_size);
+                }
 			}
 		}
 

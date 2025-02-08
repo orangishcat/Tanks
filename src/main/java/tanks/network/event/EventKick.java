@@ -5,6 +5,7 @@ import tanks.Game;
 import tanks.gui.screen.ScreenKicked;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.network.Client;
+import tanks.network.NetworkEventMap;
 import tanks.network.NetworkUtils;
 
 public class EventKick extends PersonalEvent
@@ -28,6 +29,8 @@ public class EventKick extends PersonalEvent
 		{
 			Game.cleanUp();
 			ScreenPartyLobby.isClient = false;
+			System.err.println(reason);
+			System.err.println("Last event: " + NetworkEventMap.get(Client.handler.reader.lastID).getSimpleName());
 
 			Client.handler.close();
 
