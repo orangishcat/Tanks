@@ -2,11 +2,10 @@ package tanks.obstacle;
 
 import basewindow.IBatchRenderableObject;
 import basewindow.ShaderGroup;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.rendering.ShaderGroundObstacle;
 import tanks.rendering.ShaderObstacle;
-
-import java.util.ArrayList;
 
 public abstract class Obstacle extends GameObject implements IDrawableForInterface, ISolidObject, IDrawableWithGlow, IBatchRenderableObject
 {
@@ -103,18 +102,6 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 	public boolean isGlowEnabled()
 	{
 		return false;
-	}
-
-	@Override
-	public void drawAt(double x, double y)
-	{
-		double x1 = this.posX;
-		double y1 = this.posY;
-		this.posX = x;
-		this.posY = y;
-		this.draw();
-		this.posX = x1;
-		this.posY = y1;
 	}
 
 	public void setUpdate(boolean update)
@@ -367,9 +354,11 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		afterAdd();
     }
 
-	public ArrayList<Obstacle> getNeighbors()
+	private static final ObjectArrayList<Obstacle> obsListCache = new ObjectArrayList<>();
+
+	public ObjectArrayList<Obstacle> getNeighbors()
 	{
-		ArrayList<Obstacle> neighbors = new ArrayList<>();
+		obsListCache.clear();
 		for (int i = 0; i < 4; i++)
 		{
 			double newX = posX + Game.tile_size * Game.dirX[i];
@@ -377,9 +366,9 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 			Obstacle o = Game.getObstacle(newX, newY);
 			if (o != null)
-				neighbors.add(o);
+				obsListCache.add(o);
 		}
-		return neighbors;
+		return obsListCache;
 	}
 
 	public void playDestroyAnimation(double posX, double posY, double radius)

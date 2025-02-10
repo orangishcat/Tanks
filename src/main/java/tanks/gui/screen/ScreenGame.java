@@ -2243,109 +2243,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 					mul * Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, mul * Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
 		}
 
-		this.drawDefaultBackground();
-
 		Drawing drawing = Drawing.drawing;
-
-		//drawables[0].addAll(Game.tracks);
-
-		for (Movable m: Game.movables)
-		{
-			drawables[m.drawLevel].add(m);
-
-			if (m.showName)
-				drawables[m.nameTag.drawLevel].add(m.nameTag);
-		}
-
-		for (Obstacle o : Game.obstacles)
-		{
-			if (!Game.enable3d || !o.batchDraw)
-				drawables[o.drawLevel].add(o);
-		}
-
-		for (Effect e: Game.effects)
-            drawables[e.drawLevel].add(e);
-
-		if (Game.game.window.touchscreen)
-		{
-			drawables[9].add(TankPlayer.controlStick);
-
-			if (TankPlayer.shootStickEnabled && !TankPlayer.shootStickHidden)
-				drawables[9].add(TankPlayer.shootStick);
-		}
-
-		for (int i = 0; i < this.drawables.length; i++)
-		{
-			for (IDrawable d: this.drawables[i])
-			{
-				if (d != null)
-					d.draw();
-			}
-
-			if (Game.glowEnabled)
-			{
-				for (IDrawable d: this.drawables[i])
-				{
-					if (d instanceof IDrawableWithGlow && ((IDrawableWithGlow) d).isGlowEnabled())
-						((IDrawableWithGlow) d).drawGlow();
-				}
-			}
-
-			if (i == 9 && (Game.playerTank != null && ((ILocalPlayerTank) Game.playerTank).showTouchCircle()))
-			{
-				Drawing.drawing.setColor(255, 127, 0, 63);
-				Drawing.drawing.fillInterfaceOval(Drawing.drawing.toInterfaceCoordsX(Game.playerTank.posX),
-						Drawing.drawing.toInterfaceCoordsY(Game.playerTank.posY),
-						((ILocalPlayerTank) Game.playerTank).getTouchCircleSize(), ((ILocalPlayerTank) Game.playerTank).getTouchCircleSize());
-			}
-
-			if (i == 9 && Game.playerTank != null && !Game.game.window.drawingShadow)
-			{
-				if (Level.isDark())
-					Drawing.drawing.setColor(255, 255, 255, 50);
-				else
-					Drawing.drawing.setColor(0, 0, 0, 50);
-
-				if (((ILocalPlayerTank) Game.playerTank).getDrawLifespan() > 0)
-					Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawLifespan());
-
-				if (((ILocalPlayerTank) Game.playerTank).getDrawRangeMin() > 0)
-					Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawRangeMin(), true);
-
-				if (((ILocalPlayerTank) Game.playerTank).getDrawRangeMax() > 0)
-					Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawRangeMax());
-
-				((ILocalPlayerTank) Game.playerTank).setDrawRanges(-1, -1, -1, true);
-			}
-
-			if (i == 9 && Game.playerTank != null && !Game.playerTank.destroy
-					&& Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).playing && Game.movables.contains(Game.playerTank))
-			{
-				double s = Game.startTime;
-
-				if (cancelCountdown)
-					s = 400;
-
-				Game.playerTank.drawSpinny(s);
-			}
-
-			if (i == 9 && Game.playerTank != null && !Game.playerTank.destroy
-					&& Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).playing && Game.movables.contains(Game.playerTank) && Game.playerTank.invulnerabilityTimer > 0)
-			{
-				Game.playerTank.drawSpinny(Game.playerTank.invulnerabilityTimer);
-			}
-
-			if (i == 9 && Game.followingCam && Panel.panel.zoomTimer > 0.2 && selectedArcBullet)
-			{
-				Tank t = focusedTank();
-				double x = t.posX + Math.cos(t.angle) * fcArcAim;
-				double y = t.posY + Math.sin(t.angle) * fcArcAim;
-				Drawing.drawing.setColor(t.colorR, t.colorG, t.colorB);
-				Drawing.drawing.drawImage(t.angle + Math.PI / 4, "cursor.png",x, y, Math.max(5, Game.sampleObstacleHeight(x, y)) + 5, 100, 100);
-			}
-
-			drawables[i].clear();
-		}
+		drawGame();
 
 		for (Cloud c : Game.clouds)
 			c.draw();
@@ -2788,6 +2687,124 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			this.overlay.draw();
 
 		Drawing.drawing.setInterfaceFontSize(this.textSize);
+	}
+
+	public void drawGame()
+	{
+		drawGame(drawables, this);
+	}
+
+	public static void drawGame(ArrayList<IDrawable>[] drawables)
+	{
+		drawGame(drawables, null);
+	}
+
+	public static void drawGame(ArrayList<IDrawable>[] drawables, ScreenGame game)
+	{
+		Game.screen.drawDefaultBackground();
+
+		for (Movable m: Game.movables)
+		{
+			drawables[m.drawLevel].add(m);
+
+			if (m.showName)
+				drawables[m.nameTag.drawLevel].add(m.nameTag);
+		}
+
+		for (Obstacle o : Game.obstacles)
+		{
+			if (!o.batchDraw)
+				drawables[o.drawLevel].add(o);
+		}
+
+		for (Effect e: Game.effects)
+            drawables[e.drawLevel].add(e);
+
+		for (int i = 0; i < drawables.length; i++)
+		{
+			for (IDrawable d: drawables[i])
+			{
+				if (d != null)
+					d.draw();
+			}
+
+			if (Game.glowEnabled)
+			{
+				for (IDrawable d: drawables[i])
+				{
+					if (d instanceof IDrawableWithGlow && ((IDrawableWithGlow) d).isGlowEnabled())
+						((IDrawableWithGlow) d).drawGlow();
+				}
+			}
+
+			if (game != null) drawUI(i, game);
+			drawables[i].clear();
+		}
+	}
+
+	private static void drawUI(int i, ScreenGame g)
+	{
+		if (i != 9) return;
+
+		if (Game.game.window.touchscreen)
+		{
+			TankPlayer.controlStick.draw();
+
+			if (TankPlayer.shootStickEnabled && !TankPlayer.shootStickHidden)
+				TankPlayer.shootStick.draw();
+		}
+
+
+		if (Game.playerTank != null && ((ILocalPlayerTank) Game.playerTank).showTouchCircle())
+		{
+			Drawing.drawing.setColor(255, 127, 0, 63);
+			Drawing.drawing.fillInterfaceOval(Drawing.drawing.toInterfaceCoordsX(Game.playerTank.posX),
+					Drawing.drawing.toInterfaceCoordsY(Game.playerTank.posY),
+					((ILocalPlayerTank) Game.playerTank).getTouchCircleSize(), ((ILocalPlayerTank) Game.playerTank).getTouchCircleSize());
+		}
+
+		if (Game.playerTank != null && !Game.game.window.drawingShadow)
+		{
+			if (Level.isDark())
+				Drawing.drawing.setColor(255, 255, 255, 50);
+			else
+				Drawing.drawing.setColor(0, 0, 0, 50);
+
+			if (((ILocalPlayerTank) Game.playerTank).getDrawLifespan() > 0)
+				Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawLifespan());
+
+			if (((ILocalPlayerTank) Game.playerTank).getDrawRangeMin() > 0)
+				Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawRangeMin(), true);
+
+			if (((ILocalPlayerTank) Game.playerTank).getDrawRangeMax() > 0)
+				Mine.drawRange2D(Game.playerTank.posX, Game.playerTank.posY, ((ILocalPlayerTank) Game.playerTank).getDrawRangeMax());
+
+			((ILocalPlayerTank) Game.playerTank).setDrawRanges(-1, -1, -1, true);
+		}
+
+		if (Game.playerTank != null && !Game.playerTank.destroy && Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).playing && Game.movables.contains(Game.playerTank))
+		{
+			double s = Game.startTime;
+
+			if (g.cancelCountdown)
+				s = 400;
+
+			Game.playerTank.drawSpinny(s);
+		}
+
+		if (Game.playerTank != null && !Game.playerTank.destroy && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).playing && Game.movables.contains(Game.playerTank) && Game.playerTank.invulnerabilityTimer > 0)
+		{
+			Game.playerTank.drawSpinny(Game.playerTank.invulnerabilityTimer);
+		}
+
+		if (Game.followingCam && Panel.panel.zoomTimer > 0.2 && g.selectedArcBullet)
+		{
+			Tank t = focusedTank();
+			double x = t.posX + Math.cos(t.angle) * g.fcArcAim;
+			double y = t.posY + Math.sin(t.angle) * g.fcArcAim;
+			Drawing.drawing.setColor(t.colorR, t.colorG, t.colorB);
+			Drawing.drawing.drawImage(t.angle + Math.PI / 4, "cursor.png",x, y, Math.max(5, Game.sampleObstacleHeight(x, y)) + 5, 100, 100);
+		}
 	}
 
 	public static boolean shouldHide(Face f)

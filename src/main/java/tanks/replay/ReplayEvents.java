@@ -10,7 +10,7 @@ import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.ScreenPartyHost;
 import tanks.network.NetworkEventMap;
 import tanks.network.NetworkUtils;
-import tanks.network.event.INetworkEvent;
+import tanks.network.event.*;
 import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
 
@@ -41,7 +41,7 @@ public class ReplayEvents
             b.writeDouble(mouseX).writeDouble(mouseY);
             for (INetworkEvent e : events)
             {
-                b.writeInt(NetworkEventMap.get(e.getClass()));
+                b.writeInt(get(e.getClass()));
                 e.write(b);
             }
         }
@@ -58,7 +58,7 @@ public class ReplayEvents
             {
                 for (int i = 0; i < eventCnt; i++)
                 {
-                    INetworkEvent e = NetworkEventMap.get(b.readInt()).getConstructor().newInstance();
+                    INetworkEvent e = get(b.readInt()).getConstructor().newInstance();
                     e.read(b);
                     events.add(e);
                 }
@@ -164,5 +164,69 @@ public class ReplayEvents
         {
             Drawing.drawing.drawInterfaceText(x, y, getClass().getSimpleName(), true);
         }
+    }
+
+    protected static NetworkEventMap inst = new NetworkEventMap();
+
+    @SafeVarargs
+    public static void register(Class<? extends INetworkEvent>... classes)
+    {
+        for (Class<? extends INetworkEvent> c : classes)
+        {
+            inst.map1.put(inst.id, c);
+            inst.map2.put(c, inst.id);
+            inst.id++;
+        }
+    }
+
+    public static int get(Class<? extends INetworkEvent> c)
+    {
+        Integer i = inst.map2.get(c);
+
+        if (i == null)
+            return -1;
+
+        return i;
+    }
+
+    public static Class<? extends INetworkEvent> get(int i)
+    {
+        return inst.map1.get(i);
+    }
+
+    private static boolean registered = false;
+
+    public static void registerEvents()
+    {
+        if (registered)
+            return;
+
+        registered = true;
+        register(EventSendClientDetails.class, EventPing.class, EventConnectionSuccess.class, EventKick.class,
+                EventAnnounceConnection.class, EventChat.class, EventPlayerChat.class, EventLoadLevel.class,
+                EventEnterLevel.class, EventLevelEndQuick.class, EventLevelEnd.class, EventReturnToLobby.class,
+                EventBeginCrusade.class, EventReturnToCrusade.class, EventShowCrusadeStats.class,
+                EventLoadCrusadeHotbar.class, EventSetupHotbar.class, EventAddShopItem.class, EventSortShopButtons.class,
+                EventPurchaseItem.class, EventSetItem.class, EventSetItemBarSlot.class, EventLoadItemBarSlot.class,
+                EventUpdateTankAbility.class, EventUpdateCoins.class, EventPlayerReady.class, EventPlayerAutoReady.class,
+                EventPlayerAutoReadyConfirm.class, EventPlayerSetBuild.class, EventPlayerRevealBuild.class,
+                EventUpdateReadyPlayers.class, EventUpdateRemainingLives.class, EventBeginLevelCountdown.class,
+                EventTankUpdate.class, EventTankControllerUpdateS.class, EventTankControllerUpdateC.class,
+                EventTankControllerUpdateAmmunition.class, EventTankControllerAddVelocity.class, EventTankPlayerCreate.class,
+                EventTankCreate.class, EventTankCustomCreate.class, EventTankSpawn.class, EventAirdropTank.class,
+                EventTankUpdateHealth.class, EventTankRemove.class, EventShootBullet.class, EventBulletBounce.class,
+                EventBulletUpdate.class, EventBulletDestroyed.class, EventBulletInstantWaypoint.class,
+                EventBulletAddAttributeModifier.class, EventBulletStunEffect.class, EventBulletUpdateTarget.class,
+                EventBulletReboundIndicator.class, EventAddObstacleBullet.class, EventLayMine.class, EventMineRemove.class,
+                EventMineChangeTimer.class, EventExplosion.class, EventTankTeleport.class, EventTankUpdateVisibility.class,
+                EventTankUpdateColor.class, EventTankTransformPreset.class, EventTankTransformCustom.class, EventTankCharge.class,
+                EventTankMimicTransform.class, EventTankMimicLaser.class, EventTankAddAttributeModifier.class,
+                EventCreateFreezeEffect.class, EventObstacleDestroy.class, EventObstacleHit.class, EventObstacleShrubberyBurn.class,
+                EventObstacleSnowMelt.class, EventObstacleBoostPanelEffect.class, EventPlaySound.class,
+                EventSendTankColors.class, EventUpdateTankColors.class, EventShareLevel.class, EventShareCrusade.class,
+                EventItemDrop.class, EventItemPickup.class, EventItemDropDestroy.class, EventStatusEffectBegin.class,
+                EventStatusEffectDeteriorate.class, EventStatusEffectEnd.class, EventArcadeHit.class,
+                EventArcadeRampage.class, EventClearMovables.class, EventArcadeFrenzy.class, EventArcadeEnd.class,
+                EventArcadeBonuses.class, EventPurchaseBuild.class);
     }
 }

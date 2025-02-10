@@ -190,14 +190,34 @@ public class Chunk implements Comparable<Chunk>
         return chunkCache;
     }
 
-    public static Optional<Tile> getTileOptional(int tileX, int tileY)
+    public static Tile runIfTilePresent(int tileX, int tileY, Consumer<Tile> tc)
     {
-        return Optional.ofNullable(Chunk.getTile(tileX, tileY));
+        Tile t = getTile(tileX, tileY);
+        if (t != null)
+            tc.accept(t);
+        return t;
     }
 
-    public static Optional<Tile> getTileOptional(double posX, double posY)
+    public static Tile runIfTilePresent(double posX, double posY, Consumer<Tile> tc)
     {
-        return Optional.ofNullable(Chunk.getTile(posX, posY));
+        Tile t = getTile(posX, posY);
+        if (t != null)
+            tc.accept(t);
+        return t;
+    }
+
+    public static <K> K getIfPresent(int tileX, int tileY, Function<Tile, K> func)
+    {
+        Tile t = getTile(tileX, tileY);
+        if (t == null) return null;
+        return func.apply(t);
+    }
+
+    public static <K> K getIfPresent(double posX, double posY, Function<Tile, K> func)
+    {
+        Tile t = getTile(posX, posY);
+        if (t == null) return null;
+        return func.apply(t);
     }
 
     /** Expects all pixel coordinates. */
@@ -466,6 +486,9 @@ public class Chunk implements Comparable<Chunk>
     {
         public Obstacle obstacle, surfaceObstacle, extraObstacle;
         public double colR, colG, colB, depth;
+
+        /** Whether a tank has spawned on this tile (used during level creation only) */
+        public boolean tankSolid;
 
         public double height()
         {

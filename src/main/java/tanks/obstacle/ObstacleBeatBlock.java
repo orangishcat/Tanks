@@ -35,6 +35,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
         this.tileRenderer = ShaderGroundObstacleBeatBlock.class;
         this.destructible = false;
         this.type = ObstacleType.top;
+        this.batchDraw = Game.enable3d;
 
         this.primaryMetadataID = "beat_pattern";
         this.secondaryMetadataID = "stack_height";
@@ -65,6 +66,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
     public void update()
     {
         boolean on = isOn(this.beatFrequency, this.alternate);
+        this.batchDraw = Game.enable3d;
         this.bulletCollision = on;
         this.tankCollision = on;
 
@@ -119,8 +121,8 @@ public class ObstacleBeatBlock extends ObstacleStackable
             return;
 
         Drawing drawing = Drawing.drawing;
-
         drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA, this.glow);
+        this.batchDraw = Game.enable3d;
 
         if (Game.enable3d)
         {

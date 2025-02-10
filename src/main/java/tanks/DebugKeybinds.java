@@ -7,7 +7,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.gui.ChatMessage;
 import tanks.gui.ScreenElement;
 import tanks.gui.screen.ScreenCrusadeDetails;
-import tanks.gui.screen.ScreenOptions;
 import tanks.gui.screen.ScreenPartyHost;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
@@ -241,7 +240,7 @@ public class DebugKeybinds
             else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_3))
             {
                 double finalMx = mx, finalMy = my;
-                Chunk.getTileOptional(Drawing.drawing.getMouseX(), Drawing.drawing.getMouseY()).ifPresent(t ->
+                Chunk.runIfTilePresent(Drawing.drawing.getMouseX(), Drawing.drawing.getMouseY(), t ->
                 {
                     if (t.obstacle == null)
                         return;

@@ -20,7 +20,6 @@ import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -990,17 +989,6 @@ public abstract class Tank extends Movable implements ISolidObject
 		Drawing.drawing.setColor(this.secondaryColorR, this.secondaryColorG, this.secondaryColorB);
 	}
 
-	public void drawAt(double x, double y)
-	{
-		double x1 = this.posX;
-		double y1 = this.posY;
-		this.posX = x;
-		this.posY = y;
-		this.drawTank(false, false);
-		this.posX = x1;
-		this.posY = y1;
-	}
-
 	public void drawOutlineAt(double x, double y)
 	{
 		double x1 = this.posX;
@@ -1304,9 +1292,7 @@ public abstract class Tank extends Movable implements ISolidObject
 	{
 		Tank p = this;
 		while (p.possessingTank != null)
-		{
-			p = p.possessingTank;
-		}
+            p = p.possessingTank;
 
 		return p;
 	}

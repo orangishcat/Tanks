@@ -1974,53 +1974,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 					mul * Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, mul * Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
 		}
 
-		this.drawDefaultBackground();
-
-		for (Movable m: Game.movables)
-			drawables[m.drawLevel].add(m);
-
-		for (Obstacle o : Game.obstacles)
-		{
-			if (!o.batchDraw || !Game.enable3d)
-				drawables[o.drawLevel].add(o);
-		}
-
-		for (Effect e: Game.effects)
-			drawables[7].add(e);
-
-		for (int i = 0; i < this.drawables.length; i++)
-		{
-			if (i == 5 && Game.enable3d)
-			{
-				Drawing drawing = Drawing.drawing;
-				Drawing.drawing.setColor(174, 92, 16);
-				Drawing.drawing.fillForcedBox(drawing.sizeX / 2, -Game.tile_size / 2, 0, drawing.sizeX + Game.tile_size * 2, Game.tile_size, Obstacle.draw_size, (byte) 0);
-				Drawing.drawing.fillForcedBox(drawing.sizeX / 2, Drawing.drawing.sizeY + Game.tile_size / 2, 0, drawing.sizeX + Game.tile_size * 2, Game.tile_size, Obstacle.draw_size, (byte) 0);
-				Drawing.drawing.fillForcedBox(-Game.tile_size / 2, drawing.sizeY / 2, 0, Game.tile_size, drawing.sizeY, Obstacle.draw_size, (byte) 0);
-				Drawing.drawing.fillForcedBox(drawing.sizeX + Game.tile_size / 2, drawing.sizeY / 2, 0, Game.tile_size, drawing.sizeY, Obstacle.draw_size, (byte) 0);
-			}
-
-			for (IDrawable d: this.drawables[i])
-			{
-				d.draw();
-
-				if (d instanceof Movable)
-					((Movable) d).drawTeam();
-			}
-
-			if (Game.glowEnabled)
-			{
-				for (int j = 0; j < this.drawables[i].size(); j++)
-				{
-					IDrawable d = this.drawables[i].get(j);
-
-					if (d instanceof IDrawableWithGlow && ((IDrawableWithGlow) d).isGlowEnabled())
-						((IDrawableWithGlow) d).drawGlow();
-				}
-			}
-
-			drawables[i].clear();
-		}
+		ScreenGame.drawGame(drawables);
 
 		if (!paused && !Game.game.window.touchscreen)
 		{

@@ -15,10 +15,12 @@ public class ReplayIO
 {
     public static Replay read(String replayPath)
     {
+        ReplayEvents.registerEvents();
+
         Replay r = new Replay();
         File f = new File(replayPath);
 
-        int size;
+        int size, lastEvent = -1;
         try (FileInputStream in = new FileInputStream(f))
         {
             FileChannel channel = in.getChannel();
@@ -35,11 +37,12 @@ public class ReplayIO
                 ReplayEvents.IReplayEvent event = ReplayEventMap.get(eventID).getConstructor().newInstance();
                 event.read(buf);
                 r.events.add(event);
+                lastEvent = eventID;
             }
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Error reading replay file: ", e);
+            throw new RuntimeException("Error reading replay file (last event: " + (lastEvent >= 0 ? ReplayEventMap.get(lastEvent).getSimpleName() : null) + ")\n", e);
         }
 
         System.out.println("Replay read from " + f.getPath());

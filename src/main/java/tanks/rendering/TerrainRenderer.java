@@ -559,7 +559,7 @@ public class TerrainRenderer
         {
             for (Obstacle o : Game.redrawObstacles)
             {
-                Chunk.getTileOptional(o.posX, o.posY).ifPresent(t ->
+                Chunk.runIfTilePresent(o.posX, o.posY, t ->
                 {
                     currentColor[0] = (float) (t.colR / 255.0);
                     currentColor[1] = (float) (t.colG / 255.0);
@@ -678,7 +678,7 @@ public class TerrainRenderer
     {
         Chunk.Tile t = Chunk.getTile(i, j);
         assert t != null;
-        double r = t.colR, g = t.colG, b = t.colB, depth = t.depth;
+        double r = t.colR, g = t.colG, b = t.colB, depth = Game.enable3d ? t.depth : 0;
 
         currentColor[0] = (float) (r / 255.0);
         currentColor[1] = (float) (g / 255.0);
@@ -689,27 +689,16 @@ public class TerrainRenderer
 
         Drawing.drawing.setColor(r, g, b);
 
-        if (Game.enable3d)
-        {
-            Obstacle o = t.obstacle;
-            double extra = getExtra(i, j, o);
-            if (o != null && o.replaceTiles && !o.removed)
-                o.drawTile(t, r, g, b, depth, extra);
-            else
-                this.addBox(t,
-                        i * Game.tile_size,
-                        j * Game.tile_size,
-                        -extra, Game.tile_size, Game.tile_size,
-                        extra + depth, BaseShapeRenderer.hide_behind_face, false);
-        }
+        Obstacle o = t.obstacle;
+        double extra = Game.enable3d ? getExtra(i, j, o) : 0;
+        if (o != null && o.replaceTiles && !o.removed)
+            o.drawTile(t, r, g, b, depth, extra);
         else
-        {
             this.addBox(t,
                     i * Game.tile_size,
                     j * Game.tile_size,
-                    0, Game.tile_size, Game.tile_size,
-                    0, (byte) ~BaseShapeRenderer.hide_front_face, false);
-        }
+                    -extra, Game.tile_size, Game.tile_size,
+                    extra + depth, BaseShapeRenderer.hide_behind_face, false);
 
         if (!this.staged)
         {

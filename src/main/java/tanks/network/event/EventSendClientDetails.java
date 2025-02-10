@@ -43,7 +43,6 @@ public class EventSendClientDetails extends PersonalEvent implements IServerThre
 	@Override
 	public void read(ByteBuf b) 
 	{
-		// b809188
 		this.version = b.readInt();
 		this.clientID = UUID.fromString(NetworkUtils.readString(b));
 		this.username = NetworkUtils.readString(b);

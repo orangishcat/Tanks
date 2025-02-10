@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 public class Level 
 {
@@ -91,10 +92,10 @@ public class Level
 	public HashMap<String, Tank> tankLookupTable = null;
 
 	/**
-	 * A level string is structured like this:
-	 * (parentheses signify required parameters, and square brackets signify optional parameters. 
-	 * Asterisks indicate that the parameter can be repeated, separated by commas
-	 * Do not include these in the level string.)
+	 * A level string is structured like this:<br>
+	 * (parentheses signify required parameters, and square brackets signify optional parameters.<br>
+	 * Asterisks indicate that the parameter can be repeated, separated by commas.
+	 * Do not include these in the level string.)<br>
 	 * {(SizeX),(SizeY),[(Red),(Green),(Blue)],[(RedNoise),(GreenNoise),(BlueNoise)]|[(ObstacleX)-(ObstacleY)-[ObstacleMetadata]]*|[(TankX)-(TankY)-(TankType)-[TankAngle]-[TeamName]]*|[(TeamName)-[FriendlyFire]-[(Red)-(Green)-(Blue)]]*}
 	 */
 	public Level(String level)
@@ -239,6 +240,8 @@ public class Level
 		loadLevel(s, false);
 	}
 
+	private static Pattern dash = Pattern.compile("-"), ellipsis = Pattern.compile("\\.\\.\\.");
+
 	public void loadLevel(ILevelPreviewScreen sc, boolean remote)
 	{
 		int currentCrusadeID = 0;
@@ -282,7 +285,7 @@ public class Level
 
 			for (int i = 0; i < teams.length; i++)
 			{
-				String[] t = teams[i].split("-");
+				String[] t = dash.split(teams[i]);
 
 				if (t.length >= 5)
 					tankTeams[i] = new Team(t[0], Boolean.parseBoolean(t[1]), Double.parseDouble(t[2]), Double.parseDouble(t[3]), Double.parseDouble(t[4]));
@@ -344,15 +347,12 @@ public class Level
 
 		this.reloadTiles();
 
-		boolean[][] solidGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
-
 		if (!((obstaclesPos.length == 1 && obstaclesPos[0].isEmpty()) || obstaclesPos.length == 0))
 		{
 			for (String obstaclesPo : obstaclesPos)
 			{
-				String[] obs = obstaclesPo.split("-");
-
-				String[] xPos = obs[0].split("\\.\\.\\.");
+				String[] obs = dash.split(obstaclesPo);
+				String[] xPos = ellipsis.split(obs[0]);
 
 				double startX;
 				double endX;
@@ -363,7 +363,7 @@ public class Level
 				if (xPos.length > 1)
 					endX = Double.parseDouble(xPos[1]);
 
-				String[] yPos = obs[1].split("\\.\\.\\.");
+				String[] yPos = ellipsis.split(obs[1]);
 
 				double startY;
 				double endY;
@@ -394,25 +394,8 @@ public class Level
 							o.setMetadata(meta);
 
 						Game.addObstacle(o, false);
-
-						if (o.tankCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-                            solidGrid[(int) (x / Game.tile_size)][(int) (y / Game.tile_size)] = true;
 					}
 				}
-			}
-		}
-
-		boolean[][] tankGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
-
-		for (Movable m : Game.movables)
-		{
-			if (m instanceof Tank)
-			{
-				int x = (int) (m.posX / Game.tile_size);
-				int y = (int) (m.posY / Game.tile_size);
-
-				if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-					tankGrid[x][y] = true;
 			}
 		}
 
@@ -465,12 +448,6 @@ public class Level
 					this.playerSpawnsY.add(y);
 					this.playerSpawnsAngle.add(angle);
 					this.playerSpawnsTeam.add(team);
-
-					int x1 = (int) Double.parseDouble(tank[0]);
-					int y1 = (int) Double.parseDouble(tank[1]);
-
-					if (x1 >= 0 && y1 >= 0 && x1 < tankGrid.length && y1 < tankGrid[0].length)
-						tankGrid[x1][y1] = true;
 
 					continue;
 				}
@@ -587,7 +564,7 @@ public class Level
 						t1 = new Tile(t.posX, t.posY + 1);
 
 					if (t1.posX >= 0 && t1.posX < Game.currentSizeX && t1.posY >= 0 && t1.posY < Game.currentSizeY &&
-							!solidGrid[t1.posX][t1.posY] && !tankGrid[t1.posX][t1.posY] && !explored[t1.posX][t1.posY])
+							!Game.isSolid(t1.posX, t1.posY) && Game.getMovablesInRadius(t1.posX, t1.posY, Game.tile_size * 0.5).isEmpty() && !explored[t1.posX][t1.posY])
 					{
 						explored[t1.posX][t1.posY] = true;
 
@@ -605,8 +582,6 @@ public class Level
 							playerSpawnsY.add((t1.posY + 0.5) * Game.tile_size);
 							playerSpawnsTeam.add(playerSpawnsTeam.get(i));
 							playerSpawnsAngle.add(playerSpawnsAngle.get(i));
-
-							tankGrid[t1.posX][t1.posY] = true;
 
 							for (int x = Math.max(t1.posX - 1, 0); x <= Math.min(t1.posX + 1, Game.currentSizeX - 1); x++)
 							{
@@ -640,7 +615,7 @@ public class Level
 				int x = extraSpawnsX.remove(in);
 				int y = extraSpawnsY.remove(in);
 
-				if (!tankGrid[x][y])
+				if (Game.getMovablesInRadius(x * Game.tile_size, y * Game.tile_size, Game.tile_size / 2).isEmpty())
 				{
 					playerSpawnsX.add((x + 0.5) * Game.tile_size);
 					playerSpawnsY.add((y + 0.5) * Game.tile_size);
@@ -740,6 +715,21 @@ public class Level
 		Chunk.getChunksInRange(sizeX, 0, sizeX, sizeY).forEach(chunk -> chunk.addBorderFace(1, this));
 		Chunk.getChunksInRange(0, sizeY, sizeX, sizeY).forEach(chunk -> chunk.addBorderFace(2, this));
 		Chunk.getChunksInRange(0, 0, 0, sizeY).forEach(chunk -> chunk.addBorderFace(3, this));
+	}
+
+	public void setHasTank(double x, double y)
+	{
+		Chunk.runIfTilePresent(x, y, t -> t.tankSolid = true);
+	}
+
+	public void setHasTank(int x, int y)
+	{
+		Chunk.runIfTilePresent(x, y, t -> t.tankSolid = true);
+	}
+
+	public boolean hasTank(int x, int y)
+	{
+		return Boolean.TRUE.equals(Chunk.getIfPresent(x, y, t -> t.tankSolid));
 	}
 
 	public void reloadTiles()

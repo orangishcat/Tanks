@@ -387,7 +387,7 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 		return 0;
 	}
 
-	public void drawAt(double x, double y)
+	public void drawForInterface(double x, double y)
 	{
 		double x1 = this.posX;
 		double y1 = this.posY;
@@ -396,11 +396,6 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 		this.draw();
 		this.posX = x1;
 		this.posY = y1;
-	}
-
-	public void drawForInterface(double x, double y)
-	{
-		this.drawAt(x, y);
 	}
 
 	public static double distanceBetween(double x1, double y1, double x2, double y2)

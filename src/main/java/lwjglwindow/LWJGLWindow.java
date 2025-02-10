@@ -326,9 +326,7 @@ public class LWJGLWindow extends BaseWindow
         boolean shouldClose = false;
 
         while (!shouldClose)
-        {
             shouldClose = this.tick(false);
-        }
 
         this.windowHandler.onWindowClose();
 
@@ -344,19 +342,15 @@ public class LWJGLWindow extends BaseWindow
 
         String audio = ALC11.alcGetString(NULL, ALC11.ALC_DEFAULT_ALL_DEVICES_SPECIFIER);
 
-        if (!(audio == null && this.audioDevice == null || (this.audioDevice != null && this.audioDevice.equals(audio))))
-        {
+        if (audio != null && !audio.equals(audioDevice))
             this.soundPlayer = new SoundPlayer(this);
-        }
 
         this.audioDevice = audio;
 
         SoundPlayer soundPlayer = (SoundPlayer) this.soundPlayer;
 
         if (soundPlayer != null)
-        {
             soundPlayer.update();
-        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
