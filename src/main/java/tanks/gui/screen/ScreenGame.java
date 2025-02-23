@@ -643,9 +643,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		}
 
 		if (Game.currentLevel != null && Game.currentLevel.timed)
-		{
-			this.timeRemaining = Game.currentLevel.timer;
-		}
+            this.timeRemaining = Game.currentLevel.timer;
+
+		addPauseMenuButtons();
 	}
 
 	public ScreenGame(String s)
