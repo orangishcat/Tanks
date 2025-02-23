@@ -1,7 +1,6 @@
 package tanks.gui.screen;
 
 import com.codedisaster.steamworks.SteamID;
-import com.codedisaster.steamworks.SteamMatchmaking;
 import com.codedisaster.steamworks.SteamNetworking;
 import tanks.Drawing;
 import tanks.Game;
@@ -9,7 +8,6 @@ import tanks.Panel;
 import tanks.gui.Button;
 import tanks.gui.TextBox;
 import tanks.network.Client;
-import tanks.network.SteamNetworkHandler;
 import tanks.network.event.EventSendClientDetails;
 
 import java.util.UUID;
@@ -37,7 +35,6 @@ public class ScreenJoinParty extends Screen
 	
 	Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", new Runnable()
 	{
-		@SuppressWarnings("deprecation")
 		@Override
 		public void run() 
 		{
@@ -85,6 +82,7 @@ public class ScreenJoinParty extends Screen
 			ScreenPartyLobby.sharedLevels.clear();
 
 			ScreenPartyLobby.connections.clear();
+			ScreenPartyLobby.connectedBots = 0;
 			Game.eventsOut.clear();
 
 			if (ip.inputText.startsWith("lobby:") && Game.steamNetworkHandler.initialized)

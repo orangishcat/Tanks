@@ -70,6 +70,9 @@ public class Game
 	public static ArrayList<Cloud> clouds = new ArrayList<>();
 	public static SynchronizedList<Player> players = new SynchronizedList<>();
 
+	public static ArrayList<Player> botPlayers = new ArrayList<>();
+	public static int botPlayerCount = 0;
+
 	/**
 	 * Obstacles that need to change how they look next frame
 	 */
@@ -345,6 +348,7 @@ public class Game
 		NetworkEventMap.register(EventPlayerChat.class);
 		NetworkEventMap.register(EventLoadLevel.class);
 		NetworkEventMap.register(EventEnterLevel.class);
+		NetworkEventMap.register(EventSetLevelVersus.class);
 		NetworkEventMap.register(EventLevelEndQuick.class);
 		NetworkEventMap.register(EventLevelEnd.class);
 		NetworkEventMap.register(EventReturnToLobby.class);
@@ -367,6 +371,7 @@ public class Game
 		NetworkEventMap.register(EventPlayerSetBuild.class);
 		NetworkEventMap.register(EventPlayerRevealBuild.class);
 		NetworkEventMap.register(EventUpdateReadyPlayers.class);
+		NetworkEventMap.register(EventUpdateEliminatedPlayers.class);
 		NetworkEventMap.register(EventUpdateRemainingLives.class);
 		NetworkEventMap.register(EventBeginLevelCountdown.class);
 		NetworkEventMap.register(EventTankUpdate.class);
@@ -592,7 +597,7 @@ public class Game
 
 		registerMinigame(ArcadeClassic.class, "Arcade mode", "A gamemode which gets crazier as you---destroy more tanks.------Featuring a score mechanic, unlimited---lives, a time limit, item drops, and---end-game bonuses!");
 		registerMinigame(ArcadeBeatBlocks.class, "Beat arcade mode", "Arcade mode but with beat blocks!");
-//		registerMinigame(CastleRampage.class, "Rampage trial", "Beat the level as fast as you can---with unlimited lives and rampages!");
+		registerMinigame(CastleRampage.class, "Rampage trial", "Beat the level as fast as you can---with unlimited lives and rampages!");
 //		registerMinigame(TeamDeathmatch.class, "Team deathmatch", "something");
 
 		registerMetadataSelector(SelectorStackHeight.selector_name, SelectorStackHeight.class);
@@ -1401,6 +1406,8 @@ public class Game
 		Game.player.hotbar.enabledCoins = false;
 		Game.player.hotbar.itemBar = new ItemBar(Game.player);
 		Game.player.hotbar.itemBar.showItems = false;
+		Game.player.ownedBuilds = new HashSet<>();
+		Game.player.buildName = "player";
 
 		//if (Game.game.window != null)
 		//	Game.game.window.setShowCursor(false);

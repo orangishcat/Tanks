@@ -115,20 +115,6 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 		return (TankPlayer) Serializer.fromTanksON(s);
 	}
 
-	public TankPlayer setDefaultColor()
-	{
-		this.colorR = 0;
-		this.colorG = 150;
-		this.colorB = 255;
-		this.secondaryColorR = Turret.calculateSecondaryColor(this.colorR);
-		this.secondaryColorG = Turret.calculateSecondaryColor(this.colorG);
-		this.secondaryColorB = Turret.calculateSecondaryColor(this.colorB);
-        this.tertiaryColorR = (this.colorR + this.secondaryColorR) / 2;
-        this.tertiaryColorG = (this.colorG + this.secondaryColorG) / 2;
-        this.tertiaryColorB = (this.colorB + this.secondaryColorB) / 2;
-		return this;
-	}
-
 	public TankPlayer setPlayerColor()
 	{
 		this.colorR = Game.player.colorR;
@@ -145,6 +131,12 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 		this.emblemG = this.secondaryColorG;
 		this.emblemB = this.secondaryColorB;
 		this.saveColors();
+		return this;
+	}
+
+	public TankPlayer setDefaultColor()
+	{
+		this.setDefaultPlayerColor();
 		return this;
 	}
 
@@ -281,7 +273,10 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 		double reload = em().getAttributeValue(AttributeModifier.reload, 1);
 
 		for (Item.ItemStack<?> s: this.abilities)
-            s.updateCooldown(reload);
+		{
+			s.player = this.player;
+			s.updateCooldown(reload);
+		}
 
 		Hotbar h = Game.player.hotbar;
 		if (h.enabledItemBar)
@@ -608,6 +603,13 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 					((Scoreboard) m).addPlayerScore(this.player, 1);
 			}
 		}
+
+		if (Game.screen instanceof ScreenGame && !ScreenPartyLobby.isClient)
+		{
+			((ScreenGame) Game.screen).eliminatedPlayers.add(new ConnectedPlayer(this.player));
+			Game.eventsOut.add(new EventUpdateEliminatedPlayers(((ScreenGame) Game.screen).eliminatedPlayers));
+			((ScreenGame) Game.screen).onPlayerDeath(this.player);
+		}
 	}
 
 	@Override
@@ -718,7 +720,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 	@TanksONable("crusade_shop_build")
 	public static class CrusadeShopTankBuild extends ShopTankBuild
 	{
-		@TankBuildProperty @Property(id = "unlock_level", name = "Unlocks after level", category = general)
+		@TankBuildProperty @Property(id = "unlock_level", name = "Unlocks after level", category = general, miscType = Property.MiscType.defaultBuildForbidden)
 		public int levelUnlock;
 
 		public CrusadeShopTankBuild()

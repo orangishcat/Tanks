@@ -6,11 +6,13 @@ import tanks.effect.AttributeModifier;
 import tanks.gui.IFixedMenu;
 import tanks.gui.Scoreboard;
 import tanks.gui.screen.ScreenGame;
+import tanks.gui.screen.ScreenPartyHost;
 import tanks.hotbar.Hotbar;
 import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.item.ItemBullet;
 import tanks.item.ItemMine;
+import tanks.network.ConnectedPlayer;
 import tanks.network.event.*;
 
 public class TankPlayerRemote extends TankPlayable implements IServerPlayerTank
@@ -160,6 +162,7 @@ public class TankPlayerRemote extends TankPlayable implements IServerPlayerTank
 
         for (Item.ItemStack<?> s: this.abilities)
         {
+            s.player = this.player;
             s.updateCooldown(reload);
         }
 
@@ -559,6 +562,16 @@ public class TankPlayerRemote extends TankPlayable implements IServerPlayerTank
                 else
                     ((Scoreboard) m).addPlayerScore(this.player, 1);
             }
+        }
+
+        if (Game.screen instanceof ScreenGame)
+        {
+            if (ScreenPartyHost.includedPlayers.contains(this.player.clientID))
+            {
+                ((ScreenGame) Game.screen).eliminatedPlayers.add(new ConnectedPlayer(this.player));
+                Game.eventsOut.add(new EventUpdateEliminatedPlayers(((ScreenGame) Game.screen).eliminatedPlayers));
+            }
+            ((ScreenGame) Game.screen).onPlayerDeath(this.player);
         }
     }
 

@@ -25,7 +25,6 @@ import tanks.tank.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class Panel
 {
@@ -411,26 +410,26 @@ public class Panel
 
 					for (Movable m: Game.movables)
 					{
-                        if (!(m instanceof TankPlayable))
-                            continue;
+						if (m instanceof TankPlayable)
+						{
+							int build = -1;
+							for (int i = 0; i < s.builds.size(); i++)
+							{
+								TankPlayable t = s.builds.get(i);
+								if (t.name.equals(((TankPlayable) m).buildName))
+								{
+									build = i;
+									boolean d = m.destroy;
+									t.clonePropertiesTo((TankPlayable) m);
+									if (d)
+										((TankPlayable) m).health = 0;
+									break;
+								}
+							}
 
-                        System.out.println(((TankPlayable) m).buildName);
-                        int build = -1;
-                        for (int i = 0; i < Game.currentLevel.playerBuilds.size(); i++)
-                        {
-                            TankPlayable t = Game.currentLevel.playerBuilds.get(i);
-                            if (t.name.equals(((TankPlayable) m).buildName))
-                            {
-                                build = i;
-                                System.out.println(t.emblem);
-                                t.clonePropertiesTo((TankPlayable) m);
-                                System.out.println(((TankPlayable) m).emblem);
-                                break;
-                            }
-                        }
-
-                        Game.eventsOut.add(new EventPlayerRevealBuild(((TankPlayable) m).networkID, build));
-                    }
+							Game.eventsOut.add(new EventPlayerRevealBuild(((TankPlayable) m).networkID, build));
+						}
+					}
 				}
 
 				ScreenPartyHost.disconnectedPlayers.clear();

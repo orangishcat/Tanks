@@ -46,6 +46,11 @@ public class ArrayListIndexPointer<T> extends Pointer<T>
         return this.arrayList.get(this.index);
     }
 
+    public int getIndex()
+    {
+        return this.index;
+    }
+
     @Override
     public Class<T> getType()
     {

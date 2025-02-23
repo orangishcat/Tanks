@@ -55,9 +55,7 @@ public class SteamWorkshopHandler
         @Override
         public void onCreateItem(SteamPublishedFileID publishedFileID, boolean needsToAcceptWLA, SteamResult result)
         {
-            if (needsToAcceptWLA)
-                Game.screen = new ScreenInfo(Game.screen, "Failed", new String[]{"You need to accept the Steam Subscriber Agreement!"});
-            else if (result != SteamResult.OK)
+            if (result != SteamResult.OK)
                 Game.screen = new ScreenInfo(Game.screen, "Failed", new String[]{"Failed: " + result.name()});
             else
             {
@@ -83,7 +81,6 @@ public class SteamWorkshopHandler
                     e.printStackTrace();
                     Game.exitToCrash(e);
                 }
-
             }
         }
 
@@ -92,7 +89,13 @@ public class SteamWorkshopHandler
         {
             if (result == SteamResult.OK)
             {
-                Game.screen = new ScreenInfo(new ScreenSteamWorkshop(), "Uploaded!", new String[]{uploadingType + " was uploaded to Steam Workshop!", uploadingName});
+                if (!needsToAcceptWLA)
+                    Game.screen = new ScreenInfo(new ScreenSteamWorkshop(), "Uploaded!", new String[]{uploadingType + " was uploaded to Steam Workshop!", uploadingName});
+                else
+                    Game.screen = new ScreenInfo(new ScreenSteamWorkshop(), "Uploaded!", new String[]{uploadingType + " was uploaded to Steam Workshop!",
+                            "However, you haven't yet accepted the Steam", "Workshop Legal agreement. Your " + uploadingType,
+                            "will be until you do so.", uploadingName});
+
                 Game.game.fileManager.getFile(Game.homedir + uploadDir + "/" + uploadingName).delete();
                 Game.game.fileManager.getFile(Game.homedir + screenshotDir).delete();
                 Game.game.fileManager.getFile(Game.homedir + uploadMainDir).delete();
