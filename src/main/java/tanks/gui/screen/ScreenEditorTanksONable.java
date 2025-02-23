@@ -363,7 +363,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 {
                     try
                     {
-                        if (t.inputText.length() == 0)
+                        if (t.inputText.isEmpty())
                             t.inputText = f.get() + "";
                         else
                             f.cast().set((int) Double.parseDouble(t.inputText));
@@ -398,7 +398,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 {
                     try
                     {
-                        if (t.inputText.length() == 0)
+                        if (t.inputText.isEmpty())
                             t.inputText = f.get() + "";
                         else
                             f.cast().set(Double.parseDouble(t.inputText));
@@ -885,7 +885,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
         TextBox t = new TextBox(0, 0, this.objWidth, this.objHeight, "Spawn weight", () -> {}, e.weight + "", "Bigger numbers relative to---other spawned tanks increase---the likelihood of this tank---being spawned");
         t.function = () ->
         {
-            if (t.inputText.length() == 0)
+            if (t.inputText.isEmpty())
                 t.inputText = e.weight + "";
             else
                 e.weight = Double.parseDouble(t.inputText);

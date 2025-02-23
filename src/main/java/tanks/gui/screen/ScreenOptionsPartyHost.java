@@ -112,7 +112,7 @@ public class ScreenOptionsPartyHost extends Screen
 
         bots = new TextBox(this.centerX, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Bot players", () ->
         {
-            if (bots.inputText.length() == 0)
+            if (bots.inputText.isEmpty())
                 bots.inputText = Game.botPlayerCount + "";
             else
                 Game.botPlayerCount = Integer.parseInt(bots.inputText);

@@ -357,7 +357,7 @@ public class ScreenCrusadeListEditor extends Screen implements ITankBuildScreen
         {
             BaseFile file = Game.game.fileManager.getFile(crusade.fileName);
 
-            if (crusadeName.inputText.length() > 0 && !Game.game.fileManager.getFile(Game.homedir + Game.crusadeDir + "/" + crusadeName.inputText + ".tanks").exists())
+            if (!crusadeName.inputText.isEmpty() && !Game.game.fileManager.getFile(Game.homedir + Game.crusadeDir + "/" + crusadeName.inputText + ".tanks").exists())
             {
                 if (file.exists())
                 {

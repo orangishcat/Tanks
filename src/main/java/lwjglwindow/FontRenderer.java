@@ -85,17 +85,18 @@ public class FontRenderer extends BaseFontRenderer
 		{
 			if (c[i] == '\u00C2')
 				continue;
-			else if (c[i] == '\u00A7')
+
+			if (c[i] == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;
 
 				try
 				{
-					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + "" + c[i + 3]);
-					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + "" + c[i + 6]);
-					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + "" + c[i + 9]);
-					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + "" + c[i + 12]);
+					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + c[i + 3]);
+					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + c[i + 6]);
+					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + c[i + 9]);
+					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + c[i + 12]);
 					this.window.setColor(r, g, b, a * opacity);
 				}
 				catch (Exception e)
@@ -122,17 +123,18 @@ public class FontRenderer extends BaseFontRenderer
 		{
 			if (c[i] == '\u00C2')
 				continue;
-			else if (c[i] == '\u00A7')
+
+			if (c[i] == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;
 
 				try
 				{
-					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + "" + c[i + 3]);
-					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + "" + c[i + 6]);
-					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + "" + c[i + 9]);
-					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + "" + c[i + 12]);
+					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + c[i + 3]);
+					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + c[i + 6]);
+					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + c[i + 9]);
+					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + c[i + 12]);
 					this.window.setColor(r, g, b, a * opacity);
 				}
 				catch (Exception e)
@@ -156,7 +158,8 @@ public class FontRenderer extends BaseFontRenderer
 		{
 			if (c[i] == '\u00C2')
 				continue;
-			else if (c[i] == '\u00A7')
+
+			if (c[i] == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;

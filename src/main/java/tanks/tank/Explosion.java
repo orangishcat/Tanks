@@ -253,7 +253,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
                                     else
                                         Game.player.hotbar.coins += t.coinValue;
                                 }
-                                else if (this.tank instanceof IServerPlayerTank && (Crusade.crusadeMode || Game.currentLevel.shop.size() > 0 || Game.currentLevel.startingItems.size() > 0))
+                                else if (this.tank instanceof IServerPlayerTank && (Crusade.crusadeMode || !Game.currentLevel.shop.isEmpty() || !Game.currentLevel.startingItems.isEmpty()))
                                 {
                                     if (t instanceof TankPlayer || t instanceof TankPlayerRemote)
                                     {

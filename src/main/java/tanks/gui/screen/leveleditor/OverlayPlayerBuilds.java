@@ -197,7 +197,7 @@ public class OverlayPlayerBuilds extends ScreenLevelEditorOverlay implements IRe
         reorder.draw();
         tankButtons.draw();
 
-        if (tankButtons.reorder && tankButtons.upButtons.size() > 0 && tankButtons.upButtons.get(1).selected && tankButtons.fixedFirstElements > 0)
+        if (tankButtons.reorder && !tankButtons.upButtons.isEmpty() && tankButtons.upButtons.get(1).selected && tankButtons.fixedFirstElements > 0)
             Drawing.drawing.drawTooltip(reorderFail);
     }
 

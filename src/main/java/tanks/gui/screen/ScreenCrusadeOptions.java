@@ -80,7 +80,7 @@ public class ScreenCrusadeOptions extends Screen
 
         startingLives = new TextBox(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 90, this.objWidth, this.objHeight, "Starting lives", () ->
         {
-            if (startingLives.inputText.length() == 0)
+            if (startingLives.inputText.isEmpty())
                 startingLives.inputText = crusade.startingLives + "";
             else
                 crusade.startingLives = Integer.parseInt(startingLives.inputText);
@@ -95,7 +95,7 @@ public class ScreenCrusadeOptions extends Screen
 
         bonusLifeFrequency = new TextBox(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + 0, this.objWidth, this.objHeight, "Bonus life frequency", () ->
         {
-            if (bonusLifeFrequency.inputText.length() == 0)
+            if (bonusLifeFrequency.inputText.isEmpty())
                 bonusLifeFrequency.inputText = crusade.bonusLifeFrequency + "";
             else
                 crusade.bonusLifeFrequency = Integer.parseInt(bonusLifeFrequency.inputText);
