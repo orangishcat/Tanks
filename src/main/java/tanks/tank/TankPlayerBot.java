@@ -1,9 +1,13 @@
 package tanks.tank;
 
-import tanks.*;
+import tanks.Crusade;
+import tanks.Drawing;
+import tanks.Game;
+import tanks.Player;
 import tanks.bullet.Bullet;
 import tanks.bullet.BulletAirStrike;
 import tanks.bullet.BulletArc;
+import tanks.effect.AttributeModifier;
 import tanks.gui.screen.ScreenGame;
 import tanks.hotbar.Hotbar;
 import tanks.item.*;
@@ -49,7 +53,7 @@ public class TankPlayerBot extends TankPurple implements IServerPlayerTank
     @Override
     public void updateStart()
     {
-        double reload = this.getAttributeValue(AttributeModifier.reload, 1);
+        double reload = em().getAttributeValue(AttributeModifier.reload, 1);
 
         Hotbar h = this.player.hotbar;
         if (h.enabledItemBar)

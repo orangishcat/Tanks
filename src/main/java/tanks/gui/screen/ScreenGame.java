@@ -539,7 +539,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 	public ScreenGame()
 	{
-		Game.recomputeHeightGrid();
 		this.selfBatch = false;
 		this.enableMargins = !Game.followingCam;
 
@@ -1591,10 +1590,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			for (Cloud c : Game.clouds)
 				c.update();
 
-//			if (Game.game.window.pressedKeys.contains(InputCodes.KEY_F3) && Game.game.window.pressedKeys.contains(InputCodes.KEY_F4))
-//				Game.movables.add(new Crate(new TankPlayer(Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.angle)));
-
-			for (Movable m : Game.movables)
+            for (Movable m : Game.movables)
                 m.preUpdate();
 
 			for (int i = 0; i < Game.movables.size(); i++)
@@ -1820,7 +1816,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 						}
 					}
 
-					if (Game.effects.size() <= 0 && noMovables)
+					if (Game.effects.isEmpty() && noMovables)
 					{
 						if (Game.followingCam)
 							Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
@@ -2287,10 +2283,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.1 * frac, 0));
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, 0, -Math.PI * 0.35 * frac + fcPitch, 0, fcPitch * 3, fcPitch * 3, -1));
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0, 0.5 * frac));
-
-				if (fcZoom > 0)
-					Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, fcZoom + 1, 0, 0, 0));
-			}
+            }
 			else
 			{
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, 0, 0, frac * ((t.angle + Math.PI * 3 / 2) % (Math.PI * 2) - Math.PI), 0, -Drawing.drawing.statsHeight / Game.game.window.absoluteHeight / 2, 0));
@@ -2298,11 +2291,11 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, 0, -Math.PI * 0.5 * frac, 0, 0, 0, -1));
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.0575 * frac, 0.9 * frac));
 
-				if (fcZoom > 0)
-					Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, fcZoom + 1, 0, 0, 0));
-			}
+            }
+            if (fcZoom > 0)
+                Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, fcZoom + 1, 0, 0, 0));
 
-			if (freecam)
+            if (freecam)
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, yaw, pitch, roll, 0, 0, 0));
 
 			Game.game.window.loadPerspective();
@@ -2449,11 +2442,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		if (isVersus && ((Game.playerTank != null && Game.playerTank.destroy) || finishedQuick))
 			this.showRankings = true;
 
-		if (this.showRankings)
-		{
-			if (rankingsTime * 10 >= 0)
+		if (this.showRankings &&rankingsTime * 10 >= 0)
 			this.rankingsOverlay.draw();
-		}
 
 		if (!playing)
 		{

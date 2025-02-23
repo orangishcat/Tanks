@@ -27,6 +27,7 @@ import tanks.item.ItemMine;
 import tanks.item.ItemShield;
 import tanks.minigames.ArcadeBeatBlocks;
 import tanks.minigames.ArcadeClassic;
+import tanks.minigames.CastleRampage;
 import tanks.minigames.Minigame;
 import tanks.network.Client;
 import tanks.network.NetworkEventMap;

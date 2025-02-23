@@ -21,8 +21,10 @@ import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.item.ItemBullet;
 import tanks.item.ItemRemote;
+import tanks.network.ConnectedPlayer;
 import tanks.network.event.EventLayMine;
 import tanks.network.event.EventShootBullet;
+import tanks.network.event.EventUpdateEliminatedPlayers;
 import tanks.tankson.Property;
 import tanks.tankson.Serializer;
 import tanks.tankson.TanksONable;
@@ -136,7 +138,9 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 	public TankPlayer setDefaultColor()
 	{
-		this.setDefaultPlayerColor();
+		this.colorR = 0;
+		this.colorG = 150;
+		this.colorB = 255;
 		return this;
 	}
 
@@ -234,7 +238,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			else if (x == 1)
 				a = 7 * Math.PI / 4;
 
-			double intensity = 1;
+			double intensity;
 
 			if (a < 0 && Game.game.window.touchscreen)
 			{

@@ -4,6 +4,7 @@ import basewindow.IModel;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.bullet.*;
+import tanks.effect.AttributeModifier;
 import tanks.gui.screen.ScreenGame;
 import tanks.item.Item;
 import tanks.item.ItemBullet;
@@ -3210,7 +3211,7 @@ public class TankAIControlled extends Tank implements ITankField
 					{
 						ArrayList<SpawnedTankEntry> a1 = (ArrayList<SpawnedTankEntry>) f.get(this);
 
-						ArrayList<SpawnedTankEntry> al = new ArrayList<SpawnedTankEntry>();
+						ArrayList<SpawnedTankEntry> al = new ArrayList<>();
 						for (SpawnedTankEntry o: a1)
 						{
 							al.add(new SpawnedTankEntry(cloneTankField(o.tank), o.weight));

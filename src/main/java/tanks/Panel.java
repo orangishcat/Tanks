@@ -24,7 +24,7 @@ import tanks.replay.ReplayHandler;
 import tanks.tank.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Panel
 {
@@ -406,7 +406,8 @@ public class Panel
 				if (ScreenPartyHost.readyPlayers.size() >= ScreenPartyHost.includedPlayers.size() && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).cancelCountdown)
 				{
 					Game.eventsOut.add(new EventBeginLevelCountdown());
-					((ScreenGame) Game.screen).cancelCountdown = false;
+					ScreenGame s = (ScreenGame) Game.screen;
+					s.cancelCountdown = false;
 
 					for (Movable m: Game.movables)
 					{
