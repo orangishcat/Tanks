@@ -18,7 +18,6 @@ import tanks.translation.Translation;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.UUID;
 
 public class ScreenPartyHost extends Screen

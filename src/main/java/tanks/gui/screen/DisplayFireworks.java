@@ -20,7 +20,7 @@ public class DisplayFireworks
     ArrayList<Firework> fireworks1 = new ArrayList<>();
     ArrayList<Firework> fireworks2 = new ArrayList<>();
 
-    public double fireworkMultiplier = 1;
+    public double fireworkMultiplier;
 
     boolean odd = false;
 

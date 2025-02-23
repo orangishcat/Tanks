@@ -9,7 +9,6 @@ import tanks.tank.IServerPlayerTank;
 import tanks.tank.Tank;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ItemDrop extends Movable
 {

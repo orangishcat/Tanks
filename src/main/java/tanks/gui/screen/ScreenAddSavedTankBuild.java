@@ -1,7 +1,6 @@
 package tanks.gui.screen;
 
 import basewindow.BaseFile;
-import tanks.BiConsumer;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.Button;
@@ -11,7 +10,6 @@ import tanks.tank.Tank;
 import tanks.tank.TankAIControlled;
 import tanks.tank.TankPlayable;
 import tanks.tank.TankPlayer;
-import tanks.tankson.ArrayListIndexPointer;
 import tanks.tankson.Pointer;
 import tanks.translation.Translation;
 
@@ -167,7 +165,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
             double x = this.centerX - 450 + 100 * (index % cols);
             double y = this.centerY - 100 + 100 * ((index / cols) % rows);
 
-            TankAIControlled t = null;
+            TankAIControlled t;
 
             Tank t1 = Game.registryTank.tankEntries.get(i).getTank(x, y, 0);
             if (t1 instanceof TankAIControlled)

@@ -25,7 +25,7 @@ public class ScreenAddSavedTank extends Screen implements IConditionalOverlayScr
     public int objectButtonRows = 3;
     public int objectButtonCols = 10;
 
-    public int levelTankCount = 0;
+    public int levelTankCount;
 
     public ArrayList<Button> tankButtons = new ArrayList<>();
     public boolean drawBehindScreen;

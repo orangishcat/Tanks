@@ -24,7 +24,7 @@ public class ScreenTankSavedInfo extends Screen implements IBlankBackgroundScree
     public ArrayList<ButtonObject> linkedTanksCopied = new ArrayList<>();
     public ArrayList<ButtonObject> linkedTanksNotCopied = new ArrayList<>();
 
-    public double row1Y = this.centerY - 150;
+    public double row1Y;
     public double row2Y = this.centerY;
     public double row3Y = this.centerY + 150;
     public double rowSpacing = 150;
@@ -37,7 +37,7 @@ public class ScreenTankSavedInfo extends Screen implements IBlankBackgroundScree
 
     public int pageEntries = 10;
 
-    public boolean isBuild = false;
+    public boolean isBuild;
 
     public Button quit = new Button(this.centerX, this.centerY + this.objYSpace * 4.5, this.objWidth, this.objHeight, "Ok", () ->
             Game.screen = this.previous

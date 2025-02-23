@@ -15,7 +15,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import static tanks.tank.TankPropertyCategory.*;
-import static tanks.tank.TankPropertyCategory.appearanceEmblem;
 
 public abstract class TankPlayable extends Tank implements ICopyable<TankPlayable>
 {

@@ -39,8 +39,8 @@ public class Trail implements IDrawable
     public boolean glow;
     public double luminosity;
 
-    public boolean frontCircle = true;
-    public boolean backCircle = true;
+    public boolean frontCircle;
+    public boolean backCircle;
     public boolean showOutsides = true;
     public boolean showOutsideFront = true;
     public boolean showOutsideBack = true;

@@ -19,7 +19,7 @@ public class VBOStaticBatchRenderer extends BaseShapeBatchRenderer
     public LWJGLWindow window;
 
     public ShaderGroup shader;
-    public int vertVBO = -1;
+    public int vertVBO;
     public int colVBO = -1;
     public int texVBO = -1;
     public int normVBO = -1;

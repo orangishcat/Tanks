@@ -6,7 +6,6 @@ import tanks.Movable;
 import tanks.Player;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.ScreenPartyHost;
-import tanks.network.Server;
 import tanks.network.ServerHandler;
 import tanks.tank.TankPlayer;
 import tanks.tank.TankPlayerRemote;

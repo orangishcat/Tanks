@@ -1,7 +1,6 @@
 package tanks.item;
 
 import tanks.*;
-import tanks.bullet.BulletPropertyCategory;
 import tanks.network.event.EventTankUpdateHealth;
 import tanks.tank.Tank;
 import tanks.tankson.Property;

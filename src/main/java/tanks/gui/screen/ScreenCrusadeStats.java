@@ -1675,7 +1675,8 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
             this.hits = hits;
 
             if (!i.supportsHits)
-                hits = -1;
+            {
+            }
         }
 
         @Override

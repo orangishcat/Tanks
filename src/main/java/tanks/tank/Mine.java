@@ -12,7 +12,6 @@ import tanks.obstacle.Obstacle;
 import tanks.tankson.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @TanksONable("mine")
 public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITanksONEditable

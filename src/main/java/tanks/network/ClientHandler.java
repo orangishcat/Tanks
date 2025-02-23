@@ -19,7 +19,6 @@ import tanks.network.event.INetworkEvent;
 import tanks.network.event.IStackableEvent;
 import tanks.network.event.online.EventSendOnlineClientDetails;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter 

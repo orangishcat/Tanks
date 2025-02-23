@@ -2,10 +2,8 @@ package tanks.gui.screen;
 
 import basewindow.BaseFile;
 import tanks.*;
-import tanks.bullet.Bullet;
 import tanks.gui.*;
 import tanks.item.Item;
-import tanks.item.ItemBullet;
 import tanks.registry.RegistryItem;
 import tanks.tank.*;
 import tanks.tankson.*;

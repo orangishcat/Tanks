@@ -20,7 +20,6 @@ import tanks.tank.*;
 import tanks.tankson.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @TanksONable("bullet")
 public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditable

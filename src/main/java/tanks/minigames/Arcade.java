@@ -646,7 +646,7 @@ public class Arcade extends Minigame
         double destX = 0;
         double destY = 0;
 
-        boolean found = false;
+        boolean found;
 
         boolean horizontal = this.random.nextDouble() < 0.5;
         boolean other = this.random.nextDouble() < 0.5;
