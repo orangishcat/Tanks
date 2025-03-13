@@ -1,38 +1,31 @@
 package tanks;
 
 import basewindow.InputCodes;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.extension.Extension;
 import tanks.gui.*;
-import tanks.gui.ScreenElement.CenterMessage;
-import tanks.gui.ScreenElement.Notification;
 import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
 import tanks.gui.screen.leveleditor.ScreenLevelEditorOverlay;
 import tanks.network.Client;
 import tanks.network.MessageReader;
 import tanks.network.NetworkEventMap;
-import tanks.network.event.EventBeginLevelCountdown;
-import tanks.network.event.EventPlayerRevealBuild;
-import tanks.network.event.INetworkEvent;
-import tanks.network.event.IStackableEvent;
+import tanks.network.event.*;
 import tanks.network.event.online.IOnlineServerEvent;
 import tanks.obstacle.Obstacle;
+import tanks.obstacle.ObstacleTeleporter;
 import tanks.rendering.*;
-import tanks.replay.Replay;
-import tanks.replay.ReplayHandler;
 import tanks.tank.*;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class Panel
 {
-    public static boolean onlinePaused;
-    public static LinkedList<Notification> notifs = new LinkedList<>();
-	public static long lastNotifTime = 0;
-	public static CenterMessage currentMessage;
 	public static String lastWindowTitle = "";
+
+	public static boolean onlinePaused;
 
 	public double zoomTimer = 0;
 	public static double zoomTarget = -1;
@@ -44,7 +37,6 @@ public class Panel
 
 	public static boolean showMouseTarget = true;
 	public static boolean showMouseTargetHeight = false;
-	public static boolean pauseOnDefocus = true;
 
 	public static Panel panel;
 
@@ -77,7 +69,6 @@ public class Panel
 	public long frameStartTime = System.currentTimeMillis();
 
 	public long lastFrameNano = 0;
-	public static boolean tickSprint;
 
 	public int lastFPS = 0;
 
@@ -96,19 +87,19 @@ public class Panel
 	public double age = 0;
 	public long ageFrames = 0;
 
-	protected boolean prevFocused = true;
-
 	public boolean started = false;
 	public boolean settingUp = true;
 
 	protected Screen lastDrawnScreen = null;
 
 	public ArrayList<double[]> lights = new ArrayList<>();
-	Int2ObjectOpenHashMap<IStackableEvent> stackedEventsIn = new Int2ObjectOpenHashMap<>();
+	HashMap<Integer, IStackableEvent> stackedEventsIn = new HashMap<>();
 
 	public LoadingTerrainContinuation continuation = null;
 	public long continuationStartTime = 0;
 	public boolean continuationMusic = false;
+
+	public double timeSinceBotUpdate;
 
 	/** Set to a directory to have the game screenshot the next frame and save it to that directory */
 	public String saveScreenshotDir = null;
@@ -213,6 +204,8 @@ public class Panel
 			Game.game.window.soundPlayer.loadMusic("/music/beatblocks/beat_beeps_4.ogg");
 			Game.game.window.soundPlayer.loadMusic("/music/beatblocks/beat_beeps_8.ogg");
 			Game.game.window.soundPlayer.loadMusic("/music/battle.ogg");
+			Game.game.window.soundPlayer.loadMusic("/music/results.ogg");
+			Game.game.window.soundPlayer.loadMusic("/music/finished_music.ogg");
 
 			for (int i = 1; i <= 8; i++)
 			{
@@ -322,9 +315,7 @@ public class Panel
 		Drawing.drawing.interfaceScale = Drawing.drawing.interfaceScaleZoom * Math.min(Panel.windowWidth / 28, (Panel.windowHeight - Drawing.drawing.statsHeight) / 18) / 50.0;
 		Game.game.window.absoluteDepth = Drawing.drawing.interfaceScale * Game.absoluteDepthBase;
 
-		if (tickSprint)
-			Panel.frameFrequency = 2;
-		else if (Game.deterministicMode && Game.deterministic30Fps)
+		if (Game.deterministicMode && Game.deterministic30Fps)
 			Panel.frameFrequency = 100.0 / 30;
 		else if (Game.deterministicMode)
 			Panel.frameFrequency = 100.0 / 60;
@@ -363,8 +354,17 @@ public class Panel
 		}
 
 		for (INetworkEvent e: stackedEventsIn.values())
-            e.execute();
+		{
+			e.execute();
+		}
 		stackedEventsIn.clear();
+
+		for (int i = 0; i < Game.game.heightGrid.length; i++)
+		{
+			Arrays.fill(Game.game.heightGrid[i], -1000);
+			Arrays.fill(Game.game.groundHeightGrid[i], -1000);
+			Arrays.fill(Game.game.groundEdgeHeightGrid[i], -1000);
+		}
 
 		if (ScreenPartyHost.isServer)
 		{
@@ -375,8 +375,12 @@ public class Panel
 					for (int j = 0; j < Game.movables.size(); j++)
 					{
 						Movable m = Game.movables.get(j);
+
 						if (m instanceof TankPlayerRemote && ((TankPlayerRemote) m).player.clientID.equals(ScreenPartyHost.disconnectedPlayers.get(i)))
+						{
 							((TankPlayerRemote) m).health = 0;
+							m.destroy = true;
+						}
 					}
 
 					ScreenPartyHost.includedPlayers.remove(ScreenPartyHost.disconnectedPlayers.get(i));
@@ -386,6 +390,20 @@ public class Panel
 						if (p.clientID.equals(ScreenPartyHost.disconnectedPlayers.get(i)))
 						{
 							ScreenPartyHost.readyPlayers.remove(p);
+
+							if (Game.screen instanceof ScreenGame)
+							{
+								ScreenGame sg = (ScreenGame) Game.screen;
+								for (int j = 0; j < sg.eliminatedPlayers.size(); j++)
+								{
+									if (sg.eliminatedPlayers.get(j).clientId.equals(p.clientID))
+									{
+										sg.eliminatedPlayers.remove(j);
+										Game.eventsOut.add(new EventUpdateEliminatedPlayers(sg.eliminatedPlayers));
+										break;
+									}
+								}
+							}
 
 							if (Crusade.currentCrusade != null)
 							{
@@ -429,6 +447,12 @@ public class Panel
 							}
 
 							Game.eventsOut.add(new EventPlayerRevealBuild(((TankPlayable) m).networkID, build));
+						}
+						else if (m instanceof TankPlayerBot)
+						{
+							int b = (int) (Math.random() * s.builds.size());
+							s.builds.get(b).clonePropertiesTo((TankPlayerBot) m);
+							Game.eventsOut.add(new EventPlayerRevealBuild(((TankPlayerBot) m).networkID, b));
 						}
 					}
 				}
@@ -572,20 +596,10 @@ public class Panel
 		Drawing.drawing.interfaceSizeX = Drawing.drawing.baseInterfaceSizeX / Drawing.drawing.interfaceScaleZoom;
 		Drawing.drawing.interfaceSizeY = Drawing.drawing.baseInterfaceSizeY / Drawing.drawing.interfaceScaleZoom;
 
-		if (Game.game.window.focused != prevFocused)
-		{
-			prevFocused = Game.game.window.focused;
-			Game.screen.onFocusChange(prevFocused);
-		}
-
-		ReplayHandler.preUpdate();
-
 		if (!onlinePaused)
 			Game.screen.update();
 		else
 			this.onlineOverlay.update();
-
-		ReplayHandler.update();
 
 		if (Game.game.input.fullscreen.isValid())
 		{
@@ -602,11 +616,7 @@ public class Panel
 			{
 				for (int j = 0; j < ScreenPartyHost.server.connections.size(); j++)
 				{
-					synchronized (ScreenPartyHost.server.connections.get(j).events)
-					{
-						ScreenPartyHost.server.connections.get(j).events.addAll(Game.eventsOut);
-					}
-
+					ScreenPartyHost.server.connections.get(j).addEvents(Game.eventsOut);
 					ScreenPartyHost.server.connections.get(j).reply();
 				}
 			}
@@ -622,11 +632,10 @@ public class Panel
 			Panel.selectedTextBox = null;
 		}
 
-		if (Replay.isRecording)
-			Replay.currentReplay.updateRecording(new ArrayList<>(Game.eventsOut));
-
 		if (ScreenPartyLobby.isClient)
-            Client.handler.reply();
+		{
+			Client.handler.reply();
+		}
 
 		if (forceRefreshMusic || (prevScreen != null && prevScreen != Game.screen && Game.screen != null && !Game.stringsEqual(prevScreen.music, Game.screen.music) && !(Game.screen instanceof IOnlineScreen)))
 		{
@@ -754,7 +763,6 @@ public class Panel
 			try
 			{
 				Game.screen.draw();
-				ReplayHandler.draw();
 				this.continuation = null;
 				this.continuationMusic = false;
 			}
@@ -773,8 +781,8 @@ public class Panel
 
 				Drawing.drawing.setColor(174, 92, 16);
 				Drawing.drawing.fillInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2, Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
-
 				Drawing.drawing.setColor(255, 255, 255);
+
 				Drawing.drawing.setInterfaceFontSize(24);
 				Drawing.drawing.displayInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 30, "Drawing a big level...");
 				Drawing.drawing.drawInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2, String.format("%.2f%% (%d / %d)", 100.0 * c.renderer.stagedCount / c.renderer.totalObjectsCount, c.renderer.stagedCount, c.renderer.totalObjectsCount));
@@ -816,41 +824,17 @@ public class Panel
 			this.drawBar();
 		}
 
-		if (!notifs.isEmpty())
-		{
-			double sy = 0;
-			for (int i = 0; i < notifs.size(); i++)
-			{
-				if (i == 1 && notifs.get(0).fadeStart)
-					sy -= Math.min(750, System.currentTimeMillis() - lastNotifTime) * (notifs.get(0).sY + 100) / 750;
+		if (Drawing.drawing.tooltip != null)
+			Drawing.drawing.drawTooltip(Drawing.drawing.tooltip, Drawing.drawing.getInterfaceMouseX(), Drawing.drawing.getInterfaceMouseY());
 
-				Notification n = notifs.get(i);
-				if (i > 0)
-					n.age = Math.max(0, Math.min(n.age, notifs.get(i-1).age - 25));
-				n.draw(sy);
-				sy += n.sY + 15;
-			}
-
-			if (notifs.get(0).age > notifs.get(0).duration)
-				notifs.pop();
-		}
+		Drawing.drawing.tooltip = null;
 
 		if (Game.screen.showDefaultMouse)
 			this.drawMouseTarget();
 
-		if (currentMessage != null)
-			currentMessage.draw();
-
 		Drawing.drawing.setColor(255, 255, 255);
-
-//		Drawing.drawing.setColor(0, 0, 0, 0);
-//		Drawing.drawing.fillInterfaceRect(0, 0, 0, 0);
-
-		Game.screen.drawPostMouse();
-
-
-		DebugKeybinds.update();
-	}
+        Game.screen.drawPostMouse();
+    }
 
 	public void drawMouseTarget()
 	{
@@ -903,7 +887,10 @@ public class Panel
 			double c = 127 * Obstacle.draw_size / Game.tile_size;
             double a = 255;
 
-			double r2 = 0, g2 = 0, b2 = 0, a2 = 0;
+			double r2 = 0;
+			double g2 = 0;
+			double b2 = 0;
+			double a2 = 0;
 
 			Drawing.drawing.setColor(c, c, c, a, 1);
 			Game.game.window.shapeRenderer.setBatchMode(true, false, true, true, false);
@@ -1070,25 +1057,6 @@ public class Panel
 
 			s = "Downstream: " + MessageReader.downstreamBytesPerSec / 1024 + "KB/s";
 			Game.game.window.fontRenderer.drawString(Panel.windowWidth - 5 - Game.game.window.fontRenderer.getStringSizeX(0.4, s) - offset, offset + (int) (Panel.windowHeight - 40 + 22), 0.4, 0.4, s);
-		}
-	}
-
-	public static void setTickSprint(boolean tickSprint)
-	{
-		Panel.tickSprint = tickSprint;
-
-		if (Panel.tickSprint)
-		{
-			Game.vsync = false;
-			Game.maxFPS = 0;
-			Game.game.window.setVsync(false);
-			Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
-		}
-		else
-		{
-			ScreenOptions.loadOptions(Game.homedir);
-			Game.game.window.setVsync(Game.vsync);
-			Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
 		}
 	}
 

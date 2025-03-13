@@ -813,6 +813,9 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
     public class TabAbilities extends TabTankBuild
     {
         public ArrayList<Button> deleteButtons = new ArrayList<>();
+        public ArrayList<Button> upButtons = new ArrayList<>();
+        public ArrayList<Button> downButtons = new ArrayList<>();
+
         public Selector itemSelector;
 
         public Button create = new Button(screen.centerX, -1000, 60, 60, "+", () ->
@@ -906,6 +909,33 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
                 delete.textColB = 255;
 
                 deleteButtons.add(delete);
+
+                Button up = new Button(-1000, -1000, 60, 60, "", () ->
+                {
+                    t.abilities.add(j - 1, t.abilities.remove(j));
+                    uiElements.clear();
+                    addFields();
+                    sortUIElements();
+                });
+
+                up.imageSizeX = 30;
+                up.imageSizeY = 30;
+                up.image = "icons/arrow_up.png";
+
+                Button down = new Button(-1000, -1000, 60, 60, "", () ->
+                {
+                    t.abilities.add(j, t.abilities.remove(j + 1));
+                    uiElements.clear();
+                    addFields();
+                    sortUIElements();
+                });
+
+                down.imageSizeX = 30;
+                down.imageSizeY = 30;
+                down.image = "icons/arrow_down.png";
+
+                upButtons.add(up);
+                downButtons.add(down);
             }
 
             if (t.abilities.size() < TankPlayer.max_abilities)
@@ -920,6 +950,14 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
             {
                 Button b = this.deleteButtons.get(i);
                 b.update();
+
+                Button up = this.upButtons.get(i);
+                Button down = this.downButtons.get(i);
+
+                up.enabled = i > 0;
+                down.enabled = i < target.get().abilities.size() - 1;
+                up.update();
+                down.update();
             }
         }
 
@@ -928,11 +966,22 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
             super.draw();
             for (int i = 0; i < this.deleteButtons.size(); i++)
             {
-                Button b = this.deleteButtons.get(i);
                 SelectorDrawable d = ((SelectorDrawable) this.uiElements.get(i));
+
+                Button b = this.deleteButtons.get(i);
                 b.posX = d.posX - screen.objXSpace * 0.85;
                 b.posY = d.posY - screen.objHeight / 4;
                 b.draw();
+
+                Button up = this.upButtons.get(i);
+                up.posX = d.posX + screen.objXSpace * 0.85;
+                up.posY = d.posY - screen.objHeight / 4;
+                up.draw();
+
+                Button down = this.downButtons.get(i);
+                down.posX = up.posX + screen.objYSpace * 1.25;
+                down.posY = d.posY - screen.objHeight / 4;
+                down.draw();
             }
         }
     }
@@ -947,7 +996,7 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
     @Override
     public void updateOverlay()
     {
-        if (!this.target.nullable)
+        if (!this.target.nullable && !(target instanceof ArrayListIndexPointer && ((ArrayListIndexPointer<T>) target).getIndex() == 0))
             this.delete.update();
 
         this.save.update();
@@ -956,7 +1005,7 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
     @Override
     public void drawOverlay()
     {
-        if (!this.target.nullable)
+        if (!this.target.nullable && !(target instanceof ArrayListIndexPointer && ((ArrayListIndexPointer<T>) target).getIndex() == 0))
             this.delete.draw();
 
         this.save.draw();

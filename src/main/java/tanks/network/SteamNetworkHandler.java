@@ -23,6 +23,7 @@ public class SteamNetworkHandler
 	public int[] msgSize = new int[1];
 
 	public SteamID currentLobby = null;
+	public SteamResult lobbyHostStatus = null;
 	protected int lastPlayerCount = -1;
 
 	protected Int2ObjectOpenHashMap<Long> toClose = new Int2ObjectOpenHashMap<>();
@@ -97,7 +98,7 @@ public class SteamNetworkHandler
 				}
 			}
 			else
-				Game.screen = new ScreenInfo(Game.screen , "Lobby status", new String[]{"Failed: " + result.name()});
+				lobbyHostStatus = result;
 		}
 
 		@Override
@@ -165,6 +166,8 @@ public class SteamNetworkHandler
 
 	public void hostParty()
 	{
+		currentLobby = null;
+		lobbyHostStatus = null;
 		matchmaking.createLobby(Game.steamVisibility, 250);
 	}
 
@@ -356,7 +359,11 @@ public class SteamNetworkHandler
 			if (steamIDRemote != null)
 			{
 				if (ScreenPartyHost.isServer)
-					serverHandlersBySteamID.get(remoteID).channelInactive(null);
+				{
+					ServerHandler h = serverHandlersBySteamID.get(remoteID);
+					if (h != null)
+						h.channelInactive(null);
+				}
 				else if (ScreenPartyLobby.isClient)
 					Client.handler.channelInactive(null);
 

@@ -260,7 +260,7 @@ public class ScreenTitle extends Screen implements ISeparateBackgroundScreen
 				int y = (int) (Math.random() * Game.currentSizeY);
 				Tank t = Game.registryTank.getRandomTank().getTank((x + 0.5) * Game.tile_size, (y + 0.5) * Game.tile_size, (int) (Math.random() * 4));
 				t.team = Game.enemyTeam;
-				Game.movables.add(new Crate(t));
+				Game.movables.add(new Crate(t, Math.random() * 400 + 800));
 			}
 		}
 

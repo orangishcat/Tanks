@@ -13,122 +13,246 @@ public final class Serializer
 {
     public static HashMap<Class<?>, Object> defaults = new HashMap<>();
 
+    public static HashMap<String, Tank> userTanks = new HashMap<>();
+
     public static Class<?> getCorrectClass(Object o)
     {
-        return o instanceof TankAIControlled ? TankAIControlled.class : o.getClass();
+        if (o instanceof TankAIControlled)
+        {
+            return TankAIControlled.class;
+        }
+        else
+        {
+            return o.getClass();
+        }
     }
 
     public static Object getDefault(Class<?> c)
     {
-        return defaults.computeIfAbsent(c, c1 ->
+        if (defaults.containsKey(c))
+        {
+            return defaults.get(c);
+        }
+        else
         {
             try
             {
-                return c1.getConstructor().newInstance();
+                Object o = c.getConstructor().newInstance();
+                defaults.put(c, o);
+                return o;
             }
-            catch (Exception e)
+            catch (Exception ignore)
             {
-                return null;
             }
-        });
+        }
+        return null;
     }
 
     public static boolean isTanksONable(Object o)
     {
-        return isTanksONable(o.getClass());
+        if (o != null)
+        {
+            Class c = o.getClass();
+            while (c != null)
+            {
+                if (c.isAnnotationPresent(TanksONable.class))
+                    return true;
+                else
+                    c = c.getSuperclass();
+            }
+        }
+        return false;
     }
 
     public static boolean isTanksONable(Field f)
     {
-        if (f == null) return false;
-        return isTanksONable(f.getType());
-    }
-
-    public static boolean isTanksONable(Class<?> c)
-    {
-        while (c != null && !c.isAnnotationPresent(TanksONable.class))
-            c = c.getSuperclass();
-        return c != null;
+        if (f != null)
+        {
+            Class c = f.getType();
+            while (c != null)
+            {
+                if (c.isAnnotationPresent(TanksONable.class))
+                    return true;
+                else
+                    c = c.getSuperclass();
+            }
+        }
+        return false;
     }
 
     public static <A extends Annotation> A getAnnotation(Object o, Class<A> a)
     {
-        if (o == null) return null;
-        Class<?> c = o.getClass();
-        A ann = null;
-        while (c != null && (ann = c.getAnnotation(a)) == null)
-            c = c.getSuperclass();
-        return ann;
+        Class<?> target = o.getClass();
+        while (target != null)
+        {
+            A r = target.getAnnotation(a);
+
+            if (r != null)
+                return r;
+
+            target = target.getSuperclass();
+        }
+
+        return null;
     }
 
-    public static String getID(Field f)
+    public static boolean equivalent(Object a, Object b)
+    {
+        if (a == null && b == null)
+            return true;
+        else if (a != null && b != null)
+        {
+            if (a instanceof ArrayList && b instanceof ArrayList)
+            {
+                ArrayList<?> al = (ArrayList<?>) a;
+                ArrayList<?> bl = (ArrayList<?>) b;
+
+                if (al.size() == bl.size())
+                {
+                    for (int i = 0; i < al.size(); i++)
+                    {
+                        if (!equivalent(al.get(i), bl.get(i)))
+                            return false;
+                    }
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (a.getClass().isArray() && b.getClass().isArray())
+            {
+                if (a instanceof Object[] && b instanceof Object[])
+                {
+                    Object[] al = (Object[]) a;
+                    Object[] bl = (Object[]) b;
+
+                    if (al.length == bl.length)
+                    {
+                        for (int i = 0; i < al.length; i++)
+                        {
+                            if (!equivalent(al[i], bl[i]))
+                                return false;
+                        }
+
+                        return true;
+                    }
+                    else
+                        return false;
+                } // sigh
+                else if (a instanceof int[] && b instanceof int[])
+                    return Arrays.equals((int[]) a, (int[]) b);
+                else if (a instanceof long[] && b instanceof long[])
+                    return Arrays.equals((long[]) a, (long[]) b);
+                else if (a instanceof short[] && b instanceof short[])
+                    return Arrays.equals((short[]) a, (short[]) b);
+                else if (a instanceof byte[] && b instanceof byte[])
+                    return Arrays.equals((byte[]) a, (byte[]) b);
+                else if (a instanceof boolean[] && b instanceof boolean[])
+                    return Arrays.equals((boolean[]) a, (boolean[]) b);
+                else if (a instanceof char[] && b instanceof char[])
+                    return Arrays.equals((char[]) a, (char[]) b);
+                else if (a instanceof float[] && b instanceof float[])
+                    return Arrays.equals((float[]) a, (float[]) b);
+                else if (a instanceof double[] && b instanceof double[])
+                    return Arrays.equals((double[]) a, (double[]) b);
+                else
+                    return false;
+            }
+            else if (isTanksONable(a) && isTanksONable(b))
+            {
+                if (!a.getClass().equals(b.getClass()))
+                    return false;
+
+                for (Field f : a.getClass().getFields())
+                {
+                    try
+                    {
+                        if (f.getAnnotation(Property.class) != null && !equivalent(f.get(a), f.get(b)))
+                            return false;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                return true;
+            }
+            else
+                return Objects.equals(a, b);
+        }
+        return false;
+    }
+
+    public static String getid(Field f)
     {
         return f.getAnnotation(Property.class).id();
     }
 
     public static Map<String, Object> toMap(Object o)
     {
-        if (!isTanksONable(o))
-            return null;
-
-        HashMap<String, Object> p = new HashMap<>();
-        p.put("obj_type", getAnnotation(o, TanksONable.class).value());
-        if (o instanceof Item)
+        if (isTanksONable(o))
         {
-            try
+            HashMap<String, Object> p = new HashMap<>();
+            p.put("obj_type", getAnnotation(o, TanksONable.class).value());
+            if (o instanceof Item)
             {
-                p.put("item_type", ((Item) o).getClass().getField("item_class_name").get(null));
-            }
-            catch (Exception ignored)
-            {
-
-            }
-        }
-        else if (o instanceof Bullet)
-            p.put("bullet_type", ((Bullet) o).typeName);
-
-
-        for (Field f : o.getClass().getFields())
-        {
-            try
-            {
-                if (f.isAnnotationPresent(Property.class) && (!(o instanceof Tank || o instanceof Bullet || o instanceof Mine || o instanceof Explosion) || !Objects.equals(f.get(getDefault(getCorrectClass(o))), f.get(o))))
+                try
                 {
-                    Object o2 = f.get(o);
-                    if (o2 != null && isTanksONable(f))
-                    {
-                        p.put(getID(f), toMap(o2));
-                    }
-                    else if (o2 instanceof ArrayList)
-                    {
-                        if (!((ArrayList) o2).isEmpty() && isTanksONable(((ArrayList) o2).get(0)))
-                        {
-                            ArrayList<Map<String, Object>> o3s = new ArrayList<>();
-                            for (Object o3 : ((ArrayList) o2))
-                            {
-                                o3s.add(toMap(o3));
-                            }
-                            p.put(getID(f), o3s);
-                        }
-                        else
-                        {
-                            p.put(getID(f), f.get(o));
-                        }
-                    }
-                    else if (o2 instanceof Enum)
-                        p.put(getID(f), ((Enum) o2).name());
-                    else if (o2 instanceof Serializable)
-                        p.put(getID(f), ((Serializable) o2).serialize());
-                    else
-                        p.put(getID(f), f.get(o));
+                    p.put("item_type", ((Item) o).getClass().getField("item_class_name").get(null));
+                }
+                catch (Exception ignore)
+                {
                 }
             }
-            catch (Exception e)
+            else if (o instanceof Bullet)
+                p.put("bullet_type", ((Bullet) o).typeName);
+
+
+            for (Field f : o.getClass().getFields())
             {
-                throw new RuntimeException(e);
+                try
+                {
+                    if (f.isAnnotationPresent(Property.class) && (!(o instanceof Tank || o instanceof Bullet || o instanceof Mine || o instanceof Explosion) || !equivalent(f.get(getDefault(getCorrectClass(o))), f.get(o))))
+                    {
+                        Object o2 = f.get(o);
+                        if (o2 != null && isTanksONable(f))
+                        {
+                            p.put(getid(f), toMap(o2));
+                        }
+                        else if (o2 instanceof ArrayList)
+                        {
+                            if (!((ArrayList) o2).isEmpty() && isTanksONable(((ArrayList) o2).get(0)))
+                            {
+                                ArrayList<Map<String, Object>> o3s = new ArrayList<>();
+                                for (Object o3 : ((ArrayList) o2))
+                                {
+                                    o3s.add(toMap(o3));
+                                }
+                                p.put(getid(f), o3s);
+                            }
+                            else
+                            {
+                                p.put(getid(f), f.get(o));
+                            }
+                        }
+                        else if (o2 instanceof Enum)
+                            p.put(getid(f), ((Enum) o2).name());
+                        else if (o2 instanceof Serializable)
+                            p.put(getid(f), ((Serializable) o2).serialize());
+                        else
+                            p.put(getid(f), f.get(o));
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
             }
+            return p;
         }
-        return p;
+        return null;
     }
 
     public static String toTanksON(Object o)
@@ -149,7 +273,7 @@ public final class Serializer
     {
         if (m == null)
             return null;
-        Object o;
+        Object o = null;
         Set<String> processed = new HashSet<>();
         processed.add("obj_type");
         switch ((String) m.get("obj_type"))
@@ -227,15 +351,15 @@ public final class Serializer
 
         for (Field f : o.getClass().getFields())
         {
-            if (f.isAnnotationPresent(Property.class) && m.containsKey(getID(f)))
+            if (f.isAnnotationPresent(Property.class) && m.containsKey(getid(f)))
             {
-                processed.add(getID(f));
+                processed.add(getid(f));
                 try
                 {
                     Object o2 = f.get(o);
                     if (isTanksONable(f))
                     {
-                        Object o3 = m.get(getID(f));
+                        Object o3 = m.get(getid(f));
                         try {
                             f.set(o, parseObject((Map<String, Object>) o3));
                         } catch (ClassCastException e) {
@@ -244,35 +368,35 @@ public final class Serializer
                     }
                     else if (o2 instanceof ArrayList)
                     {
-                        ArrayList arr = (ArrayList) m.get(getID(f));
+                        ArrayList arr = (ArrayList) m.get(getid(f));
                         if (!arr.isEmpty() && (arr.get(0) instanceof Map))
                         {
                             ArrayList o3s = new ArrayList();
-                            for (Map o3 : ((ArrayList<Map>) m.get(getID(f))))
+                            for (Map o3 : ((ArrayList<Map>) m.get(getid(f))))
                             {
                                 o3s.add(parseObject(o3));
                             }
                             f.set(o, o3s);
                         }
                         else
-                            f.set(o, m.get(getID(f)));
+                            f.set(o, m.get(getid(f)));
                     }
                     else if (o2 instanceof HashSet)
-                        f.set(o, new HashSet<>((ArrayList) m.get(getID(f))));
+                        f.set(o, new HashSet<>((ArrayList) m.get(getid(f))));
                     else if (o2 instanceof Enum)
-                        f.set(o, Enum.valueOf((Class<? extends Enum>) f.getType(), (String) m.get(getID(f))));
+                        f.set(o, Enum.valueOf((Class<? extends Enum>) f.getType(), (String) m.get(getid(f))));
                     else if (o2 instanceof Serializable)
-                        f.set(o, ((Serializable) o2).deserialize((String) m.get(getID(f))));
+                        f.set(o, ((Serializable) o2).deserialize((String) m.get(getid(f))));
                     else if (o2 instanceof Integer)
-                        f.set(o, ((Double) m.get(getID(f))).intValue());
+                        f.set(o, ((Double) m.get(getid(f))).intValue());
                     else if (o2 instanceof Boolean)
-                        f.set(o, m.get(getID(f)));
+                        f.set(o, m.get(getid(f)));
                     else
-                        f.set(o, m.get(getID(f)));
+                        f.set(o, m.get(getid(f)));
                 }
                 catch (Exception e)
                 {
-                    System.out.println(getID(f));
+                    System.out.println(getid(f));
                     throw new RuntimeException(e);
                 }
             }
@@ -291,9 +415,12 @@ public final class Serializer
                     throw new RuntimeException(f);
                 }
             } catch (NoSuchFieldException | NullPointerException | IllegalAccessException e) {
-                System.out.println("Unconvertable field found!");
+                System.out.println("Non-convertible field found!");
             }
         }
+
+
         return o;
     }
+
 }

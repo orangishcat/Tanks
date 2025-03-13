@@ -265,6 +265,12 @@ public class ButtonList
             this.downButtons.get(n).enabled = true;
         }
 
+        if (this.arrowsEnabled && this.buttons.size() > this.fixedFirstElements)
+        {
+            upButtons.get(this.fixedFirstElements).enabled = false;
+            downButtons.get(downButtons.size() - 1 - this.fixedLastElements).enabled = false;
+        }
+
         for (int i = page * rows * columns; i < Math.min(page * rows * columns + rows * columns, buttons.size()); i++)
         {
             boolean e = this.buttons.get(i).enabled;
@@ -307,7 +313,7 @@ public class ButtonList
         first.enabled = previous.enabled;
         last.enabled = next.enabled;
 
-        if (this.arrowsEnabled && !this.buttons.isEmpty())
+        if (this.arrowsEnabled && this.buttons.size() > this.fixedFirstElements)
         {
             upButtons.get(fixedFirstElements).enabled = false;
             downButtons.get(downButtons.size() - fixedLastElements - 1).enabled = false;

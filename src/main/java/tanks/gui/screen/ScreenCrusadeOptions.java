@@ -9,7 +9,7 @@ import tanks.gui.TextBox;
 public class ScreenCrusadeOptions extends Screen
 {
     public Crusade crusade;
-    public ScreenCrusadeListEditor previous;
+    public ScreenCrusadeEditor previous;
 
     public TextBox startingLives;
     public TextBox bonusLifeFrequency;
@@ -56,7 +56,7 @@ public class ScreenCrusadeOptions extends Screen
     }
     );
 
-    public ScreenCrusadeOptions(ScreenCrusadeListEditor p)
+    public ScreenCrusadeOptions(ScreenCrusadeEditor p)
     {
         super(350, 40, 380, 60);
 

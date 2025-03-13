@@ -6,7 +6,6 @@ import basewindow.transformation.Scale;
 import basewindow.transformation.Translation;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
-import tanks.Drawing;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
@@ -257,9 +256,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         }
 
         if (this.modifyingSize >= 0 && this.modifyingWritten >= this.modifyingSize)
-        {
             this.migrate(o);
-        }
 
         if (this.bufferStartPoints.get(o) == null)
         {
@@ -500,12 +497,6 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
             }
         }
 
-        this.vertBuffer.rewind();
-        this.colBuffer.rewind();
-        for (ShaderGroup.Attribute a: attributeBuffers.keySet())
-        {
-            this.attributeBuffers.get(a).rewind();
-        }
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vertVBO);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * pos * 3, new float[3 * size]);
@@ -519,11 +510,13 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
                 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, v);
                 GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * pos * a.count, new float[a.count * size]);
             }
-            else
-            {
-                Drawing.drawing.playSound("obliterate.ogg");
-                new Exception().printStackTrace();
-            }
+        }
+
+        this.vertBuffer.rewind();
+        this.colBuffer.rewind();
+        for (ShaderGroup.Attribute a: attributeBuffers.keySet())
+        {
+            this.attributeBuffers.get(a).rewind();
         }
     }
 
