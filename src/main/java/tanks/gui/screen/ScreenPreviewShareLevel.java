@@ -89,7 +89,7 @@ public class ScreenPreviewShareLevel extends Screen implements ILevelPreviewScre
 
         levelName = new TextBox(Drawing.drawing.interfaceSizeX - 200, Drawing.drawing.interfaceSizeY - 110, this.objWidth, this.objHeight, "Level upload name", () ->
         {
-            if (levelName.inputText.equals(""))
+            if (levelName.inputText.isEmpty())
                 levelName.inputText = levelName.previousInputText;
             this.name = levelName.inputText;
         }
@@ -118,9 +118,6 @@ public class ScreenPreviewShareLevel extends Screen implements ILevelPreviewScre
             levelName.update();
             description.update();
         }
-
-        if (Game.enable3d)
-            Game.recomputeHeightGrid();
     }
 
     boolean mouseTarget;

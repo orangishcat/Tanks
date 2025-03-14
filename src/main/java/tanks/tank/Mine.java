@@ -53,8 +53,6 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
     public static ArrayList<Integer> freeIDs = new ArrayList<>();
     public static Int2ObjectOpenHashMap<Mine> idMap = new Int2ObjectOpenHashMap<>();
 
-    public double[] lightInfo = new double[]{0, 0, 0, 0, 0, 0, 0};
-
     /**
      * Do not use if you plan to place this mine in the game field. Only for templates.
      * Use another constructor if you want to add the mine to the game field.

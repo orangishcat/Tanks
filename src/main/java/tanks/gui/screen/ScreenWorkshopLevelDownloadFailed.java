@@ -1,21 +1,11 @@
 package tanks.gui.screen;
 
-import basewindow.BaseFile;
 import com.codedisaster.steamworks.SteamFriends;
 import com.codedisaster.steamworks.SteamResult;
 import com.codedisaster.steamworks.SteamUGCDetails;
 import tanks.Drawing;
 import tanks.Game;
-import tanks.Level;
-import tanks.Movable;
 import tanks.gui.Button;
-import tanks.gui.TextBox;
-import tanks.obstacle.Obstacle;
-import tanks.tank.Tank;
-import tanks.tank.TankSpawnMarker;
-
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class ScreenWorkshopLevelDownloadFailed extends Screen
 {
@@ -47,7 +37,7 @@ public class ScreenWorkshopLevelDownloadFailed extends Screen
         Game.steamNetworkHandler.workshop.search(null, 0, 18, workshopDetails.getOwnerID(), null, Game.steamNetworkHandler.workshop.searchByScore);
     });
 
-    public Button cancelDelete = new Button(this.centerX, (int) (this.centerY + this.objYSpace), this.objWidth, this.objHeight, "No", () -> { confirmingDelete = false; });
+    public Button cancelDelete = new Button(this.centerX, (int) (this.centerY + this.objYSpace), this.objWidth, this.objHeight, "No", () -> confirmingDelete = false);
 
     public Button confirmDelete = new Button(this.centerX, (int) (this.centerY), this.objWidth, this.objHeight, "Yes", () ->
     {
@@ -58,9 +48,7 @@ public class ScreenWorkshopLevelDownloadFailed extends Screen
     );
 
     public Button delete = new Button(200, Drawing.drawing.interfaceSizeY - 110, this.objWidth, this.objHeight, "Remove from server", () ->
-    {
-        confirmingDelete = true;
-    });
+            confirmingDelete = true);
 
     public Button voteUp = new Button(Drawing.drawing.interfaceSizeX - 630 + this.objXSpace, votePosY, this.objHeight, this.objHeight, "\u00A7000200000255+", () ->
     {
@@ -86,9 +74,7 @@ public class ScreenWorkshopLevelDownloadFailed extends Screen
     }, "Dislike the level");
 
     public Button showPage = new Button(Drawing.drawing.interfaceSizeX - 435 + this.objXSpace, Drawing.drawing.interfaceSizeY - 200, this.objHeight, this.objHeight, "", () ->
-    {
-        Game.steamNetworkHandler.friends.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + Long.parseLong(workshopDetails.getPublishedFileID().toString(), 16), SteamFriends.OverlayToWebPageMode.Default);
-    }, "View level page on Steam");
+            Game.steamNetworkHandler.friends.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + Long.parseLong(workshopDetails.getPublishedFileID().toString(), 16), SteamFriends.OverlayToWebPageMode.Default), "View level page on Steam");
 
     public ScreenWorkshopLevelDownloadFailed(SteamResult r, SteamUGCDetails d, Screen s)
     {
@@ -142,9 +128,6 @@ public class ScreenWorkshopLevelDownloadFailed extends Screen
                 more.update();
             }
         }
-
-        if (Game.enable3d)
-            Game.recomputeHeightGrid();
     }
 
     @Override

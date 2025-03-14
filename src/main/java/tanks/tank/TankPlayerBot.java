@@ -1,9 +1,6 @@
 package tanks.tank;
 
-import tanks.Crusade;
-import tanks.Drawing;
-import tanks.Game;
-import tanks.Player;
+import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.bullet.BulletAirStrike;
 import tanks.bullet.BulletArc;

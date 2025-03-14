@@ -138,9 +138,15 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 	public TankPlayer setDefaultColor()
 	{
-		this.colorR = 0;
-		this.colorG = 150;
-		this.colorB = 255;
+		this.colorR = default_primary_color[0];
+		this.colorG = default_primary_color[1];
+		this.colorB = default_primary_color[2];
+		this.secondaryColorR = default_secondary_color[0];
+		this.secondaryColorG = default_secondary_color[1];
+		this.secondaryColorB = default_secondary_color[2];
+		this.tertiaryColorR = default_tertiary_color[0];
+		this.tertiaryColorG = default_tertiary_color[1];
+		this.tertiaryColorB = default_tertiary_color[2];
 		return this;
 	}
 

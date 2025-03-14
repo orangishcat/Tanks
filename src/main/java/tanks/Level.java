@@ -240,7 +240,7 @@ public class Level
 		loadLevel(s, false);
 	}
 
-	private static Pattern dash = Pattern.compile("-"), ellipsis = Pattern.compile("\\.\\.\\.");
+	private static final Pattern dash = Pattern.compile("-"), ellipsis = Pattern.compile("\\.\\.\\.");
 
 	public void loadLevel(ILevelPreviewScreen sc, boolean remote)
 	{
