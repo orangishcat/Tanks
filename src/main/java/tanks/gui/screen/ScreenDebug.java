@@ -11,6 +11,7 @@ public class ScreenDebug extends Screen
     public String traceText = "Trace rays: ";
     public String firstPersonText = "First person: ";
     public String followingCamText = "Immersive camera: ";
+    public String showPathfindingText = "Show pathfinding: ";
     public String tankIDsText = "Show tank IDs: ";
     public String invulnerableText = "Invulnerable: ";
     public String fancyLightsText = "Fancy lighting: ";
@@ -36,6 +37,8 @@ public class ScreenDebug extends Screen
         else
             followingCam.setText(followingCamText, ScreenOptions.offText);
 
+        showPathfinding.setText(showPathfindingText, Game.showPathfinding ? ScreenOptions.onText : ScreenOptions.offText);
+
         if (Game.showTankIDs)
             tankIDs.setText(tankIDsText, ScreenOptions.onText);
         else
@@ -57,7 +60,7 @@ public class ScreenDebug extends Screen
             destroyCheat.setText(destroyCheatText, ScreenOptions.offText);
     }
 
-    Button back = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + 210, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenTitle());
+    Button back = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 4, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenTitle());
 
     Button test = new Button(Drawing.drawing.interfaceSizeX / 2 - this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Test stuff", () -> Game.screen = new ScreenTestDebug());
 
@@ -100,6 +103,20 @@ public class ScreenDebug extends Screen
                 followingCam.setText(followingCamText, ScreenOptions.onText);
             else
                 followingCam.setText(followingCamText, ScreenOptions.offText);
+        }
+    });
+
+    Button showPathfinding = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 2.5, this.objWidth, this.objHeight, "", new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Game.showPathfinding = !Game.showPathfinding;
+
+            if (Game.showPathfinding)
+                showPathfinding.setText(showPathfindingText, ScreenOptions.onText);
+            else
+                showPathfinding.setText(showPathfindingText, ScreenOptions.offText);
         }
     });
 
@@ -168,6 +185,7 @@ public class ScreenDebug extends Screen
         traceAllRays.update();
         followingCam.update();
         firstPerson.update();
+        showPathfinding.update();
         invulnerable.update();
         tankIDs.update();
         fancyLighting.update();
@@ -187,6 +205,7 @@ public class ScreenDebug extends Screen
         followingCam.draw();
         test.draw();
         traceAllRays.draw();
+        showPathfinding.draw();
         tankIDs.draw();
         invulnerable.draw();
         fancyLighting.draw();

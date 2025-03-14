@@ -445,6 +445,9 @@ public class TankAIControlled extends Tank implements ITankField
 	/** Set to a value to temporarily pause the tank from seeking*/
 	protected double seekPause = 0;
 
+	/** Whether seeking was paused the previous frame */
+	protected boolean prevSeekPaused = false;
+
 	/** Upon reaching zero, the current target path is abandoned*/
 	protected double seekTimer = 0;
 
@@ -913,7 +916,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateTarget()
 	{
-		if (!frameTimerTriggered)
+		if (!frameTimerTriggered && !(targetEnemy == null || targetEnemy.destroy))
 			return;
 
 		if (this.transformMimic)
@@ -928,6 +931,8 @@ public class TankAIControlled extends Tank implements ITankField
 		for (int i = 0; i < Game.movables.size(); i++)
 		{
 			Movable m = Game.movables.get(i);
+			if (m.destroy)
+				continue;
 
 			boolean correctTeam = this.isSupportTank() == Team.isAllied(this, m);
 			if (m instanceof Tank && correctTeam && !((Tank) m).hidden && ((Tank) m).targetable && m != this)
@@ -1008,36 +1013,42 @@ public class TankAIControlled extends Tank implements ITankField
 		if (this.enableBulletAvoidance || this.enableDefensiveFiring)
 			this.checkForBulletThreats();
 
+		this.seekPause = Math.max(0, this.seekPause - Panel.frameFrequency);
+
 		if (this.avoidTimer > 0 && this.enableBulletAvoidance)
 		{
 			this.avoidTimer -= Panel.frameFrequency;
 			this.setPolarAcceleration(avoidDirection, acceleration * 2);
 			this.overrideDirection = true;
-		}
-		else
-		{
-			fleeDirection = -fleeDirection;
-
-			if (targetEnemy != null && this.seesTargetEnemy && this.enableTargetEnemyReaction && this.enableLookingAtTargetEnemy)
-			{
-				if (this.currentlySeeking)
-				{
-					this.seekTimer -= Panel.frameFrequency;
-					this.followPath();
-
-					if (this.seekTimer <= 0)
-						this.currentlySeeking = false;
-				}
-				else
-					this.reactToTargetEnemySight();
-			}
-			else if (currentlySeeking && seekPause <= 0)
-				this.followPath();
-			else
-				this.updateIdleMotion();
+			return;
 		}
 
-	}
+        fleeDirection = -fleeDirection;
+
+        if (targetEnemy != null && targetEnemy != secondary && this.seesTargetEnemy && this.enableTargetEnemyReaction && this.enableLookingAtTargetEnemy)
+        {
+            if (this.currentlySeeking)
+            {
+                this.seekTimer -= Panel.frameFrequency;
+                this.followPath();
+
+                if (this.seekTimer <= 0)
+                    this.currentlySeeking = false;
+            }
+            else
+                this.reactToTargetEnemySight();
+        }
+        else if (currentlySeeking)
+        {
+            if (seekPause <= 0 && prevSeekPaused)
+                pathfind();
+            prevSeekPaused = seekPause > 0;
+            if (seekPause <= 0)
+                this.followPath();
+        }
+        else
+            this.updateIdleMotion();
+    }
 
 	public void reactToTargetEnemySight()
 	{
@@ -1226,8 +1237,6 @@ public class TankAIControlled extends Tank implements ITankField
 		if (!this.currentlySeeking && this.enablePathfinding && this.random.nextDouble() < this.seekChance * Panel.frameFrequency && this.posX > 0 && this.posX < Game.currentSizeX * Game.tile_size && this.posY > 0 && this.posY < Game.currentSizeY * Game.tile_size)
             this.pathfind();
 
-		this.seekPause = Math.max(0, this.seekPause - Panel.frameFrequency);
-
 		if (this.parent != null && !seesTargetEnemy && this.stayNearParent)
 		{
 			if (!this.parent.destroy && Math.sqrt(Math.pow(this.posX - this.parent.posX, 2) + Math.pow(this.posY - this.parent.posY, 2)) > this.maxDistanceFromParent)
@@ -1267,10 +1276,10 @@ public class TankAIControlled extends Tank implements ITankField
 			return;
 
 		ArrayDeque<Tile> queue = new ArrayDeque<>();
-		Tile.reset();
+		resetPathfinding();
 		boolean[][] visited = new boolean[Game.currentSizeX][Game.currentSizeY];
 
-		queue.add(Tile.newTile(currX, currY, null, this));
+		queue.add(newTile(currX, currY, null, this));
 		visited[currX][currY] = true;
 
 		Tile endingTile = null;
@@ -1306,21 +1315,27 @@ public class TankAIControlled extends Tank implements ITankField
 				if (i >= 4)
 				{
 					// diagonal check
-					int signX = t.tileX > x ? 1 : -1;
-					int signY = t.tileY > y ? 1 : -1;
-					if (Tile.newTile(signX, signY + y, t, this).type == Tile.Type.solid ||
-							Tile.newTile(signX + x, signY, t, this).type == Tile.Type.solid)
+					int signX = x < t.tileX ? 1 : -1;
+					int signY = y < t.tileY ? 1 : -1;
+					if (newTile(x, y + signY, t, this).type != Tile.Type.empty ||
+							newTile(x + signX, y, t, this).type != Tile.Type.empty)
 						continue;
+
+					t.unfavorability++;
 				}
 
 				visited[x][y] = true;
-				queue.add(Tile.newTile(x, y, t, this));
+				queue.add(newTile(x, y, t, this));
 			}
 		}
 
 		if (endingTile != null)
 		{
-			this.path = new LinkedList<>();
+			if (this.path == null)
+				path = new LinkedList<>();
+			else
+				this.path.clear();
+
 			this.currentlySeeking = true;
 			this.seekTimer = this.seekTimerBase;
 
@@ -1338,8 +1353,14 @@ public class TankAIControlled extends Tank implements ITankField
 	{
 		this.seekTimer -= Panel.frameFrequency;
 
-		for (Tile t: this.path)
-            Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser));
+		if (Game.showPathfinding)
+		{
+			for (Tile t : this.path)
+			{
+				double[] col = Game.getRainbowColor((networkID % 10) * 0.1);
+				Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser).setColor(col[0], col[1], col[2]));
+			}
+		}
 
 		if (this.path.isEmpty())
 		{
@@ -2193,14 +2214,17 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public boolean isInterestingPathTarget(Movable m)
 	{
+		if (!(m instanceof Tank))
+			return false;
+
 		if (this.transformMimic)
-			return m instanceof Tank && !(m.getClass().equals(this.getClass())) && ((Tank) m).size == this.size;
+			return !(m.getClass().equals(this.getClass())) && ((Tank) m).size == this.size;
 		else if (this.isSupportTank())
-			return m instanceof Tank && Team.isAllied(m, this) && m != this && ((Tank) m).targetable
+			return Team.isAllied(m, this) && m != this && ((Tank) m).targetable
 					&& (((Tank) m).health - ((Tank) m).baseHealth < this.bullet.maxExtraHealth || this.bullet.damage >= 0 || this.bullet.maxExtraHealth <= 0)
 					&& !(m.getClass().equals(this.getClass()));
 		else
-			return m instanceof Tank && !Team.isAllied(m, this)
+			return !Team.isAllied(m, this)
 					&& m.posX >= 0 && m.posX / Game.tile_size < Game.currentSizeX
 					&& m.posY >= 0 && m.posY / Game.tile_size < Game.currentSizeY;
 	}
@@ -2826,14 +2850,25 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 	}
 
+	private final ObjectArrayList<Tile> cache = new ObjectArrayList<>();
+	private int position = 0;
+
+	public void resetPathfinding()
+	{
+		position = 0;
+	}
+
+	public Tile newTile(int x, int y, Tile parent, TankAIControlled t)
+	{
+		if (position >= cache.size())
+			cache.add(new Tile());
+		return cache.get(position++).set(x, y, parent, t);
+	}
+
 	public static class Tile
 	{
-		private static final ObjectArrayList<Tile> cache = new ObjectArrayList<>();
-		private static int position = 0;
-
 		public enum Type {empty, destructible, solid}
 		public Tile parent;
-
 		public Type type;
 
 		private Tile() {}
@@ -2843,25 +2878,10 @@ public class TankAIControlled extends Tank implements ITankField
 		public int tileX, tileY;
 		public int surrounded = 0, unfavorability = 0;
 
-		public static void reset()
-		{
-			position = 0;
-		}
-
-		public static Tile newTile(int x, int y, Tile parent, TankAIControlled t)
-		{
-			if (position >= cache.size())
-				cache.add(new Tile());
-			return cache.get(position++).set(x, y, parent, t);
-		}
-
 		public Tile set(int x, int y, Tile parent, TankAIControlled t)
 		{
 			this.posX = (x + 0.5) * Game.tile_size;
 			this.posY = (y + 0.5) * Game.tile_size;
-
-			this.shiftedX += this.posX;
-			this.shiftedY += this.posY;
 
 			this.tileX = x;
 			this.tileY = y;
@@ -2870,6 +2890,8 @@ public class TankAIControlled extends Tank implements ITankField
 
 			Obstacle o = Game.getObstacle(x, y);
 			t.setPathfindingTileProperties(this, o);
+
+			surrounded = unfavorability = 0;
 
 			for (int i = 0; i < 4; i++)
 			{

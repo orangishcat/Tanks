@@ -49,7 +49,7 @@ import java.util.*;
 
 public class Game
 {
-    public enum Framework {lwjgl, libgdx}
+	public enum Framework {lwjgl, libgdx}
 	public static Framework framework;
 
 	public static final double tile_size = 50;
@@ -146,6 +146,7 @@ public class Game
 	public static boolean showTankIDs = false;
 	public static boolean drawAutoZoom = false;
 	public static boolean showHitboxes = false;
+	public static boolean showPathfinding = false;
 	public static final boolean cinematic = false;
 
 	public static long steamLobbyInvite = -1;

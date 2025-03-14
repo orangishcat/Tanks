@@ -116,7 +116,12 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             this.force = true;
         }
         else if (type == EffectType.laser)
+        {
             this.maxAge = 21;
+            this.colR = 255;
+            this.colG = 0;
+            this.colB = 0;
+        }
         else if (type == EffectType.piece)
             this.maxAge = Math.random() * 100 + 50;
         else if (type == EffectType.obstaclePiece)
@@ -302,7 +307,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
         else if (this.type == EffectType.laser)
         {
             double size = Bullet.bullet_size - this.age / 2;
-            drawing.setColor(255, 0, 0);
+            drawing.setColor(colR, colG, colB);
 
             if (Game.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
