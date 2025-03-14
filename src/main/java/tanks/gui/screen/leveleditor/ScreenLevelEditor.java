@@ -2238,6 +2238,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 	private void magicSelectDiscont(Class<? extends Obstacle> cls, ArrayList<Integer> xs, ArrayList<Integer> ys)
 	{
+		boolean strict = Game.game.window.pressedKeys.contains(InputCodes.KEY_LEFT_SHIFT);
 		for (Obstacle o : Game.obstacles)
 		{
 			int x = (int) (o.posX / Game.tile_size), y = (int) (o.posY / Game.tile_size);

@@ -29,6 +29,7 @@ public class Ray
 	public int maxChunkCheck = 12;
 
 	public boolean enableBounciness = true;
+	public boolean asBullet = true;
 	public boolean ignoreTanks = false, ignoreBullets = true;
 	public boolean ignoreDestructible = false;
 	public boolean ignoreShootThrough = false;
@@ -50,11 +51,13 @@ public class Ray
 	public double targetX, targetY;
 	public boolean acquiredTarget = false;
 
+	/** Should be consumed immediately via getTarget or getDist. Otherwise, use {@linkplain #copy()}  */
 	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank)
 	{
 		return newRay(x, y, angle, bounces, tank, 10);
 	}
 
+	/** Should be consumed immediately via getTarget or getDist. Otherwise, use {@linkplain #copy()}  */
 	public static Ray newRay(double x, double y, double angle, int bounces, Tank tank, double speed)
 	{
 		return cacheRay.set(x, y, angle, bounces, tank, speed);
@@ -84,6 +87,7 @@ public class Ray
 		this.enableBounciness = true;
 		this.ignoreTanks = false;
 		this.ignoreBullets = true;
+		this.asBullet = true;
 		this.ignoreDestructible = false;
 		this.ignoreShootThrough = false;
 
@@ -101,6 +105,12 @@ public class Ray
 		this.targetTank = targetTank;
 		this.targetTankSizeMul = mul;
 		return this.getTarget();
+	}
+
+	public Ray setAsBullet(boolean testBulletCollision)
+	{
+		this.asBullet = testBulletCollision;
+		return this;
 	}
 
 	public Ray setMaxChunks(int maxChunks)
@@ -136,10 +146,7 @@ public class Ray
 		double remainder = 0;
 		acquiredTarget = true;
 
-		if (isInsideObstacle(this.posX - size / 2, this.posY - size / 2) ||
-				isInsideObstacle(this.posX + size / 2, this.posY - size / 2) ||
-				isInsideObstacle(this.posX + size / 2, this.posY + size / 2) ||
-				isInsideObstacle(this.posX - size / 2, this.posY + size / 2))
+		if (testInsideObstacle(posX, posY))
 			return null;
 
 		if (!ignoreTanks)
@@ -326,6 +333,14 @@ public class Ray
 		return null;
 	}
 
+	public boolean testInsideObstacle(double x, double y)
+	{
+		return isInsideObstacle(x - size / 2, y - size / 2) ||
+				isInsideObstacle(x + size / 2, y - size / 2) ||
+				isInsideObstacle(x + size / 2, y + size / 2) ||
+				isInsideObstacle(x - size / 2, y + size / 2);
+	}
+
 	public void checkCollisionIn(Result result, Chunk.FaceList faceList, boolean firstBounce, double collisionX, double collisionY)
 	{
 		Face collisionFace = null;
@@ -346,7 +361,7 @@ public class Ray
 				if (passesThrough(f))
 					continue;
 
-				if (f.startX < this.posX + size / 2 || !f.solidBullet || (f.owner == this.tank && firstBounce))
+				if (f.startX < this.posX + size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
 					continue;
 
 				double y = (f.startX - size / 2 - this.posX) * vY / vX + this.posY;
@@ -372,7 +387,7 @@ public class Ray
 				if (passesThrough(f))
 					continue;
 
-				if (f.startX > this.posX - size / 2 || !f.solidBullet || (f.owner == this.tank && firstBounce))
+				if (f.startX > this.posX - size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
 					continue;
 
 				double y = (f.startX + size / 2 - this.posX) * vY / vX + this.posY;
@@ -399,7 +414,7 @@ public class Ray
 				if (passesThrough(f))
 					continue;
 
-				if (f.startY < this.posY + size / 2 || !f.solidBullet || (f.owner == this.tank && firstBounce))
+				if (f.startY < this.posY + size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
 					continue;
 
 				double x = (f.startY - size / 2 - this.posY) * vX / vY + this.posX;
@@ -432,7 +447,7 @@ public class Ray
 				if (passesThrough(f))
 					continue;
 
-				if (f.startY > this.posY - size / 2 || !f.solidBullet || (f.owner == this.tank && firstBounce))
+				if (f.startY > this.posY - size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
 					continue;
 
 				double x = (f.startY + size / 2 - this.posY) * vX / vY + this.posX;
@@ -565,8 +580,16 @@ public class Ray
 	public boolean isInsideObstacle(double x, double y)
 	{
 		Obstacle o = Game.getObstacle(x, y);
-		if (o == null)
-			return false;
-		return o.bulletCollision && !(ignoreShootThrough && o.shouldShootThrough) && !(ignoreDestructible && o.destructible);
+		return o != null && collision(o) && !(ignoreShootThrough && o.shouldShootThrough) && !(ignoreDestructible && o.destructible);
+	}
+
+	public boolean collision(Face f)
+	{
+		return asBullet ? f.solidBullet : f.solidTank;
+	}
+
+	public boolean collision(Obstacle o)
+	{
+		return asBullet ? o.bulletCollision : o.tankCollision;
 	}
 }

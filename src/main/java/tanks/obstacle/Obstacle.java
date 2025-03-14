@@ -267,8 +267,7 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 	public boolean[] getValidHorizontalFaces(boolean unbreakable)
 	{
-		this.validFaces[0] = false;
-		this.validFaces[1] = false;
+		this.validFaces[0] = this.validFaces[1] = this.tankCollision || this.bulletCollision;
 		return this.validFaces;
 	}
 
@@ -288,8 +287,7 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 	public boolean[] getValidVerticalFaces(boolean unbreakable)
 	{
-		this.validFaces[0] = false;
-		this.validFaces[1] = false;
+		this.validFaces[0] = this.validFaces[1] = this.tankCollision || this.bulletCollision;
 		return this.validFaces;
 	}
 

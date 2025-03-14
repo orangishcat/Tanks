@@ -1010,6 +1010,8 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateMotionAI()
 	{
+		this.overrideDirection = false;
+
 		if (this.enableBulletAvoidance || this.enableDefensiveFiring)
 			this.checkForBulletThreats();
 
@@ -1029,6 +1031,9 @@ public class TankAIControlled extends Tank implements ITankField
         {
             if (this.currentlySeeking)
             {
+				if (this.stopSeekingOnSight)
+					this.currentlySeeking = false;
+
                 this.seekTimer -= Panel.frameFrequency;
                 this.followPath();
 
@@ -1038,7 +1043,7 @@ public class TankAIControlled extends Tank implements ITankField
             else
                 this.reactToTargetEnemySight();
         }
-        else if (currentlySeeking)
+        else if (currentlySeeking && targetEnemy != secondary)
         {
             if (seekPause <= 0 && prevSeekPaused)
                 pathfind();
@@ -1056,9 +1061,6 @@ public class TankAIControlled extends Tank implements ITankField
 			return;
 
 		this.overrideDirection = true;
-
-		if (this.stopSeekingOnSight)
-			this.currentlySeeking = false;
 
 		if (this.suicidal || targetEnemySightBehavior == TargetEnemySightBehavior.approach)
 			this.setAccelInDir(targetEnemy.posX, targetEnemy.posY, this.acceleration);
@@ -1254,13 +1256,26 @@ public class TankAIControlled extends Tank implements ITankField
 		for (Movable m : Game.movables)
 		{
 			if (this.isInterestingPathTarget(m))
-				targets.add((Tank) m);
+                targets.add((Tank) m);
 		}
 
 		if (targets.isEmpty())
 			return;
 
-		Tank target = targets.get((int) (Math.random() * targets.size()));
+		Tank target = null;
+		double minDist = Double.MAX_VALUE;
+		for (Tank t : targets)
+		{
+			double dist = Movable.sqDistBetw(t, this);
+			if (dist < minDist)
+			{
+				minDist = dist;
+				target = t;
+			}
+		}
+
+		if (target == null)
+			return;
 
 		int endX = (int) (target.posX / Game.tile_size);
 		int endY = (int) (target.posY / Game.tile_size);
@@ -1317,15 +1332,16 @@ public class TankAIControlled extends Tank implements ITankField
 					// diagonal check
 					int signX = x < t.tileX ? 1 : -1;
 					int signY = y < t.tileY ? 1 : -1;
-					if (newTile(x, y + signY, t, this).type != Tile.Type.empty ||
+					if (newTile(x,y + signY, t, this).type != Tile.Type.empty ||
 							newTile(x + signX, y, t, this).type != Tile.Type.empty)
 						continue;
-
-					t.unfavorability++;
 				}
 
 				visited[x][y] = true;
-				queue.add(newTile(x, y, t, this));
+				Tile n = newTile(x, y, t, this);
+				if (i >= 4)
+					n.unfavorability++;
+				queue.add(n);
 			}
 		}
 
@@ -1371,14 +1387,15 @@ public class TankAIControlled extends Tank implements ITankField
 		Tile t = this.path.get(0);
 		this.setAccelInDirWithOffset(t.shiftedX, t.shiftedY, this.acceleration, (seekTimerBase - seekTimer) % 100 < 50 ? 0.2 : -0.2);
 
-        if (Math.pow(t.shiftedX - this.posX, 2) + Math.pow(t.shiftedY - this.posY, 2) <= Math.pow(size * 1.2, 2))
+		double useMineRadius = size * 1.4;
+        if (Math.pow(t.shiftedX - this.posX, 2) + Math.pow(t.shiftedY - this.posY, 2) <= Math.pow(useMineRadius, 2))
 		{
 			this.seekTimer = this.seekTimerBase;
 
 			if (this.path.get(0).type == Tile.Type.destructible)
 			{
 				boolean found = false;
-				for (Obstacle o : Game.getObstaclesInRadius(posX, posY, size * 1.2))
+				for (Obstacle o : Game.getObstaclesInRadius(posX, posY, useMineRadius))
 				{
                     if (o.destructible)
                     {
@@ -2321,7 +2338,8 @@ public class TankAIControlled extends Tank implements ITankField
 			for (double dir = 0; dir < 1; dir += 1. / count)
 			{
 				double angle = dir * Math.PI * 2;
-				double dist = Ray.newRay(this.posX, this.posY, angle, 0, this, Game.tile_size).getDist();
+				double dist = Ray.newRay(this.posX, this.posY, angle, 0, this, Game.tile_size)
+						.setAsBullet(false).getDist();
 				if (dist >= maxEmptySpace && (dist < nearest.getRadius() || Movable.absoluteAngleBetween(angle, avoidAngle) > Math.PI / 3))
 				{
 					maxEmptySpace = dist;
@@ -2332,6 +2350,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 		if (this.enableMovement) // Otherwise stationary tanks will take off when they lay mines :P
 		{
+			// simulates pressing movement keys repeatedly until the tank fits through a one tile gap
 			this.setPolarAcceleration(bestFleeAngle + 0.2 * (age % 100) / 100, acceleration);
 			this.overrideDirection = true;
 		}
