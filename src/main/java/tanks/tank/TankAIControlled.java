@@ -1292,7 +1292,7 @@ public class TankAIControlled extends Tank implements ITankField
 				break;
 			}
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 8; i++)
 			{
 				int x = t.tileX + Game.dirX[i];
 				int y = t.tileY + Game.dirY[i];
@@ -1302,6 +1302,16 @@ public class TankAIControlled extends Tank implements ITankField
 
 				if (visited[x][y] || t.type == Tile.Type.solid || t.unfavorability >= 75 || (t.type == Tile.Type.destructible && !this.enableMineLaying))
 					continue;
+
+				if (i >= 4)
+				{
+					// diagonal check
+					int signX = t.tileX > x ? 1 : -1;
+					int signY = t.tileY > y ? 1 : -1;
+					if (Tile.newTile(signX, signY + y, t, this).type == Tile.Type.solid ||
+							Tile.newTile(signX + x, signY, t, this).type == Tile.Type.solid)
+						continue;
+				}
 
 				visited[x][y] = true;
 				queue.add(Tile.newTile(x, y, t, this));
@@ -1328,8 +1338,8 @@ public class TankAIControlled extends Tank implements ITankField
 	{
 		this.seekTimer -= Panel.frameFrequency;
 
-		/*for (Tile t: this.path)
-            Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser));*/
+		for (Tile t: this.path)
+            Game.effects.add(Effect.createNewEffect(t.posX, t.posY, 25, Effect.EffectType.laser));
 
 		if (this.path.isEmpty())
 		{
@@ -1776,7 +1786,6 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateTurretStraight()
 	{
-
 		if (this.avoidTimer > 0 && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy && (this.enableMovement || this.nearestBulletDeflectDist <= this.bulletThreatCount * Math.max(Math.max(this.cooldownBase, this.bulletItem.item.cooldownBase), 50) * 1.5))
 		{
 			if (this.bullet instanceof BulletInstant)
