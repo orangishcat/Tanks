@@ -107,6 +107,13 @@ public class Ray
 		return this.getTarget();
 	}
 
+	public Ray setAsExplosive(boolean explosive)
+	{
+		this.ignoreDestructible = explosive;
+		this.ignoreShootThrough = explosive;
+		return this;
+	}
+
 	public Ray setAsBullet(boolean testBulletCollision)
 	{
 		this.asBullet = testBulletCollision;
