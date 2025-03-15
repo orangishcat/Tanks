@@ -867,8 +867,12 @@ public class Panel
 //		Drawing.drawing.setColor(0, 0, 0, 0);
 //		Drawing.drawing.fillInterfaceRect(0, 0, 0, 0);
 
-		Game.screen.drawPostMouse();
+		if (Drawing.drawing.tooltip != null)
+			Drawing.drawing.drawTooltip(Drawing.drawing.tooltip, Drawing.drawing.getInterfaceMouseX(), Drawing.drawing.getInterfaceMouseY());
 
+		Drawing.drawing.tooltip = null;
+
+		Game.screen.drawPostMouse();
 
 		DebugKeybinds.update();
 	}
