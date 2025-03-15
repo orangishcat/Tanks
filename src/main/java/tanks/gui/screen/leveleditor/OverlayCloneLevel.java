@@ -17,6 +17,7 @@ public class OverlayCloneLevel extends ScreenLevelEditorOverlay
         public void run()
         {
             String n = levelName.inputText.replace(" ", "_") + ".tanks";
+            editor.forceSave = true;
             editor.save(n);
 
             saveCopy.enabled = false;

@@ -61,6 +61,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 	public String name;
 
 	public boolean movePlayer = true;
+	public boolean forceSave = false;
 
 	public enum EditorMode { build, erase, camera, select, picker, paste }
 	public EditorMode previousMode = EditorMode.build;
@@ -1635,9 +1636,10 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 	public void save(String levelName)
 	{
-		if (allowClose)
+		if (allowClose && !forceSave)
 			return;
 
+		forceSave = false;
 		StringBuilder level = new StringBuilder("{");
 
 		if (!this.level.editable)
@@ -1849,9 +1851,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		if (file.exists())
 		{
 			if (!this.level.editable)
-			{
-				return;
-			}
+                return;
 
 			file.delete();
 		}

@@ -908,7 +908,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void updateTarget()
 	{
-		if (!frameTimerTriggered && !(targetEnemy == null || targetEnemy.destroy))
+		if (!frameTimerTriggered || frameTimerTriggeredCnt % 2 != 0)
 			return;
 
 		if (this.transformMimic)
@@ -932,12 +932,15 @@ public class TankAIControlled extends Tank implements ITankField
 				if (this.bullet.damage < 0 && ((Tank) m).health - ((Tank) m).baseHealth >= this.bullet.maxExtraHealth && this.bullet.maxExtraHealth > 0)
 					continue;
 
-				boolean lowP = ((this.bullet.damage == 0 && this.bullet.boosting) && (m instanceof TankAIControlled && !((TankAIControlled) m).enableMovement));
+				boolean lowP = ((this.bullet.damage == 0 && this.bullet.boosting) &&
+						(m instanceof TankAIControlled && !((TankAIControlled) m).enableMovement)) ||
+						!Movable.withinRange(m, this, Game.tile_size * 10) ||
+						Ray.newRay(posX, posY, getAngleInDirection(m.posX, m.posY), 0, this, 50).getTarget() != m;
 				if (!lowPriority && lowP)
 					continue;
 
 				double dist = Movable.distanceBetween(this, m);
-				if (dist < nearestDist || (lowPriority && !lowP))
+				if (dist < nearestDist || lowPriority && !lowP)
 				{
 					this.hasTarget = true;
 					nearestDist = dist;
