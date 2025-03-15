@@ -2918,15 +2918,14 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		drawGame(drawables, this);
 	}
 
-	public static void drawGame(ArrayList<IDrawable>[] drawables)
-	{
-		drawGame(drawables, null);
-	}
-
 	public static void drawGame(ArrayList<IDrawable>[] drawables, ScreenGame game)
 	{
 		Game.screen.drawDefaultBackground();
+		drawDrawables(drawables, game);
+	}
 
+	public static void drawDrawables(ArrayList<IDrawable>[] drawables, ScreenGame game)
+	{
 		for (Movable m: Game.movables)
 		{
 			drawables[m.drawLevel].add(m);
@@ -2937,12 +2936,12 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		for (Obstacle o : Game.obstacles)
 		{
-			if (!o.batchDraw)
+			if (!o.batchDraw || !Game.enable3d)
 				drawables[o.drawLevel].add(o);
 		}
 
 		for (Effect e: Game.effects)
-            drawables[e.drawLevel].add(e);
+			drawables[e.drawLevel].add(e);
 
 		for (int i = 0; i < drawables.length; i++)
 		{

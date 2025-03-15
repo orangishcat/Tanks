@@ -1974,7 +1974,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 					mul * Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale, mul * Game.game.window.absoluteHeight / Drawing.drawing.interfaceScale);
 		}
 
-		ScreenGame.drawGame(drawables);
+		ScreenGame.drawGame(drawables, null);
 		for (Movable m : Game.movables)
         {
             if (!(m instanceof Tank))

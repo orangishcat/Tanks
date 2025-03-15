@@ -272,7 +272,7 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
                     translation.y *= this.shadowScaleNum;
                 }
 
-                ScreenGame.drawGame(drawables);
+                ScreenGame.drawDrawables(drawables, null);
 
                 translation.y = 0;
                 translation.z = 0;

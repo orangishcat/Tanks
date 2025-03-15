@@ -131,7 +131,8 @@ public class DebugKeybinds
                 notifs.add(new ScreenElement.Notification("Terrain reloaded!"));
             }
             else
-                notifs.add(new ScreenElement.Notification("F3+A doesn't work here!").setColor(255, 200, 128));
+                notifs.add(new ScreenElement.Notification("F3+A doesn't work here!"));
+
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_T))

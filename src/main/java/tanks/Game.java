@@ -1171,7 +1171,7 @@ public class Game
 		int x = (int) (o.posX / Game.tile_size);
 		int y = (int) (o.posY / Game.tile_size);
 
-		if (x >= 0 && y >= 0 && x < Game.currentSizeX && y < Game.currentSizeY && Game.enable3d)
+		if (x >= 0 && y >= 0 && x < Game.currentSizeX && y < Game.currentSizeY)
 			Game.redrawGroundTiles.add(new GroundTile(x, y));
 	}
 
