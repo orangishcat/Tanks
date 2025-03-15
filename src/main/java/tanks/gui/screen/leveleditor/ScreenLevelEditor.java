@@ -461,6 +461,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		allowClose = this.undoActions.isEmpty() && !modified;
 		windowTitle = (allowClose ? "" : "*");
 		clickCooldown = Math.max(0, clickCooldown - Panel.frameFrequency);
+		hoverObstacle = Game.getObstacle(mousePlaceable.posX, mousePlaceable.posY);
 
 		if (grab.keybind.isValid())
 		{
@@ -1600,22 +1601,18 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				int gridX = (int) (x / Game.tile_size);
 				int gridY = (int) (y / Game.tile_size);
 
+				if (!selectInverted)
+					Drawing.drawing.setColor(255, 255, 255, 127, 0.3);
+				else
+					Drawing.drawing.setColor(0, 0, 0, 127, 0.3);
+
 				if (Game.enable3d)
 				{
 					Obstacle o = Game.getObstacle(gridX, gridY);
 					if (o != null)
-					{
-						o.draw3dOutline(230 + extra, 230 + extra, 230 + extra, 128);
-					}
+                        o.draw3dOutline(230 + extra, 230 + extra, 230 + extra, 128);
 					else
-					{
-						if (!selectInverted)
-							Drawing.drawing.setColor(255, 255, 255, 127, 0.3);
-						else
-							Drawing.drawing.setColor(0, 0, 0, 127, 0.3);
-
-						Drawing.drawing.fillRect(x, y, Game.tile_size, Game.tile_size);
-					}
+                        Drawing.drawing.fillRect(x, y, Game.tile_size, Game.tile_size);
 				}
 				else
 					Drawing.drawing.fillRect(x, y, Game.tile_size, Game.tile_size);
@@ -2009,7 +2006,6 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				for (Obstacle o : clipboard.obstacles)
 				{
 					Drawing.drawing.setColor(o.colorR, o.colorG, o.colorB, 64, 0.5);
-
 					Drawing.drawing.fillRect(o.posX + mousePlaceable.posX, o.posY + mousePlaceable.posY, /*0,*/ Game.tile_size, Game.tile_size/*, ((Obstacle) o).stackHeight * Game.tile_size, (byte) 64*/);
 				}
 
@@ -2084,7 +2080,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 					o = o != null ? o : Game.getExtraObstacle(i, j);
 
 					if (o != null)
-						o.draw3dOutline(255, 255, 255, 128 + extra);
+						o.draw3dOutline(230 + extra, 230 + extra, 230 + extra, 128);
 					else
                     	Drawing.drawing.fillRect((i + 0.5) * Game.tile_size, (j + 0.5) * Game.tile_size, Game.tile_size, Game.tile_size);
                 }
@@ -2094,9 +2090,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		if (currentMode == EditorMode.camera && !paused)
 		{
 			Drawing.drawing.setColor(0, 0, 0, 127);
-
 			Drawing.drawing.drawPopup(this.centerX, Drawing.drawing.interfaceSizeY - this.objYSpace * 2, 500 * objWidth / 350, 150 * objHeight / 40);
-
 			Drawing.drawing.setColor(255, 255, 255);
 
 			Drawing.drawing.setInterfaceFontSize(this.textSize);

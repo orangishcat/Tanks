@@ -114,6 +114,12 @@ public class Ray
 		return this;
 	}
 
+	public Ray setBouncyBounces(int bouncyBounces)
+	{
+		this.bouncyBounces = bouncyBounces;
+		return this;
+	}
+
 	public Ray setAsBullet(boolean testBulletCollision)
 	{
 		this.asBullet = testBulletCollision;

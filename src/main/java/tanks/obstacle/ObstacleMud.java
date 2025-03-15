@@ -34,13 +34,6 @@ public class ObstacleMud extends Obstacle
     }
 
     @Override
-    public void draw3dOutline(double r, double g, double b, double a)
-    {
-        Drawing.drawing.setColor(r, g, b);
-        Drawing.drawing.fillRect(this.posX, this.posY, 0, Obstacle.draw_size, Obstacle.draw_size);
-    }
-
-    @Override
     public void onObjectEntry(Movable m)
     {
         if (m instanceof Tank)

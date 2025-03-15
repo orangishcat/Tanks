@@ -156,7 +156,11 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		draw3dOutline(r, g, b, 128);
 	}
 
-	public abstract void draw3dOutline(double r, double g, double b, double a);
+	public void draw3dOutline(double r, double g, double b, double a)
+	{
+		Drawing.drawing.setColor(r, g, b, a);
+		Drawing.drawing.fillBox(this.posX, this.posY, 0, Obstacle.draw_size, Obstacle.draw_size, 10);
+	}
 
 	public void onObjectEntry(Movable m)
 	{

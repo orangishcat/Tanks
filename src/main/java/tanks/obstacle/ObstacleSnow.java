@@ -57,12 +57,6 @@ public class ObstacleSnow extends Obstacle
     }
 
     @Override
-    public void draw3dOutline(double r, double g, double b, double a)
-    {
-
-    }
-
-    @Override
     public void onObjectEntry(Movable m)
     {
         if (!ScreenPartyLobby.isClient && (m instanceof Tank || m instanceof Bullet))
