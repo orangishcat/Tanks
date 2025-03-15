@@ -283,7 +283,6 @@ public class ScreenInterlevel extends Screen implements IDarkScreen
 		Game.player.hotbar.percentHidden = 100;
 
 		save.image = "icons/save.png";
-
 		save.imageSizeX = this.objHeight;
 		save.imageSizeY = this.objHeight;
 

@@ -123,7 +123,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
 
         if (paused && game != null)
         {
-            if (game.finishQuickTimer >= 210)
+            if (game.finishQuickTimer >= 220)
                 game = null;
         }
 

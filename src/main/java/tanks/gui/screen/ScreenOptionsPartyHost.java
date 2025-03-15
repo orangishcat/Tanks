@@ -75,6 +75,8 @@ public class ScreenOptionsPartyHost extends Screen
     }
     );
 
+    Button save = new Button(0, 0, this.objHeight * 1.5, this.objHeight * 1.5, "", () -> Game.screen = new ScreenAutomatedTests());
+
     public TextBox timer;
     public TextBox bots;
 
@@ -89,6 +91,11 @@ public class ScreenOptionsPartyHost extends Screen
             anticheat.setText(anticheatText, strongText);
         else
             anticheat.setText(anticheatText, weakText);
+
+        save.fullInfo = true;
+        save.image = "icons/gear.png";
+        save.imageSizeX = this.objHeight;
+        save.imageSizeY = this.objHeight;
 
         if (Game.disablePartyFriendlyFire)
             disableFriendlyFire.setText(disableFriendlyFireText, disabledText);
@@ -134,6 +141,7 @@ public class ScreenOptionsPartyHost extends Screen
         back.update();
         timer.update();
         anticheat.update();
+        save.update();
         bots.update();
         disableFriendlyFire.update();
     }
@@ -141,9 +149,15 @@ public class ScreenOptionsPartyHost extends Screen
     @Override
     public void draw()
     {
+        save.posX = (Game.game.window.absoluteWidth / Drawing.drawing.interfaceScale - Drawing.drawing.interfaceSizeX) / 2
+                + Drawing.drawing.interfaceSizeX - 50 * Drawing.drawing.interfaceScaleZoom - Game.game.window.getEdgeBounds() / Drawing.drawing.interfaceScale;
+        save.posY = ((Game.game.window.absoluteHeight - Drawing.drawing.statsHeight) / Drawing.drawing.interfaceScale - Drawing.drawing.interfaceSizeY) / 2
+                + Drawing.drawing.interfaceSizeY - (ScreenPartyHost.isServer ? 100 : 50) * Drawing.drawing.interfaceScaleZoom;
+
         this.drawDefaultBackground();
         back.draw();
         anticheat.draw();
+        save.draw();
         disableFriendlyFire.draw();
         bots.draw();
         timer.draw();
