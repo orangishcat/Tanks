@@ -125,6 +125,8 @@ public class Arcade extends Minigame
             tankItemsMap.put("lightblue", "Air");
             tankItemsMap.put("lightpink", "Laser");
             tankItemsMap.put("gold", "Zap");
+            tankItemsMap.put("purple", "Block");
+            tankItemsMap.put("magenta", "Block");
         }
         else
         {

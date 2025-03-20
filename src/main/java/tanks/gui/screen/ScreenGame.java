@@ -1700,6 +1700,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			if (Game.currentLevel instanceof Minigame)
 				((Minigame) Game.currentLevel).update();
 
+			if (Game.screen instanceof ILevelPreviewScreen)
+				return;
+
 			playing = true;
 			this.age += Panel.frameFrequency;
 
