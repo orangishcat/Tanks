@@ -962,8 +962,9 @@ public class TankAIControlled extends Tank implements ITankField
 		if (targetEnemy != nearest)
 			this.cooldownStacks = 0;
 
-        if (secondary == null || nearest == null || Ray.newRay(posX, posY, getAngleInDirection(nearest.posX, nearest.posY),
-				0, this).getTarget() == nearest)
+		seesTargetEnemy = nearest != null && Ray.newRay(posX, posY, getAngleInDirection(nearest.posX, nearest.posY), 0, this)
+				.setSize(this.bullet.size).setAsExplosive(this.bullet.hitExplosion != null).getTarget() == nearest;
+        if (secondary == null || nearest == null || seesTargetEnemy)
             targetEnemy = nearest;
 		else
 			targetEnemy = secondary;
@@ -1964,22 +1965,8 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void checkAndShoot()
 	{
-		Movable m = null;
-
-		boolean arc = this.bullet instanceof BulletArc;
-
-		if (targetEnemy != null && !arc)
-		{
-			Ray r = Ray.newRay(this.posX, this.posY, this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY), 0, this);
-			r.moveOut(this.size / 10);
-			r.size = this.bullet.size;
-			r.ignoreDestructible = this.aimIgnoreDestructible;
-			r.ignoreShootThrough = true;
-			m = r.getTarget();
-		}
-
 		if (Movable.absoluteAngleBetween(this.angle, this.aimAngle) <= this.aimThreshold)
-			if ((arc && targetEnemy != null) || (m != null && m.equals(targetEnemy) || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy)))
+			if (seesTargetEnemy || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy))
 				this.shoot();
 	}
 
@@ -2109,27 +2096,8 @@ public class TankAIControlled extends Tank implements ITankField
 
         double a = this.getAngleInDirection(targetEnemy.posX, targetEnemy.posY);
 
-		Movable target = Ray.newRay(this.posX, this.posY, a, 0, this)
-				.setSize(this.bullet.size).moveOut(this.size / 10)
-				.setAsExplosive(true).getTarget();
-
-		if (target != null)
-			this.seesTargetEnemy = target.equals(targetEnemy);
-		else
-			this.seesTargetEnemy = false;
-
 		if (this.straightShoot)
-		{
-			if (target != null)
-			{
-				if (target.equals(targetEnemy))
-					this.aimAngle = a;
-				else
-					this.straightShoot = false;
-			}
-			else
-				this.straightShoot = false;
-		}
+            this.aimAngle = a;
 
 		if (this.sightTransformTank != null && seesTargetEnemy && this.inControlOfMotion && !ScreenGame.finishedQuick)
 			this.handleSightTransformation();
@@ -2480,7 +2448,7 @@ public class TankAIControlled extends Tank implements ITankField
 			for (int i = 0; i < Game.movables.size(); i++)
 			{
 				Movable m = Game.movables.get(i);
-				if (m != this && Team.isAllied(this, m) && m.dealsDamage && !m.destroy)
+				if (m != this && m instanceof Tank && Team.isAllied(this, m) && m.dealsDamage && !m.destroy)
 				{
 					die = false;
 					break;
