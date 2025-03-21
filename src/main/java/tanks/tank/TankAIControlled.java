@@ -940,7 +940,7 @@ public class TankAIControlled extends Tank implements ITankField
 					continue;
 
 				double dist = Movable.distanceBetween(this, m);
-				if (dist < nearestDist || lowPriority && !lowP)
+				if (dist < nearestDist || (lowPriority && !lowP))
 				{
 					this.hasTarget = true;
 					nearestDist = dist;

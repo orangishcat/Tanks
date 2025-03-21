@@ -183,79 +183,16 @@ public class Ray
 		}
 
 		boolean firstBounce = this.targetTank == null;
-		int totalChunksChecked = 0;
 
 		while (this.bounces >= 0 && this.bouncyBounces >= 0)
 		{
-			double collisionX = -1;
-			double collisionY = -1;
 			Result result;
 			Chunk current = Chunk.getChunk(posX, posY);
 			if (current == null)
 				return null;
 
-			int extraChunksToCheck = 99999;
 			for (int checkNum = 0; checkNum < 2; checkNum++)
-			{
-				chunkCheck:
-				for (int chunksChecked = 0; chunksChecked < maxChunkCheck && extraChunksToCheck-- > 0; chunksChecked++)
-				{
-					double moveXBase = Chunk.chunkSize * Game.tile_size * Math.cos(angle);
-					double moveYBase = Chunk.chunkSize * Game.tile_size * Math.sin(angle);
-					double moveX = moveXBase * chunksChecked, moveXPrev = moveXBase * Math.max(0, chunksChecked - 1);
-					double moveY = moveYBase * chunksChecked, moveYPrev = moveYBase * Math.max(0, chunksChecked - 1);
-
-					chunksAdded = 0;
-					Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
-					addChunks(current, mid);
-
-					if (mid == null || current.manhattanDist(mid) > 1)
-						addChunks(current,
-								Chunk.getChunk(posX + moveXPrev, posY + moveY),
-								Chunk.getChunk(posX + moveX, posY + moveYPrev)
-						);
-
-					if (chunksAdded == 0)
-						break;
-
-					Arrays.sort(chunkCache, 0, chunksAdded);
-
-					for (int i = 0; i < chunksAdded; i++)
-					{
-						Chunk chunk = chunkCache[i];
-						if (chunk == null)
-							continue;
-
-						totalChunksChecked++;
-
-						if (Chunk.debug && trace && bounces == 1)
-						{
-							Game.effects.add(Effect.createNewEffect(
-									(chunk.chunkX + 0.5) * Chunk.chunkSize * Game.tile_size + (totalChunksChecked * 5),
-									(chunk.chunkY + 0.5) * Chunk.chunkSize * Game.tile_size,
-									150, Effect.EffectType.chain, 90
-							).setRadius(totalChunksChecked));
-
-							Game.effects.add(Effect.createNewEffect(posX + moveX, posY + moveY, 20, Effect.EffectType.laser));
-
-							if (mid == null || current.manhattanDist(mid) > 1)
-							{
-								Game.effects.add(Effect.createNewEffect(posX, posY + moveY, 20, Effect.EffectType.obstaclePiece));
-								Game.effects.add(Effect.createNewEffect(posX + moveX, posY, 20, Effect.EffectType.piece));
-							}
-						}
-
-						checkCollisionIn(checkNum == 0 ? dynamic : stat, checkNum == 0 ? chunk.faces : chunk.staticFaces, firstBounce, collisionX, collisionY);
-
-						result = checkNum == 0 ? dynamic : stat;
-						collisionX = result.collisionX;
-						collisionY = result.collisionY;
-
-						if (result.collisionFace != null)
-							break chunkCheck;
-					}
-				}
-			}
+				checkFaceList(current, checkNum == 0 ? dynamic : stat, checkNum == 0 ? current.faces : current.staticFaces, firstBounce);
 
 			if (dynamic.collisionFace != null && stat.collisionFace != null)
 			{
@@ -349,6 +286,73 @@ public class Ray
 		}
 
 		return null;
+	}
+
+	public void checkFaceList(Chunk current, Result result, Chunk.FaceList faceList, boolean firstBounce)
+	{
+		if (current == null)
+			return;
+
+		double collisionX = -1;
+		double collisionY = -1;
+		int totalChunksChecked = 0;
+
+		chunkCheck:
+		for (int chunksChecked = 0; chunksChecked < maxChunkCheck; chunksChecked++)
+		{
+			double moveXBase = Chunk.chunkSize * Game.tile_size * Math.cos(angle);
+			double moveYBase = Chunk.chunkSize * Game.tile_size * Math.sin(angle);
+			double moveX = moveXBase * chunksChecked, moveXPrev = moveXBase * Math.max(0, chunksChecked - 1);
+			double moveY = moveYBase * chunksChecked, moveYPrev = moveYBase * Math.max(0, chunksChecked - 1);
+
+			chunksAdded = 0;
+			Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
+			addChunks(current, mid);
+
+			if (mid == null || current.manhattanDist(mid) > 1)
+				addChunks(current,
+						Chunk.getChunk(posX + moveXPrev, posY + moveY),
+						Chunk.getChunk(posX + moveX, posY + moveYPrev)
+				);
+
+			if (chunksAdded == 0)
+				break;
+
+			Arrays.sort(chunkCache, 0, chunksAdded);
+
+			for (int i = 0; i < chunksAdded; i++)
+			{
+				Chunk chunk = chunkCache[i];
+				if (chunk == null)
+					continue;
+
+				totalChunksChecked++;
+
+				if (Chunk.debug && trace && bounces == 1)
+				{
+					Game.effects.add(Effect.createNewEffect(
+							(chunk.chunkX + 0.5) * Chunk.chunkSize * Game.tile_size + (totalChunksChecked * 5),
+							(chunk.chunkY + 0.5) * Chunk.chunkSize * Game.tile_size,
+							150, Effect.EffectType.chain, 90
+					).setRadius(totalChunksChecked));
+
+					Game.effects.add(Effect.createNewEffect(posX + moveX, posY + moveY, 20, Effect.EffectType.laser));
+
+					if (mid == null || current.manhattanDist(mid) > 1)
+					{
+						Game.effects.add(Effect.createNewEffect(posX, posY + moveY, 20, Effect.EffectType.obstaclePiece));
+						Game.effects.add(Effect.createNewEffect(posX + moveX, posY, 20, Effect.EffectType.piece));
+					}
+				}
+
+				checkCollisionIn(result, faceList, firstBounce, collisionX, collisionY);
+				collisionX = result.collisionX;
+				collisionY = result.collisionY;
+
+				if (result.collisionFace != null)
+					break chunkCheck;
+			}
+		}
 	}
 
 	public boolean testInsideObstacle(double x, double y)
