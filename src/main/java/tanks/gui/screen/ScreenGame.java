@@ -1074,7 +1074,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			}
 		}
 
-		if (playing)
+		if (playing && !paused)
 		{
 			if (Game.game.input.zoomIn.isPressed())
 			{

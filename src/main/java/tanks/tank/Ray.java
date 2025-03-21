@@ -1,10 +1,7 @@
 package tanks.tank;
 
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
-import tanks.Chunk;
-import tanks.Effect;
-import tanks.Game;
-import tanks.Movable;
+import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.gui.screen.ScreenGame;
 import tanks.obstacle.Face;
@@ -191,8 +188,8 @@ public class Ray
 			if (current == null)
 				return null;
 
-			for (int checkNum = 0; checkNum < 2; checkNum++)
-				checkFaceList(current, checkNum == 0 ? dynamic : stat, checkNum == 0 ? current.faces : current.staticFaces, firstBounce);
+			checkFaceList(current, dynamic, Ray::dynamicFaces, firstBounce);
+			checkFaceList(current, stat, Ray::staticFaces, firstBounce);
 
 			if (dynamic.collisionFace != null && stat.collisionFace != null)
 			{
@@ -213,9 +210,7 @@ public class Ray
 			{
 				if (trace && ScreenGame.isUpdatingGame())
 				{
-					double dx = result.collisionX - posX;
-					double dy = result.collisionY - posY;
-
+					double dx = result.collisionX - posX, dy = result.collisionY - posY;
 					double steps = (Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)) / (1 + Math.pow(this.vX, 2) + Math.pow(this.vY, 2))) + 1);
 
 					if (dotted)
@@ -288,13 +283,22 @@ public class Ray
 		return null;
 	}
 
-	public void checkFaceList(Chunk current, Result result, Chunk.FaceList faceList, boolean firstBounce)
+	public static Chunk.FaceList dynamicFaces(Chunk c)
+	{
+		return c.faces;
+	}
+
+	public static Chunk.FaceList staticFaces(Chunk c)
+	{
+		return c.staticFaces;
+	}
+
+	public void checkFaceList(Chunk current, Result result, Function<Chunk, Chunk.FaceList> faceList, boolean firstBounce)
 	{
 		if (current == null)
 			return;
 
-		double collisionX = -1;
-		double collisionY = -1;
+		double collisionX = -1, collisionY = -1;
 		int totalChunksChecked = 0;
 
 		chunkCheck:
@@ -345,7 +349,7 @@ public class Ray
 					}
 				}
 
-				checkCollisionIn(result, faceList, firstBounce, collisionX, collisionY);
+				checkCollisionIn(result, faceList.apply(chunk), firstBounce, collisionX, collisionY);
 				collisionX = result.collisionX;
 				collisionY = result.collisionY;
 
