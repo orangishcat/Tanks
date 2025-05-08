@@ -1965,9 +1965,11 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void checkAndShoot()
 	{
-		if (Movable.absoluteAngleBetween(this.angle, this.aimAngle) <= this.aimThreshold)
-			if (seesTargetEnemy || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy))
-				this.shoot();
+		if (Movable.absoluteAngleBetween(this.angle, this.aimAngle) >= this.aimThreshold)
+			return;
+
+		if (seesTargetEnemy || this.bullet instanceof BulletArc || (this.avoidTimer > 0 && this.disableOffset && this.enableDefensiveFiring && this.nearestBulletDeflect != null && !this.nearestBulletDeflect.destroy))
+			this.shoot();
 	}
 
 	public void updateTurretReflect()

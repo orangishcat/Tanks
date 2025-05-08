@@ -193,8 +193,8 @@ public class Ray
 
 			if (dynamic.collisionFace != null && stat.collisionFace != null)
 			{
-				result = Movable.sqDistBetw(dynamic.collisionX, dynamic.collisionY, startX, startY) <
-						Movable.sqDistBetw(stat.collisionX, stat.collisionY, startX, startY) ? dynamic : stat;
+				result = Movable.sqDistBetw(dynamic.collisionX, dynamic.collisionY, posX, posY) <
+						Movable.sqDistBetw(stat.collisionX, stat.collisionY, posX, posY) ? dynamic : stat;
 			}
 			else
 				result = dynamic.collisionFace != null ? dynamic : stat;
@@ -273,7 +273,7 @@ public class Ray
 					else
 						this.vX = -this.vX;
 
-					this.angle = Movable.getPolarDirection(this.vX, this.vY);    // i hate quadrants
+					this.angle = Movable.getPolarDirection(this.vX, this.vY);
 				}
 			}
 			else

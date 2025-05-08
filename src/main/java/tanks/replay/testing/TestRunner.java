@@ -1,5 +1,9 @@
 package tanks.replay.testing;
 
+import tanks.Game;
+import tanks.network.event.EventRunTest;
+import tanks.network.event.EventStartTest;
+
 import java.util.Arrays;
 
 public class TestRunner
@@ -26,6 +30,7 @@ public class TestRunner
         reset();
         Test.runner.started = true;
         Test.registry.refreshCache();
+        Game.eventsOut.add(new EventStartTest());
     }
 
     public TestState getState(int ind)
@@ -56,6 +61,7 @@ public class TestRunner
 
         current = Test.registry.loadTest(pos - 1);
         started = true;
+        Game.eventsOut.add(new EventRunTest(pos - 1));
     }
 
     public void runNextTest()

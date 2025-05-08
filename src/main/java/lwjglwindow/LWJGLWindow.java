@@ -261,10 +261,7 @@ public class LWJGLWindow extends BaseWindow
                 }
                 catch (Exception exc)
                 {
-                    if (innerExc == null)
-                        innerExc = exc;
-                    else
-                        exc.printStackTrace();
+                    innerExc = exc;
                 }
             }
 
@@ -326,7 +323,7 @@ public class LWJGLWindow extends BaseWindow
         boolean shouldClose = false;
 
         while (!shouldClose)
-            shouldClose = this.tick(false);
+            shouldClose = this.tick();
 
         this.windowHandler.onWindowClose();
 
@@ -336,7 +333,7 @@ public class LWJGLWindow extends BaseWindow
         System.exit(0);
     }
 
-    protected boolean tick(boolean resizing)
+    protected boolean tick()
     {
         this.startTiming();
 
@@ -401,7 +398,7 @@ public class LWJGLWindow extends BaseWindow
 
         glfwSwapBuffers(window);
 
-        if (!resizing)
+        if (!false)
             glfwPollEvents();
 
         boolean shouldClose = glfwWindowShouldClose(window);
@@ -557,7 +554,6 @@ public class LWJGLWindow extends BaseWindow
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, decoder.getWidth(), decoder.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-                in.close();
 
                 textures.put(image, id);
                 textureSX.put(image, decoder.getWidth());
