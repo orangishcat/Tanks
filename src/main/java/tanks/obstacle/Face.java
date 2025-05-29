@@ -7,11 +7,13 @@ public class Face implements Comparable<Face>
     public double endX;
     public double endY;
 
+    /** Whether the face looks like a horizontal or vertical line */
     public boolean horizontal;
+    /** If true, objects collide in the +x or +y direction depending on the value of horizontal.<br>
+     * If false, -x or -y depending on horizontal */
     public boolean positiveCollision;
 
-    public boolean solidTank;
-    public boolean solidBullet;
+    public boolean solidTank, solidBullet;
 
     public ISolidObject owner;
 

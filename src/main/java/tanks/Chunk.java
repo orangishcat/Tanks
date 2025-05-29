@@ -16,7 +16,6 @@ public class Chunk implements Comparable<Chunk>
 {
     public static Level defaultLevel = new Level("{28,18|,|,}");
     public static final Chunk zeroChunk = new Chunk();
-    public static final Tile emptyTile = new Tile();
     public static boolean debug = false;
 
     public static Int2ObjectOpenHashMap<Chunk> chunks = new Int2ObjectOpenHashMap<>();
@@ -29,8 +28,13 @@ public class Chunk implements Comparable<Chunk>
     public Face[] borderFaces = new Face[4];
     public final ObjectOpenHashSet<Obstacle> obstacles = new ObjectOpenHashSet<>();
     public final ObjectOpenHashSet<Movable> movables = new ObjectOpenHashSet<>();
+
+    // Maybe this could be done with one FaceList, but I'm too lazy to figure that out
+    /** Stores faces of Movables, which are updated every frame */
     public final FaceList faces = new FaceList();
+    /** Stores faces of Obstacles, which are updated only when the obstacle is added, removed, or changes position */
     public final FaceList staticFaces = new FaceList();
+
     public final FaceList[] faceLists = {faces, staticFaces};
     public final Tile[][] tileGrid = new Tile[chunkSize][chunkSize];
 
@@ -66,6 +70,8 @@ public class Chunk implements Comparable<Chunk>
     static int[] y1 = {0, 0, 1, 0}, y2 = {0, 1, 1, 1};
 
     /**
+     * Adds a level border on the specified side of the chunk, where rays will collide off of.
+     *
      * @param side Integer from 0-3, indicating top, right, bottom, or left face
      */
     public void addBorderFace(int side, Level l)

@@ -79,24 +79,23 @@ public class FontRenderer extends BaseFontRenderer
 		double opacity = this.window.colorA;
 
 		double curX = x;
-		char[] c = s.toCharArray();
 
-		for (int i = 0; i < c.length; i++)
+		for (int i = 0; i < s.length(); i++)
 		{
-			if (c[i] == '\u00C2')
+			if (s.charAt(i) == '\u00C2')
 				continue;
 
-			if (c[i] == '\u00A7')
+			if (s.charAt(i) == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;
 
 				try
 				{
-					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + c[i + 3]);
-					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + c[i + 6]);
-					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + c[i + 9]);
-					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + c[i + 12]);
+					int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
+					int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
+					int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
+					int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
 					this.window.setColor(r, g, b, a * opacity);
 				}
 				catch (Exception e)
@@ -107,7 +106,7 @@ public class FontRenderer extends BaseFontRenderer
 				i += 12;
 			}
 			else
-				curX += (drawChar(curX, y, z, sX, sY, c[i], true) + 1) * sX * 4;
+				curX += (drawChar(curX, y, z, sX, sY, s.charAt(i), true) + 1) * sX * 4;
 		}
 
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -116,25 +115,24 @@ public class FontRenderer extends BaseFontRenderer
 	public void drawString(double x, double y, double sX, double sY, String s)
 	{
 		double curX = x;
-		char[] c = s.toCharArray();
 		double opacity = this.window.colorA;
 
-		for (int i = 0; i < c.length; i++)
+		for (int i = 0; i < s.length(); i++)
 		{
-			if (c[i] == '\u00C2')
+			if (s.charAt(i) == '\u00C2')
 				continue;
 
-			if (c[i] == '\u00A7')
+			if (s.charAt(i) == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;
 
 				try
 				{
-					int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + c[i + 3]);
-					int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + c[i + 6]);
-					int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + c[i + 9]);
-					int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + c[i + 12]);
+					int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
+					int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
+					int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
+					int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
 					this.window.setColor(r, g, b, a * opacity);
 				}
 				catch (Exception e)
@@ -145,31 +143,34 @@ public class FontRenderer extends BaseFontRenderer
 				i += 12;
 			}
 			else
-				curX += (drawChar(curX, y, 0, sX, sY, c[i], false) + 1) * sX * 4;
+				curX += (drawChar(curX, y, 0, sX, sY, s.charAt(i), false) + 1) * sX * 4;
 		}
 	}
 
 	public double getStringSizeX(double sX, String s)
 	{
 		double w = 0;
-		char[] c = s.toCharArray();
 
-		for (int i = 0; i < c.length; i++)
+		for (int i = 0; i < s.length(); i++)
 		{
-			if (c[i] == '\u00C2')
+			if (s.charAt(i) == '\u00C2')
 				continue;
 
-			if (c[i] == '\u00A7')
+			if (s.charAt(i) == '\u00A7')
 			{
 				if (s.length() <= i + 12)
 					continue;
 
 				i += 12;
 			}
-			else if (this.chars.indexOf(c[i]) == -1)
-				c[i] = '?';
 			else
-				w += (charSizes[this.chars.indexOf(c[i])] + 1) * sX * 4;
+			{
+				char currentChar = s.charAt(i);
+				if (this.chars.indexOf(currentChar) == -1)
+					currentChar = '?';
+
+				w += (charSizes[this.chars.indexOf(currentChar)] + 1) * sX * 4;
+			}
 		}
 
 		return Math.max(w - sX * 4, 0);

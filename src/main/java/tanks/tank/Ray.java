@@ -13,7 +13,9 @@ import java.util.Arrays;
 public class Ray
 {
 	public static int chunksAdded;
+	/** Caches the chunks to avoid creating new temp objects */
 	public static Chunk[] chunkCache = new Chunk[40];
+	/** Caches the ray to avoid creating new temp objects */
 	public static Ray cacheRay = new Ray();
 
 	public double size = 10;
@@ -148,8 +150,10 @@ public class Ray
 		return this;
 	}
 
-	/** Caches the result objects to avoid creating new temp objects */
-	public static Result dynamic = new Result(), stat = new Result();
+	/** Result of dynamic collisions */
+	public static Result dynamic = new Result();
+	/** Result of static collisions */
+	public static Result stat = new Result();
 
 	public Movable getTarget()
 	{
@@ -283,11 +287,13 @@ public class Ray
 		return null;
 	}
 
+	/** Lambdas with parameter(s) are anonymous classes, which create temp objects. We don't want that. */
 	public static Chunk.FaceList dynamicFaces(Chunk c)
 	{
 		return c.faces;
 	}
 
+	/** Lambdas with parameter(s) are anonymous classes, which create temp objects. Temp objects bad. */
 	public static Chunk.FaceList staticFaces(Chunk c)
 	{
 		return c.staticFaces;
@@ -310,9 +316,13 @@ public class Ray
 			double moveY = moveYBase * chunksChecked, moveYPrev = moveYBase * Math.max(0, chunksChecked - 1);
 
 			chunksAdded = 0;
+
+			// move forward one chunk in the ray's direction
 			Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
+			// add current chunk and chunk in front
 			addChunks(current, mid);
 
+			// if the ray moved diagonally, add the chunks on the sides
 			if (mid == null || current.manhattanDist(mid) > 1)
 				addChunks(current,
 						Chunk.getChunk(posX + moveXPrev, posY + moveY),
@@ -322,6 +332,7 @@ public class Ray
 			if (chunksAdded == 0)
 				break;
 
+			// sort the chunks by distance from the ray
 			Arrays.sort(chunkCache, 0, chunksAdded);
 
 			for (int i = 0; i < chunksAdded; i++)
@@ -332,8 +343,9 @@ public class Ray
 
 				totalChunksChecked++;
 
-				if (Chunk.debug && trace && bounces == 1)
+				if (Chunk.debug && trace)
 				{
+					// displays the order of chunks checked and locations that the ray checked
 					Game.effects.add(Effect.createNewEffect(
 							(chunk.chunkX + 0.5) * Chunk.chunkSize * Game.tile_size + (totalChunksChecked * 5),
 							(chunk.chunkY + 0.5) * Chunk.chunkSize * Game.tile_size,
@@ -375,7 +387,8 @@ public class Ray
 
 		if (vX > 0)
 		{
-			for (Face f : faceList.leftFaces)
+			// rays moving right will not collide with faces to the left of the ray
+			for (Face f : faceList.leftFaces.tailSet(DummyFace.face.set(false, this.posX - size / 2)))
 			{
 				double size = this.size;
 
@@ -403,7 +416,8 @@ public class Ray
 		}
 		else if (vX < 0)
 		{
-			for (Face f : faceList.rightFaces)
+			// rays moving left will not collide with faces to the right of the ray
+			for (Face f : faceList.rightFaces.tailSet(DummyFace.face.set(false, this.posX + size / 2)))
 			{
 				double size = this.size;
 
@@ -430,7 +444,8 @@ public class Ray
 
 		if (vY > 0)
 		{
-			for (Face f : faceList.topFaces)
+			// rays moving down will not collide with faces above the ray
+			for (Face f : faceList.topFaces.tailSet(DummyFace.face.set(true, this.posY - size / 2)))
 			{
 				double size = this.size;
 
@@ -463,7 +478,8 @@ public class Ray
 		}
 		else if (vY < 0)
 		{
-			for (Face f : faceList.bottomFaces)
+			// rays moving up will not collide with faces below the ray
+			for (Face f : faceList.bottomFaces.tailSet(DummyFace.face.set(true, this.posY + size / 2)))
 			{
 				double size = this.size;
 
@@ -617,5 +633,27 @@ public class Ray
 	public boolean collision(Obstacle o)
 	{
 		return asBullet ? o.bulletCollision : o.tankCollision;
+	}
+
+	/** Used to compare coordinates between faces */
+	public static class DummyFace extends Face
+	{
+		/** The instance of DummyFace to reduce memory allocation */
+		public static DummyFace face = new DummyFace();
+
+		public DummyFace()
+		{
+			super(null, 0, 0, 0, 0, false, false, true, true);
+		}
+
+		public DummyFace set(boolean horizontal, double filter)
+		{
+			this.horizontal = horizontal;
+			if (horizontal)
+				this.startY = filter;
+			else
+				this.startX = filter;
+			return this;
+		}
 	}
 }

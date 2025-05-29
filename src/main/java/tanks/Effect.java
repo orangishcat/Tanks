@@ -50,7 +50,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
     {
         while (!Game.recycleEffects.isEmpty())
         {
-            Effect e = Game.recycleEffects.remove();
+            Effect e = Game.recycleEffects.poll();
 
             if (e.state == State.recycle)
             {
@@ -909,23 +909,23 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
         {
             if (Math.random() < Panel.frameFrequency * Game.effectMultiplier * 0.1)
             {
+                Effect e;
                 if (Game.enable3d)
                 {
-                    Effect e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, this.posZ, EffectType.piece);
+                    e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, this.posZ, EffectType.piece);
                     e.colR = 255;
                     e.colG = Math.random() * 255;
                     e.colB = 0;
                     e.vZ = Math.random() + 1;
-                    Game.addEffects.add(e);
                 }
                 else
                 {
-                    Effect e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, EffectType.piece);
+                    e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, EffectType.piece);
                     e.colR = 255;
                     e.colG = Math.random() * 255;
                     e.colB = 0;
-                    Game.addEffects.add(e);
                 }
+                Game.addEffects.add(e);
             }
 
             if (Game.enable3d && Math.random() < Panel.frameFrequency * Game.effectMultiplier * 0.1 * (2 - this.posZ / Game.tile_size))
