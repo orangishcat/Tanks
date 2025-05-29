@@ -131,7 +131,8 @@ public class Ray
 		return this;
 	}
 
-	public Ray setMaxDistance(double distance)
+	@SuppressWarnings("unused")
+    public Ray setMaxDistance(double distance)
 	{
 		setMaxChunks((int) (distance / Game.tile_size / Chunk.chunkSize + 1));
 		return this;
@@ -603,20 +604,7 @@ public class Ray
 		x -= this.posX;
 		y -= this.posY;
 
-		double angle = 0;
-		if (x > 0)
-			angle = Math.atan(y/x);
-		else if (x < 0)
-			angle = Math.atan(y/x) + Math.PI;
-		else
-		{
-			if (y > 0)
-				angle = Math.PI / 2;
-			else if (y < 0)
-				angle = Math.PI * 3 / 2;
-		}
-
-		return angle;
+		return Movable.getPolarDirection(x, y);
 	}
 
 	public boolean isInsideObstacle(double x, double y)

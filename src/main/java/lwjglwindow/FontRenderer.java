@@ -87,23 +87,7 @@ public class FontRenderer extends BaseFontRenderer
 
 			if (s.charAt(i) == '\u00A7')
 			{
-				if (s.length() <= i + 12)
-					continue;
-
-				try
-				{
-					int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
-					int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
-					int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
-					int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
-					this.window.setColor(r, g, b, a * opacity);
-				}
-				catch (Exception e)
-				{
-					continue;
-				}
-
-				i += 12;
+				i = handleColorChar(s, opacity, i);
 			}
 			else
 				curX += (drawChar(curX, y, z, sX, sY, s.charAt(i), true) + 1) * sX * 4;
@@ -123,28 +107,32 @@ public class FontRenderer extends BaseFontRenderer
 				continue;
 
 			if (s.charAt(i) == '\u00A7')
-			{
-				if (s.length() <= i + 12)
-					continue;
-
-				try
-				{
-					int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
-					int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
-					int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
-					int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
-					this.window.setColor(r, g, b, a * opacity);
-				}
-				catch (Exception e)
-				{
-					continue;
-				}
-
-				i += 12;
-			}
+                i = handleColorChar(s, opacity, i);
 			else
 				curX += (drawChar(curX, y, 0, sX, sY, s.charAt(i), false) + 1) * sX * 4;
 		}
+	}
+
+	public int handleColorChar(String s, double opacity, int i)
+	{
+		if (s.length() <= i + 12)
+			return i;
+
+		try
+		{
+			int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
+			int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
+			int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
+			int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
+			this.window.setColor(r, g, b, a * opacity);
+		}
+		catch (Exception e)
+		{
+			return i;
+		}
+
+		i += 12;
+		return i;
 	}
 
 	public double getStringSizeX(double sX, String s)

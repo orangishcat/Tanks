@@ -219,6 +219,7 @@ public class Chunk implements Comparable<Chunk>
         return func.apply(t);
     }
 
+    @SuppressWarnings("unused")
     public static <K> K getIfPresent(double posX, double posY, Function<Tile, K> func)
     {
         Tile t = getTile(posX, posY);

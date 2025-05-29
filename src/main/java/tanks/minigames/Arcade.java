@@ -454,19 +454,7 @@ public class Arcade extends Minigame
             int secondHalves = (int) (timer / 50);
             timer -= Panel.frameFrequency;
 
-            int newSeconds = (int) (timer / 100 + 0.5);
-            int newSecondHalves = (int) (timer / 50);
-
-            if (seconds <= 5)
-            {
-                if (newSecondHalves < secondHalves)
-                    Drawing.drawing.playSound("tick.ogg", 2f, 0.5f);
-            }
-            else if (newSeconds < seconds && seconds <= 10)
-                Drawing.drawing.playSound("tick.ogg", 2f, 0.5f);
-
-            if (seconds > newSeconds && (newSeconds == 10 || newSeconds == 30 || newSeconds == 60))
-                Drawing.drawing.playSound("timer.ogg");
+            ScreenGame.playTimerTick(seconds, secondHalves, timer);
         }
 
         this.playingMusics.clear();
