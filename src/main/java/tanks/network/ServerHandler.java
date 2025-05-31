@@ -173,7 +173,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter
 			if (time != lastStackedEventSend)
 			{
 				lastStackedEventSend = time;
-				int size = this.stackedEvents.values().size();
+				int size = this.stackedEvents.size();
 
 				if (prev != null)
 					this.sendEvent(prev, size == 0);

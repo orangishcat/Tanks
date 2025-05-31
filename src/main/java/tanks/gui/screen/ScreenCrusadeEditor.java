@@ -117,9 +117,7 @@ public class ScreenCrusadeEditor extends Screen implements ITankBuildScreen
     );
 
     public Button addBuild = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace + add_offset, Drawing.drawing.interfaceSizeY / 2 + titleOffset, this.objHeight, this.objHeight, "+", () ->
-    {
-        Game.screen = new ScreenAddSavedTankBuild(this, crusade.crusadeShopBuilds);
-    }, "Add a player build");
+            Game.screen = new ScreenAddSavedTankBuild(this, crusade.crusadeShopBuilds), "Add a player build");
 
     public Button options = new Button(Drawing.drawing.interfaceSizeX / 2 + 380, Drawing.drawing.interfaceSizeY / 2 + 300, this.objWidth, this.objHeight, "Crusade options", () -> Game.screen = new ScreenCrusadeOptions(this));
 

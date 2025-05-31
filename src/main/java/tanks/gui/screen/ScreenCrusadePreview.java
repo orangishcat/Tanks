@@ -126,9 +126,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
     );
 
     public Button delete = new Button(this.centerX - this.objXSpace, this.centerY + this.objYSpace * 2, this.objWidth, this.objHeight, "Remove from server", () ->
-    {
-        confirmingDelete = true;
-    });
+            confirmingDelete = true);
 
     public Button more = new Button(this.centerX - this.objXSpace, this.centerY + this.objYSpace * 3, this.objWidth, this.objHeight, "More by this user", () ->
     {
@@ -137,7 +135,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
         Game.steamNetworkHandler.workshop.search(null, 0, 18, workshopDetails.getOwnerID(), null, Game.steamNetworkHandler.workshop.searchByScore);
     });
 
-    public Button cancelDelete = new Button(this.centerX, (int) (this.centerY + this.objYSpace), this.objWidth, this.objHeight, "No", () -> { confirmingDelete = false; });
+    public Button cancelDelete = new Button(this.centerX, (int) (this.centerY + this.objYSpace), this.objWidth, this.objHeight, "No", () -> confirmingDelete = false);
 
     public Button confirmDelete = new Button(this.centerX, (int) (this.centerY), this.objWidth, this.objHeight, "Yes", () ->
     {
@@ -173,9 +171,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
     }, "Dislike the crusade");
 
     public Button showPage = new Button(this.centerX + this.objXSpace - this.objWidth / 2 + this.objHeight / 2, this.centerY + this.objYSpace * 1.5, this.objHeight, this.objHeight, "", () ->
-    {
-        Game.steamNetworkHandler.friends.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + Long.parseLong(workshopDetails.getPublishedFileID().toString(), 16), SteamFriends.OverlayToWebPageMode.Default);
-    }, "View crusade page on Steam");
+            Game.steamNetworkHandler.friends.friends.activateGameOverlayToWebPage("steam://url/CommunityFilePage/" + Long.parseLong(workshopDetails.getPublishedFileID().toString(), 16), SteamFriends.OverlayToWebPageMode.Default), "View crusade page on Steam");
 
     public ScreenCrusadePreview(Crusade c, Screen previous, boolean upload)
     {

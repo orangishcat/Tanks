@@ -19,9 +19,7 @@ public class ScreenWorkshopCreations extends Screen
 	public int lastLoadedLevels = 0;
 
 	public Button quit = new Button(this.centerX, this.centerY + this.objYSpace * 5, this.objWidth, this.objHeight, "Back", () ->
-	{
-		Game.screen = new ScreenSteamWorkshop();
-	}
+            Game.screen = new ScreenSteamWorkshop()
 	);
 
 	SearchBox search = new SearchBox(this.centerX, this.centerY - this.objYSpace * 4, this.objWidth * 1.25, this.objHeight, "Search", new Runnable()
@@ -95,7 +93,7 @@ public class ScreenWorkshopCreations extends Screen
 	@Override
 	public void update()
 	{
-		if (this.creations.buttons.size() < Game.steamNetworkHandler.workshop.publishedFiles.keySet().size())
+		if (this.creations.buttons.size() < Game.steamNetworkHandler.workshop.publishedFiles.size())
 			this.initializeLevels();
 
 		this.creations.update();

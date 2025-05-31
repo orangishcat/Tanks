@@ -38,7 +38,7 @@ public class ScreenOverlayOnline extends Screen
     @Override
     public void update()
     {
-        double pos = this.centerY - this.objYSpace / 2 * (1 + buttons.keySet().size());
+        double pos = this.centerY - this.objYSpace / 2 * (1 + buttons.size());
 
         for (int i = 0; i < max_button_count; i++)
         {

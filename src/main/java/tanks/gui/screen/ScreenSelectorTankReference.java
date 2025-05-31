@@ -138,8 +138,6 @@ public class ScreenSelectorTankReference extends ScreenEditorTanksONable<ITankFi
                 Game.currentLevel.customTanks.get(i - 1 - Game.registryTank.tankEntries.size()).cloneProperties(t);
             }
 
-            final TankAIControlled tt = t;
-
             String desc = "";
 
             if (t != null)

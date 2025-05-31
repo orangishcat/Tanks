@@ -22,7 +22,8 @@ import java.util.HashMap;
 
 public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenChatboxScreen, ICrusadePreviewScreen
 {
-    public enum View {tanks, levels, items, misc};
+    public enum View {tanks, levels, items, misc}
+
     public View view = View.tanks;
     public View prevView = View.tanks;
 

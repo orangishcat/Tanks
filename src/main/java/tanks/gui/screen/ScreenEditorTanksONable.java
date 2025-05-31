@@ -680,7 +680,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 }
 
-                musics.sort((o1, o2) -> o1.compareTo(o2));
+                musics.sort(Comparator.naturalOrder());
 
                 for (int i = 1; i <= 8; i++)
                 {

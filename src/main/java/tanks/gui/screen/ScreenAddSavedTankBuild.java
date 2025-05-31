@@ -52,9 +52,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
     public Button lastTankPage = new Button(this.centerX + 500, this.centerY + this.objYSpace * 3, 40, 40, "", () -> tankPage = (tankButtons.size() - 1) / objectButtonRows / objectButtonCols);
 
     Button openFolder = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace * 0.75, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 4, this.objHeight, this.objHeight, "", () ->
-    {
-        Game.game.fileManager.openFileManager(Game.homedir + Game.buildDir);
-    }, "Open folder in file manager");
+            Game.game.fileManager.openFileManager(Game.homedir + Game.buildDir), "Open folder in file manager");
 
 
     public Button quit = new Button(this.centerX + this.objXSpace / 2, this.centerY + this.objYSpace * 4, this.objWidth, this.objHeight, "Back", new Runnable()
