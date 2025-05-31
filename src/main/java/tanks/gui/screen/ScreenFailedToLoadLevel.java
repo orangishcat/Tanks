@@ -48,7 +48,7 @@ public class ScreenFailedToLoadLevel extends Screen
 			f.create();
 
 			f.startWriting();
-			f.println("Level load failure report: " + Game.version + " - " + new Date().toString() + "\n");
+			f.println("Level load failure report: " + Game.version + " - " + new Date() + "\n");
 			f.println("Level name: " + lvl);
 			f.println("Level contents: " + contents + "\n");
 			f.println(e.toString());

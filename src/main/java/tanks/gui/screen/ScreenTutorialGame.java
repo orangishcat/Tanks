@@ -26,7 +26,7 @@ public class ScreenTutorialGame extends ScreenGame
 			f.startWriting();
 			f.println("Fake certificate of completion:");
 			f.println("Tanks: The Crusades tutorial");
-			f.println("Skipped " + new Date().toString());
+			f.println("Skipped " + new Date());
 			f.stopWriting();
 		}
 		catch (Exception e)

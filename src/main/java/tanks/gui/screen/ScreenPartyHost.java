@@ -8,10 +8,8 @@ import tanks.gui.ChatBox;
 import tanks.gui.ChatMessage;
 import tanks.network.Server;
 import tanks.network.ServerHandler;
-import tanks.network.SteamNetworkHandler;
 import tanks.network.SynchronizedList;
 import tanks.network.event.*;
-import tanks.obstacle.ObstacleTeleporter;
 import tanks.tank.Tank;
 import tanks.tank.Turret;
 import tanks.translation.Translation;
@@ -420,7 +418,7 @@ public class ScreenPartyHost extends Screen
                                 Drawing.drawing.drawInterfaceText(this.centerX - w - 255, y, server.connections.get(i).lastLatency + "ms", true);
                             }
                         }
-                        catch (Exception e)
+                        catch (Exception ignored)
                         {
 
                         }

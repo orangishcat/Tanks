@@ -194,7 +194,7 @@ public abstract class Minigame extends Level
                 }
             }
             outputName.append(name.substring(prevBeginIndex)).append(" Tank");
-            message.append(outputName.toString());
+            message.append(outputName);
         }
         message.append("\u00a7000000000255 was ").append(isBullet ? "shot" : "blown up").append(" by ").append("\u00a7").append(killR).append(killG).append(killB).append("255");
 
@@ -220,7 +220,7 @@ public abstract class Minigame extends Level
                 }
             }
             outputName.append(name.substring(prevBeginIndex)).append(" Tank");
-            message.append(outputName.toString());
+            message.append(outputName);
         }
 
         return message.toString();
@@ -271,7 +271,7 @@ public abstract class Minigame extends Level
                 }
             }
             outputName.append(name.substring(prevBeginIndex)).append(" Tank");
-            message.append(outputName.toString());
+            message.append(outputName);
         }
 
         message.append("\u00a7000000000255 drowned");

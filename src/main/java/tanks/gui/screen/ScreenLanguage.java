@@ -32,7 +32,7 @@ public class ScreenLanguage extends Screen
                         button.text = file.nextLine();
                         file.stopReading();
                     }
-                    catch (Exception e)
+                    catch (Exception ignored)
                     {
 
                     }

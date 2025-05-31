@@ -5,13 +5,10 @@ import com.codedisaster.steamworks.SteamFriends;
 import com.codedisaster.steamworks.SteamUGCDetails;
 import tanks.*;
 import tanks.gui.Button;
-import tanks.gui.ButtonList;
 import tanks.gui.TextBox;
-import tanks.item.Item;
 import tanks.network.event.EventShareCrusade;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScreen
 {

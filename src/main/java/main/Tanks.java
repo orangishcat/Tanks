@@ -137,7 +137,7 @@ public class Tanks
                 "If you would like support regarding this issue, you may join the Tanks Discord via the following link:\n" +
                 "https://discord.gg/aWPaJD3\n\n" +
                 "Crash details:\n" +
-                s.toString() + "\n";
+                s + "\n";
 
         Game.logger.println(errorMsg + "System properties:\n" + props + "\n");
         System.err.println(errorMsg);

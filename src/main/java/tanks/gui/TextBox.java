@@ -148,7 +148,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		if (selected)
 		{
-			if (this.inputText.length() >= this.maxChars || (allowDoubles && inputText.toLowerCase(Locale.ROOT).contains("infinity")))
+			if (this.inputText.length() >= this.maxChars || allowDoubles && inputText.toLowerCase(Locale.ROOT).contains("infinity"))
 			{
 				drawing.setColor(this.selectedFullColorR * (1 - this.flashAnimation) + this.selectedFullFlashColorR * flashAnimation,
 						this.selectedFullColorG * (1 - this.flashAnimation) + this.selectedFullFlashColorG * flashAnimation,
@@ -289,7 +289,7 @@ public class TextBox implements IDrawable, ITrigger
 				double mx = Drawing.drawing.getInterfacePointerX(p.x);
 				double my = Drawing.drawing.getInterfacePointerY(p.y);
 
-				boolean handled = checkMouse(mx, my, true, p.valid && p.tag.equals(""), p);
+				boolean handled = checkMouse(mx, my, true, p.valid && p.tag.isEmpty(), p);
 
 				if (handled)
 					p.tag = "textbox";
@@ -449,7 +449,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		boolean hover = mx > posX - sizeX / 2 && mx < posX + sizeX / 2 && my > posY - sizeY / 2 - sizeY * 3 / 4 && my < posY + sizeY / 2;
 
-		if (((!hover && valid)) && selected)
+		if (!hover && valid && selected)
 		{
 			this.submit();
 		}
@@ -612,13 +612,13 @@ public class TextBox implements IDrawable, ITrigger
 						inputText += key;
 				}
 
-				if (allowNegatives && inputText.isEmpty() || (inputText.toLowerCase(Locale.ROOT).endsWith("e")) && allowDoubles)
+				if (allowNegatives && inputText.isEmpty() || inputText.toLowerCase(Locale.ROOT).endsWith("e"))
 				{
 					if ('-' == key)
 						inputText += key;
 				}
 
-				if (allowDoubles && !inputText.contains(".") && (!inputText.toLowerCase(Locale.ROOT).contains("e")) && allowDoubles)
+				if (allowDoubles && !inputText.contains(".") && !inputText.toLowerCase(Locale.ROOT).contains("e"))
 				{
 					if ('.' == key)
 						inputText += key;
@@ -629,7 +629,7 @@ public class TextBox implements IDrawable, ITrigger
 					inputText += "Infinity";
 				}
 
-				if (allowDoubles && !inputText.toLowerCase(Locale.ROOT).contains("e") && (!this.inputText.isEmpty() && !this.inputText.equals("-")))
+				if (allowDoubles && !inputText.toLowerCase(Locale.ROOT).contains("e") && !this.inputText.isEmpty() && !this.inputText.equals("-"))
 				{
 					if ('e' == Character.toLowerCase(key))
 						inputText += "E";
@@ -760,7 +760,7 @@ public class TextBox implements IDrawable, ITrigger
 			drawing.setColor(r, g, b, a);
 			drawing.addInterfaceVertex(posX + sizeX / 2 - sizeY / 2, posY, 0);
 			drawing.setColor(0, 0, 0, 0);
-			drawing.addInterfaceVertex(posX + sizeX / 2 - sizeY / 2 + sizeY * Math.cos((i) / 30.0 * Math.PI) * size, posY + sizeY * Math.sin((i) / 30.0 * Math.PI) * size, 0);
+			drawing.addInterfaceVertex(posX + sizeX / 2 - sizeY / 2 + sizeY * Math.cos(i / 30.0 * Math.PI) * size, posY + sizeY * Math.sin(i / 30.0 * Math.PI) * size, 0);
 			drawing.addInterfaceVertex(posX + sizeX / 2 - sizeY / 2 + sizeY * Math.cos((i + 1) / 30.0 * Math.PI) * size, posY + sizeY * Math.sin((i + 1) / 30.0 * Math.PI) * size, 0);
 
 			drawing.setColor(r, g, b, a);

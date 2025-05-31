@@ -48,7 +48,7 @@ public class ScreenFailedToLoadCrusade extends Screen
 			f.create();
 
 			f.startWriting();
-			f.println("Crusade load failure report: " + Game.version + " - " + new Date().toString() + "\n");
+			f.println("Crusade load failure report: " + Game.version + " - " + new Date() + "\n");
 			f.println("Crusade name: " + fileName);
 			f.println("Crusade contents: " + contents + "\n");
 			f.println(e.toString());

@@ -448,7 +448,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
         if (entries.isEmpty())
             return;
 
-        Collections.sort(entries, comparison);
+        entries.sort(comparison);
 
         int ranks = 0;
 

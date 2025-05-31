@@ -229,11 +229,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable e)
     {
 		System.err.println("A network exception has occurred: " + e.toString());
-		Game.logger.println("A network exception has occurred: " + e.toString());
+		Game.logger.println("A network exception has occurred: " + e);
 		e.printStackTrace();
 		e.printStackTrace(Game.logger);
 
-		EventKick ev = new EventKick("A network exception has occurred: " + e.toString());
+		EventKick ev = new EventKick("A network exception has occurred: " + e);
 		ev.clientID = null;
 		Game.eventsIn.add(ev);
 

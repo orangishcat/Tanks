@@ -113,7 +113,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
         for (TankPlayer t: builds)
         {
             String desc = t.description;
-            if (!t.description.equals(""))
+            if (!t.description.isEmpty())
                 desc += " \n \n ";
 
             desc += "\u00A7255000255255Player build from this level";
@@ -136,7 +136,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
                 TankPlayer t = TankPlayer.fromString(tankStr);
 
                 String desc = t.description;
-                if (!t.description.equals(""))
+                if (!t.description.isEmpty())
                     desc += " \n \n ";
 
                 desc += "\u00A7255127000255Saved player build";
@@ -208,7 +208,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
             }
                 , t.description);
 
-            if (t.description.equals(""))
+            if (t.description.isEmpty())
                 b.enableHover = false;
 
             this.tankButtons.add(b);
@@ -262,7 +262,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
             for (TankAIControlled t: ((OverlayObjectMenu) tankScreen).editor.level.customTanks)
             {
                 String desc = t.description;
-                if (!t.description.equals(""))
+                if (!t.description.isEmpty())
                     desc += " \n \n ";
 
                 desc += "\u00A7000255255255Custom tank from this level";
@@ -286,7 +286,7 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
                 TankAIControlled t = TankAIControlled.fromString(tankStr);
 
                 String desc = t.description;
-                if (!t.description.equals(""))
+                if (!t.description.isEmpty())
                     desc += " \n \n ";
 
                 desc += "\u00A7000255000255Saved custom tank template";

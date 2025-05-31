@@ -377,7 +377,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 };
 
                 t.hoverText = formatDescription(p.desc());
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.maxChars = 11;
                 t.allowLetters = false;
                 t.allowSpaces = false;
@@ -412,7 +412,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 };
 
                 t.hoverText = formatDescription(p.desc());
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.allowDoubles = true;
                 t.allowLetters = false;
                 t.allowSpaces = false;
@@ -456,7 +456,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 };
 
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.hoverText = formatDescription(p.desc());
                 t.images = emblems;
                 t.imageR = 127;
@@ -491,7 +491,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 };
 
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.hoverText = formatDescription(p.desc());
                 return t;
             }
@@ -544,7 +544,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 };
 
                 t.hoverText = formatDescription(p.desc());
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
 
                 if (p.miscType() == Property.MiscType.complexString)
                 {
@@ -580,7 +580,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 };
                 Pointer<Boolean> b = f.cast();
                 t.optionText = b.get() ? "Yes" : "No";
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.hoverText = formatDescription(p.desc());
                 return t;
             }
@@ -611,7 +611,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 };
 
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.hoverText = formatDescription(p.desc());
                 return t;
             }
@@ -660,7 +660,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 };
 
-                t.enableHover = !p.desc().equals("");
+                t.enableHover = !p.desc().isEmpty();
                 t.hoverText = formatDescription(p.desc());
                 t.models = models;
 
@@ -680,7 +680,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     }
                 }
 
-                Collections.sort(musics, (o1, o2) -> o1.compareTo(o2));
+                musics.sort((o1, o2) -> o1.compareTo(o2));
 
                 for (int i = 1; i <= 8; i++)
                 {
@@ -758,7 +758,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                         s.optionText = "";
                 }
 
-                s.enableHover = !p.desc().equals("");
+                s.enableHover = !p.desc().isEmpty();
                 s.hoverText = formatDescription(p.desc());
 
                 return s;
@@ -831,7 +831,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 }
             });
         };
-        b.enableHover = !desc.equals("");
+        b.enableHover = !desc.isEmpty();
         b.hoverText = formatDescription(desc);
 
         if (Tank.class.isAssignableFrom(p.getType()))

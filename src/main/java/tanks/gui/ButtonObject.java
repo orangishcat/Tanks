@@ -94,7 +94,7 @@ public class ButtonObject extends Button
 		drawing.fillInterfaceRect(posX, posY - sizeY / 2 + thickness / 2, sizeX - thickness * 2, thickness);
 		drawing.fillInterfaceRect(posX, posY + sizeY / 2 - thickness / 2, sizeX - thickness * 2, thickness);
 
-		if (!this.text.equals("") && this.showText)
+		if (!this.text.isEmpty() && this.showText)
 		{
 			drawing.setColor(255, 255, 255);
 			drawing.setInterfaceFontSize(12);

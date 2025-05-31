@@ -1,7 +1,6 @@
 package tanks.gui.screen;
 
 import basewindow.BaseFile;
-import tanks.Consumer;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
