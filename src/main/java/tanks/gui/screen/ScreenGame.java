@@ -556,6 +556,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	public ButtonList npcShopList = new ButtonList(new ArrayList<>(), 0, 0, (int) shopOffset, -30);
 	public double gameAge = 0;
 	public boolean playSounds = true;
+	public boolean shouldExit = true;
 
 	public ScreenGame()
 	{
@@ -2045,7 +2046,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 								System.gc();
 							}
-							else if (Game.currentLevel != null && !Game.currentLevel.remote)
+							else if (shouldExit && Game.currentLevel != null && !Game.currentLevel.remote)
 							{
 								if (name != null)
 									Game.exitToEditor(name);

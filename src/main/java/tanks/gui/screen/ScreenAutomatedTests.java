@@ -88,6 +88,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         Replay.currentPlaying = null;
         testOngoing = true;
         setAutoCont(false);
+        paused = false;
         Test.runner.loadTest(i);
     }
 
@@ -96,7 +97,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
     {
         if (testOngoing && !paused)
         {
-            if (!game.paused && Test.runner.updateTest())
+            if ((game == null || !game.paused) && Test.runner.updateTest())
             {
                 if (Test.runner.current != null && (!Test.runner.currentTestPassed() || !autoContinue))
                 {
@@ -158,6 +159,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         {
             Game.screen = game;
             game.playSounds = false;
+            game.shouldExit = false;
             music = game.paused ? testMusicPaused : testMusic;
             musicID = testMusicID;
             game.update();

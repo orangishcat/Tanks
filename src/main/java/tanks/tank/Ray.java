@@ -394,8 +394,7 @@ public class Ray
 
 		if (vX > 0)
 		{
-			// rays moving right will not collide with faces to the left of the ray
-			for (Face f : faceList.leftFaces.tailSet(DummyFace.face.set(false, this.posX - size / 2)))
+			for (Face f : faceList.leftFaces)
 			{
 				double size = this.size;
 
@@ -423,8 +422,7 @@ public class Ray
 		}
 		else if (vX < 0)
 		{
-			// rays moving left will not collide with faces to the right of the ray
-			for (Face f : faceList.rightFaces.tailSet(DummyFace.face.set(false, this.posX + size / 2)))
+			for (Face f : faceList.rightFaces)
 			{
 				double size = this.size;
 
@@ -451,8 +449,7 @@ public class Ray
 
 		if (vY > 0)
 		{
-			// rays moving down will not collide with faces above the ray
-			for (Face f : faceList.topFaces.tailSet(DummyFace.face.set(true, this.posY - size / 2)))
+			for (Face f : faceList.topFaces)
 			{
 				double size = this.size;
 
@@ -485,8 +482,7 @@ public class Ray
 		}
 		else if (vY < 0)
 		{
-			// rays moving up will not collide with faces below the ray
-			for (Face f : faceList.bottomFaces.tailSet(DummyFace.face.set(true, this.posY + size / 2)))
+			for (Face f : faceList.bottomFaces)
 			{
 				double size = this.size;
 

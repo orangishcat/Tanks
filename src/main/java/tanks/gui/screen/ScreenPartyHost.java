@@ -273,9 +273,7 @@ public class ScreenPartyHost extends Screen
             int entries = Math.min(10, server.connections.size() - this.usernamePage * entries_per_page);
 
             for (int i = 0; i < entries; i++)
-            {
                 this.kickButtons[i].update();
-            }
 
             int c = server.connections.size();
 

@@ -961,6 +961,13 @@ public class Game
 		ScreenPartyHost.isServer = false;
 		ScreenPartyLobby.isClient = false;
 
+		try
+		{
+			if (Game.screen instanceof ScreenLevelEditor)
+				((ScreenLevelEditor) Game.screen).save();
+		}
+		catch (Exception ignored) {}
+
 		cleanUp();
 
 		Game.crashMessage = e.toString();

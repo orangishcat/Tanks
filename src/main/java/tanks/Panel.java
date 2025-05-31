@@ -1100,6 +1100,9 @@ public class Panel
 
 	public static void setTickSprint(boolean tickSprint)
 	{
+		if (tickSprint == Panel.tickSprint)
+			return;
+
 		Panel.tickSprint = tickSprint;
 
 		if (Panel.tickSprint)

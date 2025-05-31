@@ -816,6 +816,9 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public void finalCheckAndShoot(double offset)
 	{
+		if (targetEnemy == null)
+			return;
+
 		Ray a = Ray.newRay(this.posX, this.posY, this.angle + offset, this.bullet.bounces, this, 2.5)
 					.setSize(bullet.size).moveOut(size / 2.5);
 		Movable m = a.getTarget();

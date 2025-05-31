@@ -22,6 +22,8 @@ public class TestRegistry
         registerTest(TestAttribute.class);
         registerTest(TestSupportTank.class);
         registerTest(TestPathfinding.class);
+        registerTest(TestDiagPathfind.class);
+        registerTest(TestPerformance.class);
     }
 
     public void registerTest(Class<? extends Test> t)

@@ -479,9 +479,7 @@ public class TextBox implements IDrawable, ITrigger
 		Panel.selectedTextBox = null;
 
 		if (Game.glowEnabled)
-		{
-			this.submitEffect();
-		}
+            this.submitEffect();
 	}
 
 	public void submitEffect()
