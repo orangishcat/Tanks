@@ -39,8 +39,7 @@ public class ScreenCinematicTitle extends Screen implements ISeparateBackgroundS
         Drawing.drawing.setInterfaceFontSize(70);
 
         double c = 0.5 - (8) * 3.0 / 30;
-        if (c < 0)
-            c = 1 + c;
+        c = 1 + c;
 
         double[] col = Game.getRainbowColor(c);
 

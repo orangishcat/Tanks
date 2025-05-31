@@ -75,10 +75,19 @@ public class FontRenderer extends BaseFontRenderer
 
 	public void drawString(double x, double y, double z, double sX, double sY, String s)
 	{
+		drawString(x, y, z, sX, sY, s, true);
+	}
+
+	public void drawString(double x, double y, double z, double sX, double sY, String s, boolean depth)
+	{
 		if (window.drawingShadow)
 			return;
 
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		if (depth)
+			GL11.glEnable(GL11.GL_DEPTH_TEST);
+		else
+			GL11.glDisable(GL11.GL_DEPTH_TEST);
+
 		double opacity = this.window.colorA;
 
 		double curX = x;

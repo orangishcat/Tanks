@@ -50,6 +50,5 @@ public class TankModels
         Tank.health_model = Drawing.drawing.createModel("/models/tankhealth/");
 
         Game.registerTankEmblems();
-
     }
 }

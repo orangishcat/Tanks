@@ -56,7 +56,7 @@ public class SelectorTeam extends SelectorChoice<Team>
 
         selectedIndex += add;
         if (Game.currentLevel.enableTeams && editor == null)
-            setChoice(editor, o, -1);
+            setChoice(null, o, -1);
         else
             setChoice(editor, o, selectedIndex);
     }

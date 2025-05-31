@@ -620,8 +620,7 @@ public class ScreenCrusadeEditor extends Screen implements ITankBuildScreen
                 Drawing.drawing.displayInterfaceText(this.centerX, this.centerY + o, "There are no %s in the crusade.", missing[0]);
             else if (m == 2)
                 Drawing.drawing.displayInterfaceText(this.centerX, this.centerY + o, "There are no %s or %s in the crusade.", missing[0], missing[1]);
-            else if (m == 3)
-                Drawing.drawing.displayInterfaceText(this.centerX, this.centerY + o, "There are no %s, %s, or %s in the crusade.", missing[0], missing[1], missing[2]);
+            else Drawing.drawing.displayInterfaceText(this.centerX, this.centerY + o, "There are no %s, %s, or %s in the crusade.", missing[0], missing[1], missing[2]);
 
             if (m > 0 && !readOnly)
                 Drawing.drawing.displayInterfaceText(this.centerX, this.centerY + 30, "Use the '+' buttons at the top to add some!");

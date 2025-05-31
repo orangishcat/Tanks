@@ -204,7 +204,7 @@ public class ReplayEvents
         registered = true;
         register(EventSendClientDetails.class, EventPing.class, EventConnectionSuccess.class, EventKick.class,
                 EventAnnounceConnection.class, EventChat.class, EventPlayerChat.class, EventLoadLevel.class,
-                EventEnterLevel.class, EventLevelEndQuick.class, EventLevelEnd.class, EventReturnToLobby.class,
+                EventEnterLevel.class, EventLevelFinishedQuick.class, EventLevelExit.class, EventReturnToLobby.class,
                 EventBeginCrusade.class, EventReturnToCrusade.class, EventShowCrusadeStats.class,
                 EventLoadCrusadeHotbar.class, EventSetupHotbar.class, EventAddShopItem.class, EventSortShopButtons.class,
                 EventPurchaseItem.class, EventSetItem.class, EventSetItemBarSlot.class, EventLoadItemBarSlot.class,

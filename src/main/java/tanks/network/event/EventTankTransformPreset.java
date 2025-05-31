@@ -70,11 +70,8 @@ public class EventTankTransformPreset extends PersonalEvent
             t.lightIntensity = target.lightIntensity;
             t.lightSize = target.lightSize;
 
-            if (((TankRemote) t).tank instanceof TankAIControlled)
-            {
-                ((TankAIControlled) ((TankRemote) t).tank).bullet.shotCount = target.bullet.shotCount;
-                ((TankAIControlled) ((TankRemote) t).tank).bullet.multishotSpread = target.bullet.multishotSpread;
-            }
+            ((TankAIControlled) ((TankRemote) t).tank).bullet.shotCount = target.bullet.shotCount;
+            ((TankAIControlled) ((TankRemote) t).tank).bullet.multishotSpread = target.bullet.multishotSpread;
 
             t.mandatoryKill = target.mandatoryKill;
             t.musicTracks = target.musicTracks;

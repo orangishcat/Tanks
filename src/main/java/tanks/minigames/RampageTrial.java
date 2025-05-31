@@ -71,7 +71,7 @@ public class RampageTrial extends Minigame
         if (ScreenPartyLobby.isClient)
             return;
 
-        if (target instanceof IServerPlayerTank && !ScreenPartyLobby.isClient)
+        if (target instanceof IServerPlayerTank)
         {
             playerDeathTimes.put(((IServerPlayerTank) target).getPlayer(), this.age);
             playerDeaths.put(((IServerPlayerTank) target).getPlayer(), target);
@@ -160,7 +160,7 @@ public class RampageTrial extends Minigame
                 {
                     double duration = 10 + 10;
                     double detAge = 10;
-                    m.addStatusEffect(StatusEffect.arcade_rampage[power - 1], 0, detAge, duration);
+                    m.em().addStatusEffect(StatusEffect.arcade_rampage[power - 1], 0, detAge, duration);
                 }
             }
         }

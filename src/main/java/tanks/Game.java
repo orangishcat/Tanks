@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.bullet.*;
 import tanks.extension.Extension;
 import tanks.extension.ExtensionRegistry;
+import tanks.generator.LevelGenerator;
 import tanks.generator.LevelGeneratorRandom;
 import tanks.gui.Button;
 import tanks.gui.ChatFilter;
@@ -350,8 +351,9 @@ public class Game
 		NetworkEventMap.register(EventLoadLevel.class);
 		NetworkEventMap.register(EventEnterLevel.class);
 		NetworkEventMap.register(EventSetLevelVersus.class);
-		NetworkEventMap.register(EventLevelEndQuick.class);
-		NetworkEventMap.register(EventLevelEnd.class);
+		NetworkEventMap.register(EventLevelFinishedQuick.class);
+		NetworkEventMap.register(EventLevelFinished.class);
+		NetworkEventMap.register(EventLevelExit.class);
 		NetworkEventMap.register(EventReturnToLobby.class);
 		NetworkEventMap.register(EventBeginCrusade.class);
 		NetworkEventMap.register(EventReturnToCrusade.class);
@@ -489,14 +491,29 @@ public class Game
 		new RegistryItem.ItemEntry(Game.registryItem, item, name, image);
 	}
 
+	public static void registerGenerator(Class<? extends LevelGenerator> generator, String name)
+	{
+		try
+		{
+			Game.registryGenerator.generators.put(name, generator.getConstructor().newInstance());
+		}
+		catch (Exception e)
+		{
+			Game.exitToCrash(e);
+		}
+	}
+
 	public static void registerTankModel(String dir)
 	{
 		Game.registryModelTank.registerFullModel(dir);
 	}
 
-	public static void registerTankEmblem(String dir)
+	public static void registerTankEmblems()
 	{
-		Game.registryModelTank.tankEmblems.add(new RegistryModelTank.TankModelEntry("emblems/" + dir));
+		ArrayList<String> emblems = Game.game.fileManager.getInternalFileContents("/images/emblems/emblems.txt");
+
+		for (String s: emblems)
+            Game.registryModelTank.tankEmblems.add(new RegistryModelTank.TankModelEntry("emblems/" + s + ".png"));
 	}
 
 	public static void registerMinigame(Class<? extends Minigame> minigame, String name, String desc)

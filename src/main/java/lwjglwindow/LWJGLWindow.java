@@ -895,6 +895,17 @@ public class LWJGLWindow extends BaseWindow
     }
 
 	@Override
+	public void transform(Matrix4 m)
+	{
+		double[][] matrix = m.values;
+		double[] d = new double[]{matrix[0][0], matrix[0][1], matrix[0][2], matrix[0][3],
+				matrix[1][0], matrix[1][1], matrix[1][2], matrix[1][3],
+				matrix[2][0], matrix[2][1], matrix[2][2], matrix[2][3],
+				matrix[3][0], matrix[3][1], matrix[3][2], matrix[3][3]};
+		glMultMatrixd(d);
+	}
+
+	@Override
 	public void calculateBillboard()
 	{
 		angled = !(yaw == 0 && pitch == 0 && roll == 0);

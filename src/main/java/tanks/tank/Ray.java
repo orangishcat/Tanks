@@ -12,6 +12,8 @@ import java.util.Arrays;
 
 public class Ray
 {
+	public static double min_trace_size = 5;
+
 	public static int chunksAdded;
 	/** Caches the chunks to avoid creating new temp objects */
 	public static Chunk[] chunkCache = new Chunk[40];
@@ -37,6 +39,7 @@ public class Ray
 	public boolean dotted = false;
 
 	public double speed = 10;
+	public double range;
 
 	public double age = 0;
 	public int traceAge;
@@ -97,6 +100,7 @@ public class Ray
 		this.ignoreShootThrough = false;
 
 		this.age = 0;
+		this.range = 0;
 		this.acquiredTarget = false;
 		this.tank = tank;
 
@@ -142,6 +146,12 @@ public class Ray
     public Ray setMaxDistance(double distance)
 	{
 		setMaxChunks((int) (distance / Game.tile_size / Chunk.chunkSize + 1));
+		return this;
+	}
+
+	public Ray setRange(double range)
+	{
+		this.range = range;
 		return this;
 	}
 
@@ -220,9 +230,25 @@ public class Ray
 
 			if (result.collisionFace != null)
 			{
+				double dx = result.collisionX - posX, dy = result.collisionY - posY;
+
+				if (this.range > 0)
+				{
+					double dist = Math.sqrt(dx * dx + dy * dy);
+					if (this.range < dist)
+					{
+						result.collisionX = posX + dx * range / dist;
+						result.collisionY = posY + dy * range / dist;
+						dx = result.collisionX - posX;
+						dy = result.collisionY - posY;
+						this.bounces = -1;
+					}
+					else
+						this.range -= dist;
+				}
+
 				if (trace && ScreenGame.isUpdatingGame())
 				{
-					double dx = result.collisionX - posX, dy = result.collisionY - posY;
 					double steps = (Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)) / (1 + Math.pow(this.vX, 2) + Math.pow(this.vY, 2))) + 1);
 
 					if (dotted)

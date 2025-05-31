@@ -155,7 +155,7 @@ public class Panel
 		Game.resetTiles();
 
 		if (Game.game.fullscreen)
-			Game.game.window.setFullscreen(Game.game.fullscreen);
+			Game.game.window.setFullscreen(true);
 
 		Game.game.window.setIcon("/images/icon64.png");
 

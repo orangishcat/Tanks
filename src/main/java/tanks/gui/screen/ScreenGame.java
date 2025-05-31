@@ -12,6 +12,7 @@ import tanks.bullet.BulletArc;
 import tanks.generator.LevelGeneratorVersus;
 import tanks.gui.*;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
+import tanks.hotbar.Hotbar;
 import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.item.ItemBullet;
@@ -2406,42 +2407,32 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		if ((Game.playerTank == null || Game.playerTank.destroy) && !ScreenGame.finishedQuick && Drawing.drawing.unzoomedScale < Drawing.drawing.interfaceScale)
 		{
-			AtomicBoolean found = new AtomicBoolean(false);
-			Game.getMovablesInRadius(x, y, 100).stream().filter(m -> m instanceof Tank).findFirst().ifPresent(t ->
-			{
-				for (Movable m: Game.movables)
-				{
-					if (m instanceof Tank && !m.destroy && !((Tank) m).hidden)
-					{
-						double dx = x - m.posX;
-						double dy = y - m.posY;
+            for (Movable m : Game.getMovablesInRadius(x, y, 100))
+            {
+                if (!(m instanceof Tank) || m.destroy || ((Tank) m).hidden)
+                    continue;
 
-						if (dx * dx + dy * dy < Math.pow(((Tank) m).size + Game.tile_size / 2, 2))
-						{
-							this.spectatingTank = (Tank) m;
+                this.spectatingTank = (Tank) m;
 
-							if (Panel.panel.zoomTimer > 0)
-							{
-								Drawing.drawing.lastSwitchedPlayerX = Drawing.drawing.lastPlayerX;
-								Drawing.drawing.lastSwitchedPlayerY = Drawing.drawing.lastPlayerY;
-								Drawing.drawing.spectateTransitionTime = Drawing.drawing.spectateTransitionTimeBase;
-							}
+                if (Panel.panel.zoomTimer > 0)
+                {
+                    Drawing.drawing.lastSwitchedPlayerX = Drawing.drawing.lastPlayerX;
+                    Drawing.drawing.lastSwitchedPlayerY = Drawing.drawing.lastPlayerY;
+                    Drawing.drawing.spectateTransitionTime = Drawing.drawing.spectateTransitionTimeBase;
+                }
 
-							Panel.panel.pastPlayerX.clear();
-							Panel.panel.pastPlayerY.clear();
-							Panel.panel.pastPlayerTime.clear();
+                Panel.panel.pastPlayerX.clear();
+                Panel.panel.pastPlayerY.clear();
+                Panel.panel.pastPlayerTime.clear();
 
-							Panel.panel.pastPlayerX.add(Drawing.drawing.lastPlayerX);
-							Panel.panel.pastPlayerY.add(Drawing.drawing.lastPlayerY);
-							Panel.panel.pastPlayerTime.add(Panel.panel.age - Drawing.drawing.getTrackOffset());
+                Panel.panel.pastPlayerX.add(Drawing.drawing.lastPlayerX);
+                Panel.panel.pastPlayerY.add(Drawing.drawing.lastPlayerY);
+                Panel.panel.pastPlayerTime.add(Panel.panel.age - Drawing.drawing.getTrackOffset());
 
-							Drawing.drawing.movingCamera = true;
-							return true;
-						}
-					}
-				}
-			}
-		}
+                Drawing.drawing.movingCamera = true;
+                return true;
+            }
+        }
 
 		return false;
 	}
@@ -3159,8 +3150,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		if (Game.playerTank != null && Game.playerTank.showTouchCircle())
 		{
 			Drawing.drawing.setColor(255, 127, 0, 63);
-			Drawing.drawing.fillInterfaceOval(Drawing.drawing.toInterfaceCoordsX(Game.playerTank.posX),
-					Drawing.drawing.toInterfaceCoordsY(Game.playerTank.posY),
+			Drawing.drawing.fillInterfaceOval(Drawing.drawing.gameToInterfaceCoordsX(Game.playerTank.posX),
+					Drawing.drawing.gameToInterfaceCoordsY(Game.playerTank.posY),
 					Game.playerTank.getTouchCircleSize(), Game.playerTank.getTouchCircleSize());
 		}
 

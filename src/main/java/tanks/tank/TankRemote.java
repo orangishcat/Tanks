@@ -116,33 +116,7 @@ public class TankRemote extends Tank
 	@Override
 	public void update()
 	{
-		if (this.localAge <= 0)
-		{
-			this.currentKnownPosX = this.posX;
-			this.currentKnownPosY = this.posY;
-			this.prevKnownPosX = this.posX;
-			this.prevKnownPosY = this.posY;
-		}
-
-		this.timeSinceRefresh += Panel.frameFrequency;
-		this.localAge += Panel.frameFrequency;
-
-		super.update();
-
-		if (this.destroy)
-		{
-			this.vX = 0;
-			this.vY = 0;
-			return;
-		}
-
-		double pvx = this.prevKnownVXFinal;
-		double pvy = this.prevKnownVYFinal;
-		double cvx = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
-		double cvy = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
-
-		this.posX = cubicInterpolationVelocity(this.prevKnownPosX, pvx, this.currentKnownPosX, cvx, this.timeSinceRefresh, this.interpolationTime);
-		this.posY = cubicInterpolationVelocity(this.prevKnownPosY, pvy, this.currentKnownPosY, cvy, this.timeSinceRefresh, this.interpolationTime);
+		if (updateMovement()) return;
 //		this.posX = this.currentKnownPosX;
 //		this.posY = this.currentKnownPosY;
 		double frac = Math.min(1, this.timeSinceRefresh / this.interpolationTime);
@@ -183,6 +157,38 @@ public class TankRemote extends Tank
 			else
 				this.orientation -= Movable.angleBetween(this.orientation + Math.PI, dir) / 20 * dist;
 		}
+	}
+
+	public boolean updateMovement()
+	{
+		if (this.localAge <= 0)
+		{
+			this.currentKnownPosX = this.posX;
+			this.currentKnownPosY = this.posY;
+			this.prevKnownPosX = this.posX;
+			this.prevKnownPosY = this.posY;
+		}
+
+		this.timeSinceRefresh += Panel.frameFrequency;
+		this.localAge += Panel.frameFrequency;
+
+		super.update();
+
+		if (this.destroy)
+		{
+			this.vX = 0;
+			this.vY = 0;
+			return true;
+		}
+
+		double pvx = this.prevKnownVXFinal;
+		double pvy = this.prevKnownVYFinal;
+		double cvx = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVX) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+		double cvy = em().getAttributeValue(AttributeModifier.velocity, this.currentKnownVY) * ScreenGame.finishTimer / ScreenGame.finishTimerMax;
+
+		this.posX = cubicInterpolationVelocity(this.prevKnownPosX, pvx, this.currentKnownPosX, cvx, this.timeSinceRefresh, this.interpolationTime);
+		this.posY = cubicInterpolationVelocity(this.prevKnownPosY, pvy, this.currentKnownPosY, cvy, this.timeSinceRefresh, this.interpolationTime);
+		return false;
 	}
 
 	@Override

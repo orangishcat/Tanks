@@ -3515,7 +3515,7 @@ public class TankAIControlled extends Tank implements ITankField
 	}
 
 	@Override
-	public void setBufferCooldown(double value)
+	public void setBufferCooldown(Item.ItemStack<?> stack, double value)
 	{
 		this.bulletItem.cooldown = Math.max(this.bulletItem.cooldown, value);
 		this.mineItem.cooldown = Math.max(this.mineItem.cooldown, value);

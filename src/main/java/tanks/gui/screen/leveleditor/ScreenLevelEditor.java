@@ -785,8 +785,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				panDown = false;
 		}
 
-		double px = Drawing.drawing.toInterfaceCoordsX(panCurrentX);
-		double py = Drawing.drawing.toInterfaceCoordsY(panCurrentY);
+		double px = Drawing.drawing.gameToInterfaceCoordsX(panCurrentX);
+		double py = Drawing.drawing.gameToInterfaceCoordsY(panCurrentY);
 
 		if (!zoomDown && panDown)
 		{
@@ -803,8 +803,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		if (zoomDown)
 		{
-			double zx = Drawing.drawing.toInterfaceCoordsX(zoomCurrentX);
-			double zy = Drawing.drawing.toInterfaceCoordsY(zoomCurrentY);
+			double zx = Drawing.drawing.gameToInterfaceCoordsX(zoomCurrentX);
+			double zy = Drawing.drawing.gameToInterfaceCoordsY(zoomCurrentY);
 			double d = Math.sqrt(Math.pow(px - zx, 2) + Math.pow(py - zy, 2));
 
 			if (prevZoomDown)
