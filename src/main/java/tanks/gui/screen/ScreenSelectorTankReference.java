@@ -122,7 +122,7 @@ public class ScreenSelectorTankReference extends ScreenEditorTanksONable<ITankFi
 
             TankAIControlled t;
 
-            if (i <= 0)
+            if (i == 0)
                 t = null;
             else if (i <= Game.registryTank.tankEntries.size())
             {

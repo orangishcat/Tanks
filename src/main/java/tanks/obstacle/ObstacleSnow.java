@@ -163,11 +163,6 @@ public class ObstacleSnow extends Obstacle
         }
     }
 
-    public byte getOptionsByte(double h)
-    {
-        return 0;
-    }
-
     public double getTileHeight()
     {
         double shrubScale = 0.25;

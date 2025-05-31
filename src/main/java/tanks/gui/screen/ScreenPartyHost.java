@@ -140,7 +140,7 @@ public class ScreenPartyHost extends Screen
     {
         super(350, 40, 380, 60);
 
-        if (ScreenPartyHost.server == null || ScreenPartyHost.server.connections.size() <= 0)
+        if (ScreenPartyHost.server == null || ScreenPartyHost.server.connections.isEmpty())
             this.music = "menu_3.ogg";
         else
             this.music = "menu_4.ogg";
@@ -283,7 +283,7 @@ public class ScreenPartyHost extends Screen
 
             if (lastConnectionCount != c)
             {
-                if (c <= 0)
+                if (c == 0)
                     this.music = "menu_3.ogg";
                 else
                     this.music = "menu_4.ogg";

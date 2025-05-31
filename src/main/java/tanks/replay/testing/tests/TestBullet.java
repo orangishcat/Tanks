@@ -9,8 +9,8 @@ public class TestBullet extends Test
     {
         super("bullet test", TestType.REPLAY);
         this.name = "Bullet test";
-        this.maximumTime = 60 * 100;
-        this.fixedFPS = true;
+        this.maximumTime = 55 * 100;
+//        this.fixedFPS = true;
         expectAllyWin();
     }
 }

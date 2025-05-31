@@ -82,12 +82,9 @@ public abstract class ScreenElement
         public TextWithStyling styling;
         public double baseColorA = -1;
 
-        public CenterMessage(String message, Object... objects)
+        public CenterMessage(String message, int duration, Object... objects)
         {
-            this(String.format(message, objects), 300);
-        }
-        public CenterMessage(String message, int duration)
-        {
+            message = String.format(message, objects);
             int brightness = (ScreenGame.getInstance() != null && Level.isDark()) ? 255 : 0;
             this.styling = new TextWithStyling(message, brightness, brightness, brightness, 80 - Math.max(8, message.length() * 2));
             this.styling.colorA = 128;

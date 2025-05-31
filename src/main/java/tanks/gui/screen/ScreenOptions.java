@@ -213,7 +213,8 @@ public class ScreenOptions extends Screen
 			f.println("vsync=" + Game.vsync);
 			f.println("max_fps=" + Game.maxFPS);
 			f.println("antialiasing=" + Game.antialiasing);
-			f.println("perspective=" + ScreenOptionsGraphics.viewNo);
+			f.println("perspective=" + ScreenOptionsGraphics.viewNum);
+			f.println("levels_sort_order=" + ScreenSavedLevels.sortByTime);
 			f.println("preview_crusades=" + Game.previewCrusades);
 			f.println("tank_textures=" + Game.tankTextures);
 			f.println("xray_bullets=" + Game.xrayBullets);
@@ -403,8 +404,8 @@ public class ScreenOptions extends Screen
 						Game.warnBeforeClosing = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "perspective":
-						ScreenOptionsGraphics.viewNo = Integer.parseInt(optionLine[1]);
-						switch (ScreenOptionsGraphics.viewNo)
+						ScreenOptionsGraphics.viewNum = Integer.parseInt(optionLine[1]);
+						switch (ScreenOptionsGraphics.viewNum)
 						{
 							case 0:
 								Game.angledView = false;
@@ -426,6 +427,9 @@ public class ScreenOptions extends Screen
 								Game.followingCam = true;
 								Game.firstPerson = true;
 						}
+						break;
+					case "levels_sort_order":
+						ScreenSavedLevels.sortByTime = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "tank_textures":
 						Game.tankTextures = Boolean.parseBoolean(optionLine[1]);

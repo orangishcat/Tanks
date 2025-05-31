@@ -351,7 +351,7 @@ public class ScreenEditorBullet extends ScreenEditorTanksONable<Bullet>
             {
                 Bullet b = screen.target.get();
 
-                if (colorRed.inputText.length() <= 0)
+                if (colorRed.inputText.isEmpty())
                     colorRed.inputText = colorRed.previousInputText;
 
                 int red = Integer.parseInt(colorRed.inputText);
@@ -376,7 +376,7 @@ public class ScreenEditorBullet extends ScreenEditorTanksONable<Bullet>
             {
                 Bullet b = screen.target.get();
 
-                if (colorGreen.inputText.length() <= 0)
+                if (colorGreen.inputText.isEmpty())
                     colorGreen.inputText = colorGreen.previousInputText;
 
                 int green = Integer.parseInt(colorGreen.inputText);
@@ -401,7 +401,7 @@ public class ScreenEditorBullet extends ScreenEditorTanksONable<Bullet>
             {
                 Bullet b = screen.target.get();
 
-                if (colorBlue.inputText.length() <= 0)
+                if (colorBlue.inputText.isEmpty())
                     colorBlue.inputText = colorBlue.previousInputText;
 
                 int blue = Integer.parseInt(colorBlue.inputText);

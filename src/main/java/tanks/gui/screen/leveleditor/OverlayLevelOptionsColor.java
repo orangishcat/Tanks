@@ -21,7 +21,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorRed = new TextBoxSlider(this.centerX - objXSpace / 2, this.centerY - this.objYSpace * 2, this.objWidth, this.objHeight, "Red", () ->
         {
-            if (colorRed.inputText.length() <= 0)
+            if (colorRed.inputText.isEmpty())
                 colorRed.inputText = colorRed.previousInputText;
 
             screenLevelEditor.level.colorR = Integer.parseInt(colorRed.inputText);
@@ -44,7 +44,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorGreen = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace / 2, this.objWidth, this.objHeight, "Green", () ->
         {
-            if (colorGreen.inputText.length() <= 0)
+            if (colorGreen.inputText.isEmpty())
                 colorGreen.inputText = colorGreen.previousInputText;
 
             screenLevelEditor.level.colorG = Integer.parseInt(colorGreen.inputText);
@@ -67,7 +67,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorBlue = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Blue", () ->
         {
-            if (colorBlue.inputText.length() <= 0)
+            if (colorBlue.inputText.isEmpty())
                 colorBlue.inputText = colorBlue.previousInputText;
 
             screenLevelEditor.level.colorB = Integer.parseInt(colorBlue.inputText);
@@ -90,7 +90,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorVarRed = new TextBox(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace * 2, this.objWidth, this.objHeight, "Red noise", () ->
         {
-            if (colorVarRed.inputText.length() <= 0)
+            if (colorVarRed.inputText.isEmpty())
                 colorVarRed.inputText = colorVarRed.previousInputText;
 
             screenLevelEditor.level.colorVarR = Integer.parseInt(colorVarRed.inputText);
@@ -107,7 +107,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorVarGreen = new TextBox(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace / 2, this.objWidth, this.objHeight, "Green noise", () ->
         {
-            if (colorVarGreen.inputText.length() <= 0)
+            if (colorVarGreen.inputText.isEmpty())
                 colorVarGreen.inputText = colorVarGreen.previousInputText;
 
             screenLevelEditor.level.colorVarG = Integer.parseInt(colorVarGreen.inputText);
@@ -124,7 +124,7 @@ public class OverlayLevelOptionsColor extends ScreenLevelEditorOverlay
 
         colorVarBlue = new TextBox(this.centerX + this.objXSpace / 2, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Blue noise", () ->
         {
-            if (colorVarBlue.inputText.length() <= 0)
+            if (colorVarBlue.inputText.isEmpty())
                 colorVarBlue.inputText = colorVarBlue.previousInputText;
 
             screenLevelEditor.level.colorVarB = Integer.parseInt(colorVarBlue.inputText);

@@ -277,6 +277,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
             Explosion e = new Explosion(this);
             e.explode();
+            destroy = true;
 
             this.item.liveMines--;
         }

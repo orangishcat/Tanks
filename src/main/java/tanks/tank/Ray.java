@@ -62,6 +62,12 @@ public class Ray
 		return cacheRay.set(x, y, angle, bounces, tank, speed);
 	}
 
+	/** Creates another ray with the properties of the last ray.<br>
+	 * To set custom properties on your ray copy:
+	 * <blockquote><pre>
+	 *     Ray copy = Ray.newRay(params).copy()
+	 * </pre></blockquote>
+	 * */
 	public Ray copy()
 	{
 		return new Ray().set(posX, posY, angle, bounces, tank, speed);
@@ -90,6 +96,7 @@ public class Ray
 		this.ignoreDestructible = false;
 		this.ignoreShootThrough = false;
 
+		this.age = 0;
 		this.acquiredTarget = false;
 		this.tank = tank;
 
@@ -300,12 +307,12 @@ public class Ray
 		return c.staticFaces;
 	}
 
+	private static boolean isDynamic = false;
 	public void checkFaceList(Chunk current, Result result, Function<Chunk, Chunk.FaceList> faceList, boolean firstBounce)
 	{
 		if (current == null)
 			return;
 
-		double collisionX = -1, collisionY = -1;
 		int totalChunksChecked = 0;
 
 		chunkCheck:
@@ -319,7 +326,7 @@ public class Ray
 			chunksAdded = 0;
 
 			// move forward one chunk in the ray's direction
-			Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : current;
+			Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : null;
 			// add current chunk and chunk in front
 			addChunks(current, mid);
 
@@ -344,11 +351,11 @@ public class Ray
 
 				totalChunksChecked++;
 
-				if (Chunk.debug && trace)
+				if (Chunk.debug && trace && (isDynamic = !isDynamic))
 				{
 					// displays the order of chunks checked and locations that the ray checked
 					Game.effects.add(Effect.createNewEffect(
-							(chunk.chunkX + 0.5) * Chunk.chunkSize * Game.tile_size + (totalChunksChecked * 5),
+							(chunk.chunkX + 0.5) * Chunk.chunkSize * Game.tile_size + (totalChunksChecked * 15),
 							(chunk.chunkY + 0.5) * Chunk.chunkSize * Game.tile_size,
 							150, Effect.EffectType.chain, 90
 					).setRadius(totalChunksChecked));
@@ -362,9 +369,7 @@ public class Ray
 					}
 				}
 
-				checkCollisionIn(result, faceList.apply(chunk), firstBounce, collisionX, collisionY);
-				collisionX = result.collisionX;
-				collisionY = result.collisionY;
+				checkCollisionIn(result, faceList.apply(chunk), firstBounce);
 
 				if (result.collisionFace != null)
 					break chunkCheck;
@@ -380,11 +385,12 @@ public class Ray
 				isInsideObstacle(x - size / 2, y + size / 2);
 	}
 
-	public void checkCollisionIn(Result result, Chunk.FaceList faceList, boolean firstBounce, double collisionX, double collisionY)
+	public void checkCollisionIn(Result result, Chunk.FaceList faceList, boolean firstBounce)
 	{
 		Face collisionFace = null;
 		double t = Double.MAX_VALUE;
 		boolean corner = false;
+		double collisionX = 0, collisionY = 0;
 
 		if (vX > 0)
 		{
@@ -532,9 +538,7 @@ public class Ray
 
     public static final class Result
     {
-        private double t;
-        private double collisionX;
-        private double collisionY;
+        private double t, collisionX, collisionY;
         private Face collisionFace;
         private boolean corner;
 
@@ -591,7 +595,7 @@ public class Ray
 	{
 		for (Chunk c : chunks)
 		{
-			if (c == null)
+			if (c == null || (chunksAdded > 0 && c == chunkCache[chunksAdded - 1]))
 				continue;
 
 			c.compareTo = compare;

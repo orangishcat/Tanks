@@ -132,7 +132,7 @@ public class ScreenPlaySavedLevels extends Screen
 
 		this.sort.draw();
 
-		if (levels.buttons.size() <= 0)
+		if (levels.buttons.isEmpty())
 		{
 			Drawing.drawing.setColor(0, 0, 0);
 			Drawing.drawing.setInterfaceFontSize(24);

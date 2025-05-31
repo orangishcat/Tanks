@@ -26,15 +26,11 @@ public class ScreenOptionsFramerate extends Screen
         maxFPS.b1 = 210;
     }
 
-    Button vsync = new Button(this.centerX, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "V-Sync", new Runnable()
+    Button vsync = new Button(this.centerX, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "V-Sync", () ->
     {
-        @Override
-        public void run()
-        {
-            Game.vsync = true;
-            Game.maxFPS = 0;
-            Game.game.window.setVsync(Game.vsync);
-        }
+        Game.vsync = true;
+        Game.maxFPS = 0;
+        Game.game.window.setVsync(Game.vsync);
     },
             "Limits framerate to your screen's refresh rate------May fix issues with screen tearing");
 
@@ -47,7 +43,7 @@ public class ScreenOptionsFramerate extends Screen
             Game.vsync = false;
             Game.game.window.setVsync(Game.vsync);
 
-            if (maxFPS.inputText.length() <= 0)
+            if (maxFPS.inputText.isEmpty())
                 maxFPS.inputText = maxFPS.previousInputText;
 
             Game.maxFPS = Integer.parseInt(maxFPS.inputText);
@@ -56,29 +52,21 @@ public class ScreenOptionsFramerate extends Screen
             , Game.maxFPS, 10, 240, 10);
 
 
-    Button unlimited = new Button(this.centerX, this.centerY + this.objYSpace * 1, this.objWidth, this.objHeight, "Unlimited", new Runnable()
+    Button unlimited = new Button(this.centerX, this.centerY + this.objYSpace * 1, this.objWidth, this.objHeight, "Unlimited", () ->
     {
-        @Override
-        public void run()
-        {
-            Game.vsync = false;
-            Game.maxFPS = 0;
-            Game.game.window.setVsync(Game.vsync);
-        }
+        Game.vsync = false;
+        Game.maxFPS = 0;
+        Game.game.window.setVsync(Game.vsync);
     },
             "Disables the framerate limit------May cause issues with inconsistent game speed");
 
-    Button manual = new Button(this.centerX, this.centerY - this.objYSpace * 0.25, this.objWidth, this.objHeight, "Manual limit", new Runnable()
+    Button manual = new Button(this.centerX, this.centerY - this.objYSpace * 0.25, this.objWidth, this.objHeight, "Manual limit", () ->
     {
-        @Override
-        public void run()
-        {
-            Game.vsync = false;
-            Game.maxFPS = 60;
-            maxFPS.inputText = Game.maxFPS + "";
-            maxFPS.value = Game.maxFPS;
-            Game.game.window.setVsync(Game.vsync);
-        }
+        Game.vsync = false;
+        Game.maxFPS = 60;
+        maxFPS.inputText = Game.maxFPS + "";
+        maxFPS.value = Game.maxFPS;
+        Game.game.window.setVsync(Game.vsync);
     },
             "Set a manual framerate limit");
 

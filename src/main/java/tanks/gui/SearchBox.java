@@ -8,6 +8,9 @@ import tanks.Panel;
 
 public class SearchBox extends TextBox
 {
+	private static final String[] autoFocusTooltip = new String[]{"Press t to focus"};
+	public boolean autoFocus = true;
+
 	public SearchBox(double x, double y, double sX, double sY, String text, Runnable f, String defaultText)
 	{
 		super(x, y, sX, sY, text, f, defaultText);
@@ -97,6 +100,21 @@ public class SearchBox extends TextBox
 			drawing.setInterfaceFontSize(this.sizeY * 0.6);
 			drawing.drawInterfaceText(this.posX + this.sizeX / 2 - this.sizeY / 2, this.posY - 2.5, "x");
 		}
+
+		if (autoFocus && hover)
+			Drawing.drawing.drawTooltip(autoFocusTooltip);
+	}
+
+	@Override
+	public void update()
+	{
+		super.update();
+		if (autoFocus && Panel.selectedTextBox == null && Game.game.window.inputCodepoints.contains('t'))
+		{
+			Game.game.window.inputCodepoints.clear();
+			Panel.selectedTextBox = this;
+			selected = true;
+		}
 	}
 
 	@Override
@@ -159,7 +177,7 @@ public class SearchBox extends TextBox
 			Drawing.drawing.drawInterfaceText(posX, posY, inputText + "\u00a7127127127255_");
 		else
 		{
-			if (this.inputText.length() <= 0)
+			if (this.inputText.isEmpty())
 				Drawing.drawing.drawInterfaceText(posX, posY, "\u00a7127127127255Search");
 			else
 				Drawing.drawing.drawInterfaceText(posX, posY, inputText);

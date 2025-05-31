@@ -82,23 +82,6 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
     public Button dismissMessage = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + Drawing.drawing.objHeight, Drawing.drawing.objWidth, Drawing.drawing.objHeight, "Ok", () -> message = null);
 
     @Override
-    public void setupLayoutParameters()
-    {
-        this.interfaceScaleZoomOverride = 1;
-        centerX = Drawing.drawing.baseInterfaceSizeX / 2;
-        centerY = Drawing.drawing.baseInterfaceSizeY / 2;
-        Drawing.drawing.interfaceSizeX = Drawing.drawing.baseInterfaceSizeX;
-        Drawing.drawing.interfaceSizeY = Drawing.drawing.baseInterfaceSizeY;
-    }
-
-    public void resetLayout()
-    {
-        Drawing.drawing.interfaceScaleZoom = Drawing.drawing.interfaceScaleZoomDefault;
-        Drawing.drawing.interfaceSizeX = Drawing.drawing.interfaceSizeX / Drawing.drawing.interfaceScaleZoom;
-        Drawing.drawing.interfaceSizeY = Drawing.drawing.interfaceSizeY / Drawing.drawing.interfaceScaleZoom;
-    }
-
-    @Override
     public void setupTabs()
     {
         Tab general = new TabGeneral(this, "General", TankPropertyCategory.general);
@@ -383,7 +366,7 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             colorRed = new TextBoxSlider(0, 0, this.screen.objWidth, this.screen.objHeight, "Red", () ->
             {
                 TankAIControlled tank = screen.target.get();
-                if (colorRed.inputText.length() <= 0)
+                if (colorRed.inputText.isEmpty())
                     colorRed.inputText = colorRed.previousInputText;
 
                 int red = Integer.parseInt(colorRed.inputText);
@@ -410,7 +393,7 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             {
                 TankAIControlled tank = screen.target.get();
 
-                if (colorGreen.inputText.length() <= 0)
+                if (colorGreen.inputText.isEmpty())
                     colorGreen.inputText = colorGreen.previousInputText;
 
                 int green = Integer.parseInt(colorGreen.inputText);
@@ -437,7 +420,7 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             {
                 TankAIControlled tank = screen.target.get();
 
-                if (colorBlue.inputText.length() <= 0)
+                if (colorBlue.inputText.isEmpty())
                     colorBlue.inputText = colorBlue.previousInputText;
 
                 int blue = Integer.parseInt(colorBlue.inputText);

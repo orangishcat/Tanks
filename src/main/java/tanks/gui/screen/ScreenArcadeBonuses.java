@@ -157,14 +157,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
             this.bonuses.add(bonuses.remove((int) (Math.random() * bonuses.size())));
         }
 
-        Collections.sort(this.bonuses, new Comparator<Bonus>()
-        {
-            @Override
-            public int compare(Bonus o1, Bonus o2)
-            {
-                return o2.value - o1.value;
-            }
-        });
+        Collections.sort(this.bonuses, (o1, o2) -> o2.value - o1.value);
 
         Game.eventsOut.add(new EventArcadeBonuses(this.bonuses.get(0), this.bonuses.get(1), this.bonuses.get(2)));
     }

@@ -122,7 +122,7 @@ public class OverlayShop extends ScreenLevelEditorOverlay implements IConditiona
         Drawing.drawing.setInterfaceFontSize(this.titleSize);
         Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - 270, "Shop items");
 
-        if (this.shopList.buttons.size() <= 0)
+        if (this.shopList.buttons.isEmpty())
         {
             Drawing.drawing.setInterfaceFontSize(this.textSize);
             Drawing.drawing.drawInterfaceText(this.centerX, this.centerY - 30, "There are no shop items in this level");

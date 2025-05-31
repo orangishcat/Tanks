@@ -174,8 +174,7 @@ public abstract class Test
 
         public TestFunction setName(String name)
         {
-            String s = "'" + name + "'";
-            return setPassMessage(s).setFailMessage(s);
+            return setPassMessage(name).setFailMessage(name);
         }
 
         public TestFunction setPassMessage(String message)

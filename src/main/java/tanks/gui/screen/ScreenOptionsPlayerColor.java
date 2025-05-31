@@ -36,32 +36,24 @@ public class ScreenOptionsPlayerColor extends Screen
     }
     );
 
-    Button addColor = new Button(this.centerX + this.objXSpace * 0.3, this.centerY + this.objYSpace * 2.75, this.objHeight * 1.5, this.objHeight * 1.5, "+", new Runnable()
+    Button addColor = new Button(this.centerX + this.objXSpace * 0.3, this.centerY + this.objYSpace * 2.75, this.objHeight * 1.5, this.objHeight * 1.5, "+", () ->
     {
-        @Override
-        public void run()
-        {
-            if (!Game.player.enableSecondaryColor)
-                Game.player.enableSecondaryColor = true;
-            else
-                Game.player.enableTertiaryColor = true;
+        if (!Game.player.enableSecondaryColor)
+            Game.player.enableSecondaryColor = true;
+        else
+            Game.player.enableTertiaryColor = true;
 
-            updateColorForParty = true;
-        }
+        updateColorForParty = true;
     });
 
-    Button removeColor = new Button(this.centerX - this.objXSpace * 0.3, this.centerY + this.objYSpace * 2.75, this.objHeight * 1.5, this.objHeight * 1.5, "-", new Runnable()
+    Button removeColor = new Button(this.centerX - this.objXSpace * 0.3, this.centerY + this.objYSpace * 2.75, this.objHeight * 1.5, this.objHeight * 1.5, "-", () ->
     {
-        @Override
-        public void run()
-        {
-            if (!Game.player.enableTertiaryColor)
-                Game.player.enableSecondaryColor = false;
-            else
-                Game.player.enableTertiaryColor = false;
+        if (!Game.player.enableTertiaryColor)
+            Game.player.enableSecondaryColor = false;
+        else
+            Game.player.enableTertiaryColor = false;
 
-            updateColorForParty = true;
-        }
+        updateColorForParty = true;
     });
 
     Button resetColor = new Button(0, 0, this.objHeight * 1.5, this.objHeight * 1.5, "", new Runnable()
@@ -142,7 +134,7 @@ public class ScreenOptionsPlayerColor extends Screen
     {
         colorRed = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Primary red", () ->
         {
-            if (colorRed.inputText.length() <= 0)
+            if (colorRed.inputText.isEmpty())
                 colorRed.inputText = colorRed.previousInputText;
 
             Game.player.colorR = Integer.parseInt(colorRed.inputText);
@@ -159,7 +151,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorGreen = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY, this.objWidth, this.objHeight, "Primary green", () ->
         {
-            if (colorGreen.inputText.length() <= 0)
+            if (colorGreen.inputText.isEmpty())
                 colorGreen.inputText = colorGreen.previousInputText;
 
             Game.player.colorG = Integer.parseInt(colorGreen.inputText);
@@ -176,7 +168,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorBlue = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY + this.objYSpace * 1.5, this.objWidth, this.objHeight, "Primary blue", () ->
         {
-            if (colorBlue.inputText.length() <= 0)
+            if (colorBlue.inputText.isEmpty())
                 colorBlue.inputText = colorBlue.previousInputText;
 
             Game.player.colorB = Integer.parseInt(colorBlue.inputText);
@@ -196,7 +188,7 @@ public class ScreenOptionsPlayerColor extends Screen
     {
         colorRed2 = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Secondary red", () ->
         {
-            if (colorRed2.inputText.length() <= 0)
+            if (colorRed2.inputText.isEmpty())
                 colorRed2.inputText = colorRed2.previousInputText;
 
             Game.player.colorR2 = Integer.parseInt(colorRed2.inputText);
@@ -213,7 +205,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorGreen2 = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY + 0, this.objWidth, this.objHeight, "Secondary green", () ->
         {
-            if (colorGreen2.inputText.length() <= 0)
+            if (colorGreen2.inputText.isEmpty())
                 colorGreen2.inputText = colorGreen2.previousInputText;
 
             Game.player.colorG2 = Integer.parseInt(colorGreen2.inputText);
@@ -230,7 +222,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorBlue2 = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY + this.objYSpace * 1.5, this.objWidth, this.objHeight, "Secondary blue", () ->
         {
-            if (colorBlue2.inputText.length() <= 0)
+            if (colorBlue2.inputText.isEmpty())
                 colorBlue2.inputText = colorBlue2.previousInputText;
 
             Game.player.colorB2 = Integer.parseInt(colorBlue2.inputText);
@@ -250,7 +242,7 @@ public class ScreenOptionsPlayerColor extends Screen
     {
         colorRed3 = new TextBoxSlider(this.centerX + this.objXSpace, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Tertiary red", () ->
         {
-            if (colorRed3.inputText.length() <= 0)
+            if (colorRed3.inputText.isEmpty())
                 colorRed3.inputText = colorRed3.previousInputText;
 
             Game.player.colorR3 = Integer.parseInt(colorRed3.inputText);
@@ -267,7 +259,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorGreen3 = new TextBoxSlider(this.centerX + this.objXSpace, this.centerY + 0, this.objWidth, this.objHeight, "Tertiary green", () ->
         {
-            if (colorGreen3.inputText.length() <= 0)
+            if (colorGreen3.inputText.isEmpty())
                 colorGreen3.inputText = colorGreen3.previousInputText;
 
             Game.player.colorG3 = Integer.parseInt(colorGreen3.inputText);
@@ -284,7 +276,7 @@ public class ScreenOptionsPlayerColor extends Screen
 
         colorBlue3 = new TextBoxSlider(this.centerX + this.objXSpace, this.centerY + this.objYSpace * 1.5, this.objWidth, this.objHeight, "Tertiary blue", () ->
         {
-            if (colorBlue3.inputText.length() <= 0)
+            if (colorBlue3.inputText.isEmpty())
                 colorBlue3.inputText = colorBlue3.previousInputText;
 
             Game.player.colorB3 = Integer.parseInt(colorBlue3.inputText);

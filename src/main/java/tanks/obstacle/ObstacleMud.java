@@ -149,8 +149,4 @@ public class ObstacleMud extends Obstacle
         return 0;
     }
 
-    public double getGroundHeight()
-    {
-        return 0;
-    }
 }

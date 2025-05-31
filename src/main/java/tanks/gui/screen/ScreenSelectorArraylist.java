@@ -52,24 +52,10 @@ public class ScreenSelectorArraylist extends Screen implements IConditionalOverl
         Game.screen = screen;
     });
 
-    Button next = new Button(this.centerX + this.objXSpace, this.centerY + this.objYSpace * 5, this.objWidth, this.objHeight, "Next page", new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            page++;
-        }
-    }
+    Button next = new Button(this.centerX + this.objXSpace, this.centerY + this.objYSpace * 5, this.objWidth, this.objHeight, "Next page", () -> page++
     );
 
-    Button previous = new Button(this.centerX - this.objXSpace, this.centerY + this.objYSpace * 5, this.objWidth, this.objHeight, "Previous page", new Runnable()
-    {
-        @Override
-        public void run()
-        {
-            page--;
-        }
-    }
+    Button previous = new Button(this.centerX - this.objXSpace, this.centerY + this.objYSpace * 5, this.objWidth, this.objHeight, "Previous page", () -> page--
     );
 
     @Override

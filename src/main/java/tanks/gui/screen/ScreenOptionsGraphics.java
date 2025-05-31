@@ -23,7 +23,7 @@ public class ScreenOptionsGraphics extends Screen
     public static final String birdsEyeText = "\u00A7000100200255bird's-eye";
     public static final String angledText = "\u00A7200100000255angled";
 
-    public static int viewNo = 0;
+    public static int viewNum = 0;
 
     public ScreenOptionsGraphics()
     {
@@ -57,7 +57,7 @@ public class ScreenOptionsGraphics extends Screen
 
         update3dGroundButton();
 
-        switch (viewNo)
+        switch (viewNum)
         {
             case 0:
                 altPerspective.setText(perspectiveText, birdsEyeText);
@@ -281,13 +281,13 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            viewNo = (viewNo + 1);
+            viewNum = (viewNum + 1);
             if (!Game.debug)
-                viewNo = viewNo % 2;
+                viewNum = viewNum % 2;
             else
-                viewNo = viewNo % 4;
+                viewNum = viewNum % 4;
 
-            switch (viewNo)
+            switch (viewNum)
             {
                 case 0:
                     altPerspective.setText(perspectiveText, birdsEyeText);

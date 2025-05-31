@@ -45,7 +45,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorRed = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace * 2, this.objWidth, this.objHeight, "Red", () ->
         {
-            if (colorRed.inputText.length() <= 0)
+            if (colorRed.inputText.isEmpty())
                 colorRed.inputText = colorRed.previousInputText;
 
             this.setColor();
@@ -61,7 +61,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorGreen = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace / 2, this.objWidth, this.objHeight, "Green", () ->
         {
-            if (colorGreen.inputText.length() <= 0)
+            if (colorGreen.inputText.isEmpty())
                 colorGreen.inputText = colorGreen.previousInputText;
 
             this.setColor();
@@ -77,7 +77,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorBlue = new TextBoxSlider(this.centerX - this.objXSpace / 2, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Blue", () ->
         {
-            if (colorBlue.inputText.length() <= 0)
+            if (colorBlue.inputText.isEmpty())
                 colorBlue.inputText = colorBlue.previousInputText;
 
             this.setColor();
@@ -93,7 +93,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorVarRed = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace * 2, this.objWidth, this.objHeight, "Red noise", () ->
         {
-            if (colorVarRed.inputText.length() <= 0)
+            if (colorVarRed.inputText.isEmpty())
                 colorVarRed.inputText = colorVarRed.previousInputText;
 
             this.setColor();
@@ -107,7 +107,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorVarGreen = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace / 2, this.objWidth, this.objHeight, "Green noise", () ->
         {
-            if (colorVarGreen.inputText.length() <= 0)
+            if (colorVarGreen.inputText.isEmpty())
                 colorVarGreen.inputText = colorVarGreen.previousInputText;
 
             this.setColor();
@@ -121,7 +121,7 @@ public class OverlaySelectColorAndNoise extends ScreenLevelEditorOverlay
 
         colorVarBlue = new TextBoxSlider(this.centerX + this.objXSpace / 2, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Blue noise", () ->
         {
-            if (colorVarBlue.inputText.length() <= 0)
+            if (colorVarBlue.inputText.isEmpty())
                 colorVarBlue.inputText = colorVarBlue.previousInputText;
 
             this.setColor();

@@ -27,7 +27,7 @@ public class OverlaySelectColor extends ScreenLevelEditorOverlay
 
         colorRed = new TextBoxSlider(this.centerX, this.centerY - this.objYSpace * 2, this.objWidth, this.objHeight, "Red", () ->
         {
-            if (colorRed.inputText.length() <= 0)
+            if (colorRed.inputText.isEmpty())
                 colorRed.inputText = colorRed.previousInputText;
 
             int color = ((Number) this.selectorColor.getMetadata(screenLevelEditor.mousePlaceable)).intValue();
@@ -47,7 +47,7 @@ public class OverlaySelectColor extends ScreenLevelEditorOverlay
 
         colorGreen = new TextBoxSlider(this.centerX, this.centerY - this.objYSpace / 2, this.objWidth, this.objHeight, "Green", () ->
         {
-            if (colorGreen.inputText.length() <= 0)
+            if (colorGreen.inputText.isEmpty())
                 colorGreen.inputText = colorGreen.previousInputText;
 
             int color = ((Number) this.selectorColor.getMetadata(screenLevelEditor.mousePlaceable)).intValue();
@@ -67,7 +67,7 @@ public class OverlaySelectColor extends ScreenLevelEditorOverlay
 
         colorBlue = new TextBoxSlider(this.centerX, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Blue", () ->
         {
-            if (colorBlue.inputText.length() <= 0)
+            if (colorBlue.inputText.isEmpty())
                 colorBlue.inputText = colorBlue.previousInputText;
 
             int color = ((Number) this.selectorColor.getMetadata(screenLevelEditor.mousePlaceable)).intValue();

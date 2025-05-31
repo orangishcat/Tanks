@@ -35,7 +35,7 @@ public class OverlayEditTeam extends ScreenLevelEditorOverlay
                 }
             }
 
-            if (teamName.inputText.length() <= 0 || duplicate)
+            if (teamName.inputText.isEmpty() || duplicate)
                 teamName.inputText = team.name;
             else
             {

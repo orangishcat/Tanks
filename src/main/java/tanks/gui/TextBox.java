@@ -521,14 +521,10 @@ public class TextBox implements IDrawable, ITrigger
 		if (Game.game.window.textPressedKeys.contains(InputCodes.KEY_LEFT_CONTROL) || Game.game.window.textPressedKeys.contains(InputCodes.KEY_RIGHT_CONTROL) || Game.game.window.textPressedKeys.contains(InputCodes.KEY_LEFT_SUPER) || Game.game.window.textPressedKeys.contains(InputCodes.KEY_RIGHT_SUPER))
 		{
 			if (Game.game.window.textPressedKeys.contains(InputCodes.KEY_C))
-			{
-				this.copy();
-			}
+                this.copy();
 
 			if (Game.game.window.textPressedKeys.contains(InputCodes.KEY_V))
-			{
-				this.paste();
-			}
+                this.paste();
 
 			if (Game.game.window.textPressedKeys.contains(InputCodes.KEY_BACKSPACE) || Game.game.window.textPressedKeys.contains(InputCodes.KEY_DELETE))
 			{
@@ -541,9 +537,7 @@ public class TextBox implements IDrawable, ITrigger
 		}
 
 		for (char key : texts)
-		{
-			inputKey(key);
-		}
+            inputKey(key);
 
 		texts.clear();
 	}

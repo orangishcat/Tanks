@@ -587,7 +587,7 @@ public class ScreenCrusadeEditor extends Screen implements ITankBuildScreen
 
         quit.draw();
 
-        if (this.buttons.buttons.size() <= 0)
+        if (this.buttons.buttons.isEmpty())
         {
             Drawing.drawing.setInterfaceFontSize(this.textSize);
             Drawing.drawing.setColor(0, 0, 0);

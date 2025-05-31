@@ -37,7 +37,7 @@ public class TestSupportTank extends Test
                         return true;
                 return false;
             }).setPassMessage(s + "as expected")
-                    .setFailMessage(s + "but function returned " + e.getValue());
+                    .setFailMessage(s + "but function returned " + !e.getValue());
         }
     }
 }

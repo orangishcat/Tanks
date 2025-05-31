@@ -511,12 +511,6 @@ public class ScreenAddSavedTankBuild extends Screen implements IConditionalOverl
     }
 
     @Override
-    public void setupLayoutParameters()
-    {
-
-    }
-
-    @Override
     public double getOffsetX()
     {
         if (drawBehindScreen)

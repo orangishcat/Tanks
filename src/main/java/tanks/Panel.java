@@ -1107,13 +1107,13 @@ public class Panel
 			Game.vsync = false;
 			Game.maxFPS = 0;
 			Game.game.window.setVsync(false);
-			Panel.currentMessage = new ScreenElement.CenterMessage("Game sprinting");
+			Panel.notifs.add(new ScreenElement.Notification("Game sprinting"));
 		}
 		else
 		{
 			ScreenOptions.loadOptions(Game.homedir);
 			Game.game.window.setVsync(Game.vsync);
-			Panel.currentMessage = new ScreenElement.CenterMessage("Sprinting stopped");
+			Panel.notifs.add(new ScreenElement.Notification("Sprinting stopped"));
 		}
 	}
 

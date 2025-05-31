@@ -176,7 +176,7 @@ public class ScreenWorkshopCreations extends Screen
 			}
 		}
 
-		if (creations.buttons.size() <= 0)
+		if (creations.buttons.isEmpty())
 		{
 			Drawing.drawing.setColor(0, 0, 0);
 			Drawing.drawing.setInterfaceFontSize(24);

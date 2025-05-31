@@ -48,7 +48,7 @@ public class ScreenOptionsSound extends Screen
         @Override
         public void run()
         {
-            if (musicVolume.inputText.length() <= 0)
+            if (musicVolume.inputText.isEmpty())
                 musicVolume.inputText = musicVolume.previousInputText;
 
             Game.musicVolume = Integer.parseInt(musicVolume.inputText) / 100f;
@@ -69,7 +69,7 @@ public class ScreenOptionsSound extends Screen
         @Override
         public void run()
         {
-            if (soundVolume.inputText.length() <= 0)
+            if (soundVolume.inputText.isEmpty())
                 soundVolume.inputText = soundVolume.previousInputText;
 
             Game.soundVolume = Integer.parseInt(soundVolume.inputText) / 100f;

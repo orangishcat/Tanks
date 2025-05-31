@@ -1094,6 +1094,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 				Game.game.window.validScrollUp = false;
 				Panel.zoomTarget = Math.min(1, Panel.zoomTarget + 0.02 * Panel.frameFrequency * Drawing.drawing.unzoomedScale);
+				displayZoomMessage();
 			}
 
 			if (Game.game.input.zoomOut.isPressed())
@@ -1110,6 +1111,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 				Game.game.window.validScrollDown = false;
 				Panel.zoomTarget = Math.max(0, Panel.zoomTarget - 0.02 * Panel.frameFrequency * Drawing.drawing.unzoomedScale);
+				displayZoomMessage();
 			}
 
 			if (Game.playerTank != null && !Game.playerTank.destroy && Panel.autoZoom)
@@ -1156,6 +1158,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.validScrollDown = false;
 				Panel.zoomTarget = Math.max(0, Panel.zoomTarget - 0.1 * Drawing.drawing.unzoomedScale);
 			}
+
+			displayZoomMessage();
 		}
 		else if (zoomPressed)
 		{
@@ -1176,6 +1180,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 			Game.game.input.zoomAuto.invalidate();
 			Panel.autoZoom = !Panel.autoZoom;
+			Panel.currentMessage = new ScreenElement.CenterMessage("Auto zoom: " + (Panel.autoZoom ? "on" : "off"), 100);
 		}
 
 		Game.player.hotbar.update();
@@ -2149,6 +2154,11 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
             this.tutorial.update();
 	}
 
+	private static void displayZoomMessage()
+	{
+		Panel.currentMessage = new ScreenElement.CenterMessage("Zoom: %.0f", 100, Panel.zoomTarget >= 0 ? Panel.zoomTarget * 100 : (Drawing.drawing.movingCamera ? 100 : 0));
+	}
+
 	public static void playTimerTick(int seconds, int secondHalves, double timeRemaining)
 	{
 		int newSeconds = (int) (timeRemaining / 100 + 0.5);
@@ -2176,7 +2186,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
                 (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames) ? new Button[]{resumeLowerPos, restartLowerPos, ScreenInterlevel.fromQuickPlay != null ? backToQuickPlay : back} : null,
                 ScreenInterlevel.tutorialInitial ? new Button[]{resumeLowerPos, restartTutorial} : null,
                 ScreenInterlevel.tutorial ? new Button[]{resumeLowerPos, restartTutorial, quitHigherPos} : null,
-                Crusade.crusadeMode ? getCrusadeButtons() : null
+                Crusade.crusadeMode ? getCrusadeButtons() : null,
+				Game.screen instanceof ScreenAutomatedTests ? new Button[]{resumeLowerPos} : null
         );
 		if (pauseMenuButtons.isEmpty())
 			addButtons(pauseMenuButtons, new Button[]{resume, newLevel, restart, quit});
@@ -2906,6 +2917,13 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			this.overlay.draw();
 
 		Drawing.drawing.setInterfaceFontSize(this.textSize);
+
+		if (Game.showPathfinding)
+		{
+			Drawing.drawing.setColor(255, 255, 255);
+			Drawing.drawing.setInterfaceFontSize(16);
+			Drawing.drawing.drawInterfaceText(Drawing.drawing.getInterfaceEdgeX(true) - 10, Drawing.drawing.getInterfaceEdgeY(true) - Drawing.drawing.fontSize * 36, "Operations: " + TankAIControlled.Tile.tilesChecked + "/" + Game.currentSizeX * Game.currentSizeY, true);
+		}
 	}
 
 	public void drawGame()

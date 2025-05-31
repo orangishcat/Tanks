@@ -96,7 +96,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
     {
         if (testOngoing && !paused)
         {
-            if (Test.runner.updateTest())
+            if (!game.paused && Test.runner.updateTest())
             {
                 if (Test.runner.current != null && (!Test.runner.currentTestPassed() || !autoContinue))
                 {
@@ -154,15 +154,16 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
             fadeAge = screenAge;
         }
 
-        Game.screen = game;
         if (game != null)
         {
+            Game.screen = game;
             game.playSounds = false;
             music = game.paused ? testMusicPaused : testMusic;
             musicID = testMusicID;
             game.update();
+            if (shouldResetScreen())
+                Game.screen = this;
         }
-        Game.screen = this;
 
         back.update();
     }
@@ -234,7 +235,8 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         {
             Game.screen = game;
             game.draw();
-            Game.screen = this;
+            if (shouldResetScreen())
+                Game.screen = this;
         }
         else
             drawDefaultBackground();
@@ -329,6 +331,11 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         prevTest.draw();
         autoContButton.draw();
         back.draw();
+    }
+
+    private boolean shouldResetScreen()
+    {
+        return true;
     }
 
     private double getTestDrawY(int i)

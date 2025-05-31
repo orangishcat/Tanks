@@ -236,6 +236,7 @@ public class Chunk implements Comparable<Chunk>
     /** Expects all tile coordinates. */
     public static ObjectArrayList<Chunk> getChunksInRadius(int tx1, int ty1, int radius)
     {
+        chunkCache.clear();
         double x1 = (double) tx1 / chunkSize, y1 = (double) ty1 / chunkSize, cRad = Math.ceil((double) radius / chunkSize) + 1;
         for (Chunk chunk : chunkList)
         {

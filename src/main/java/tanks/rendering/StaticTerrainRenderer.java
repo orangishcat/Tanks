@@ -118,12 +118,6 @@ public class StaticTerrainRenderer extends TerrainRenderer
         return s;
     }
 
-    public void addVertexCoord(BaseShapeBatchRenderer s, ShaderGroup shader, float f)
-    {
-        if (shader instanceof IObstacleVertexCoordShader)
-            s.setAttribute(((IObstacleVertexCoordShader) shader).getVertexCoord(), f);
-    }
-
     public void addBox(IBatchRenderableObject o, double x, double y, double z, double sX, double sY, double sZ, byte options, boolean out)
     {
         if (this.freed)

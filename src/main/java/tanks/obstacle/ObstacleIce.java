@@ -76,8 +76,4 @@ public class ObstacleIce extends Obstacle
         return -15;
     }
 
-    public double getGroundHeight()
-    {
-        return 0;
-    }
 }

@@ -182,7 +182,7 @@ public class Arcade extends Minigame
         if (tankItemsMap.get(target.name) != null)
         {
             Item.ItemStack<?> i = itemsMap.get(tankItemsMap.get(target.name)).getCopy();
-            i.stackSize *= target.coinValue / 2;
+            i.stackSize *= (int) (target.coinValue * 0.5);
 
             if (i instanceof ItemShield.ItemStackShield)
                 i.stackSize /= 2;
@@ -257,14 +257,6 @@ public class Arcade extends Minigame
                         m.em().addStatusEffect(StatusEffect.arcade_rampage[power - 1], 0, detAge, duration);
                     }
                 }
-
-                /*if (m instanceof AreaEffect)
-                {
-                    AttributeModifier c = new AttributeModifier("rampage_speed", "speed", AttributeModifier.Operation.multiply, power / 5.0);
-                    c.duration = rampage_duration + rampage_exit_duration;
-                    c.deteriorationAge = rampage_exit_duration;
-                    m.addUnduplicateAttribute(c);
-                }*/
             }
         }
     }
@@ -381,7 +373,7 @@ public class Arcade extends Minigame
                 this.availablePlayerSpawns.add(i);
             }
 
-            if (alivePlayers.size() <= 0 && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).playing)
+            if (alivePlayers.isEmpty() && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).playing)
             {
                 Game.eventsOut.add(new EventClearMovables());
 
@@ -520,34 +512,6 @@ public class Arcade extends Minigame
     {
         if (Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).paused && ((ScreenGame) Game.screen).screenshotMode)
             return;
-
-        /*this.flashTimer -= Panel.frameFrequency;
-        if (flashTimer <= 0)
-        {
-            flashTimer += 37.5;
-
-            if (chain >= max_power * 3)
-                flashTimer /= 2;
-
-            for (int i = 0; i < Game.tilesFlash.length; i++)
-            {
-                for (int j = 0; j < Game.tilesFlash[i].length; j++)
-                {
-                    if (Math.random() < 0.01 * (chain / 3))
-                    {
-                        Game.tilesFlash[i][j] = 0.5;
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < Game.tilesFlash.length; i++)
-        {
-            for (int j = 0; j < Game.tilesFlash[i].length; j++)
-            {
-                Game.tilesFlash[i][j] = Math.max(0, Game.tilesFlash[i][j] - 0.005 * Panel.frameFrequency);
-            }
-        }*/
 
         if (age - lastRampage < 200 && chain >= 3)
         {

@@ -136,11 +136,6 @@ public class ObstacleLava extends Obstacle implements IAvoidObject
         return 0;
     }
 
-    public double getGroundHeight()
-    {
-        return 0;
-    }
-
     @Override
     public double getRadius()
     {
