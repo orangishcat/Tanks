@@ -1,6 +1,7 @@
 package lwjglwindow;
 
 import basewindow.*;
+import basewindow.transformation.Matrix4;
 import basewindow.transformation.Transformation;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
@@ -37,40 +38,56 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class LWJGLWindow extends BaseWindow
 {
-    public boolean batchMode = false;
-    public boolean batchQuads = false;
-    public boolean batchDepth = false;
-    public boolean batchDepthMask = false;
-    public boolean batchGlow = false;
-    public ShaderHandler shaderHandler;
-    public String currentTexture = null;
-    protected long window;
-    protected GLFWVidMode vidmode;
-    protected String audioDevice;
-    protected double[] mx = new double[1];
-    protected double[] my = new double[1];
-    protected int[] w = new int[1];
-    protected int[] h = new int[1];
-    protected int[] prevPosX = new int[1];
-    protected int[] prevPosY = new int[1];
-    protected int[] prevSizeX = new int[1];
-    protected int[] prevSizeY = new int[1];
-    protected HashMap<String, Integer> textures = new HashMap<>();
-    protected HashMap<String, Integer> textureSX = new HashMap<>();
-    protected HashMap<String, Integer> textureSY = new HashMap<>();
-    protected boolean shadowsEnabled = false;
-    protected boolean upscaleImages = false;
-    protected int lightTex;
-    double bbx1 = 1;
-    double bby1 = 0;
-    double bbz1 = 0;
-    double bbx2 = 0;
-    double bby2 = 1;
-    double bbz2 = 0;
-    double bbx3 = 0;
-    double bby3 = 0;
-    double bbz3 = 1;
-    ArrayList<double[]> scaledLights = new ArrayList<>();
+	protected long window;
+	protected GLFWVidMode vidmode;
+
+	protected String audioDevice;
+
+	protected double[] mx = new double[1];
+	protected double[] my = new double[1];
+
+	protected int[] w = new int[1];
+	protected int[] h = new int[1];
+
+	protected int[] prevPosX = new int[1];
+	protected int[] prevPosY = new int[1];
+
+	protected int[] prevSizeX = new int[1];
+	protected int[] prevSizeY = new int[1];
+
+	protected HashMap<String, Integer> textures = new HashMap<>();
+	protected HashMap<String, Integer> textureSX = new HashMap<>();
+	protected HashMap<String, Integer> textureSY = new HashMap<>();
+
+	public boolean batchMode = false;
+	public boolean batchQuads = false;
+	public boolean batchDepth = false;
+	public boolean batchDepthMask = false;
+	public boolean batchGlow = false;
+
+	public boolean forceModelGlow = false;
+
+	protected boolean shadowsEnabled = false;
+
+	protected boolean upscaleImages = false;
+
+	protected int lightTex;
+
+	public ShaderHandler shaderHandler;
+
+	double bbx1 = 1;
+	double bby1 = 0;
+	double bbz1 = 0;
+	double bbx2 = 0;
+	double bby2 = 1;
+	double bbz2 = 0;
+	double bbx3 = 0;
+	double bby3 = 0;
+	double bbz3 = 1;
+
+	public String currentTexture = null;
+
+	ArrayList<double[]> scaledLights = new ArrayList<>();
 
     public LWJGLWindow(String name, int x, int y, int z, IUpdater u, IDrawer d, IWindowHandler w, boolean vsync, boolean showMouse)
     {
@@ -877,10 +894,10 @@ public class LWJGLWindow extends BaseWindow
         glMultMatrixd(matrix);
     }
 
-    @Override
-    public void calculateBillboard()
-    {
-        angled = !(yaw == 0 && pitch == 0 && roll == 0);
+	@Override
+	public void calculateBillboard()
+	{
+		angled = !(yaw == 0 && pitch == 0 && roll == 0);
 
         double a = Math.cos(-roll);
         double b = Math.sin(-roll);
@@ -1306,8 +1323,13 @@ public class LWJGLWindow extends BaseWindow
             }
         }
 
-        File f = new File(dir);
-        ImageIO.write(destination, "png", f);
-        return destination;
-    }
+		File f = new File(dir);
+		ImageIO.write(destination, "png", f);
+		return destination;
+	}
+
+	public void setForceModelGlow(boolean glow)
+	{
+		this.forceModelGlow = glow;
+	}
 }

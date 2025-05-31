@@ -1,9 +1,6 @@
 package basewindow;
 
-import basewindow.transformation.ScaleAboutPoint;
-import basewindow.transformation.Shear;
-import basewindow.transformation.Transformation;
-import basewindow.transformation.Translation;
+import basewindow.transformation.*;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -211,6 +208,8 @@ public abstract class BaseWindow
 
     public abstract void transform(double[] matrix);
 
+    public abstract void transform(Matrix4 matrix);
+
     public abstract void calculateBillboard();
 
     public abstract double getEdgeBounds();
@@ -276,6 +275,8 @@ public abstract class BaseWindow
     public abstract BaseShaderUtil getShaderUtil(ShaderProgram p);
 
     public abstract BufferedImage screenshot(String dir) throws IOException;
+
+    public abstract void setForceModelGlow(boolean glow);
 
     public void setShader(ShaderBase s)
     {

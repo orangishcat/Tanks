@@ -1,6 +1,7 @@
 package tanks.gui.screen;
 
 import com.codedisaster.steamworks.SteamID;
+import com.codedisaster.steamworks.SteamMatchmaking;
 import com.codedisaster.steamworks.SteamNetworking;
 import tanks.Drawing;
 import tanks.Game;
@@ -8,6 +9,7 @@ import tanks.Panel;
 import tanks.gui.Button;
 import tanks.gui.TextBox;
 import tanks.network.Client;
+import tanks.network.SteamNetworkHandler;
 import tanks.network.event.EventSendClientDetails;
 
 import java.util.UUID;
@@ -35,6 +37,7 @@ public class ScreenJoinParty extends Screen
 	
 	Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", new Runnable()
 	{
+		@SuppressWarnings("deprecation")
 		@Override
 		public void run() 
 		{
@@ -85,9 +88,11 @@ public class ScreenJoinParty extends Screen
 			ScreenPartyLobby.connectedBots = 0;
 			Game.eventsOut.clear();
 
-			if (ip.inputText.startsWith("lobby:") && Game.steamNetworkHandler.initialized)
+			String ipText = ip.inputText.trim();
+
+			if (ipText.startsWith("lobby:") && Game.steamNetworkHandler.initialized)
 			{
-				Game.steamNetworkHandler.joinParty(Long.parseLong(ip.inputText.split(":")[1], 16));
+				Game.steamNetworkHandler.joinParty(Long.parseLong(ipText.split(":")[1], 16));
 				ScreenConnecting s = new ScreenConnecting(clientThread);
 				Game.screen = s;
 				Client.connectionID = UUID.randomUUID();
@@ -153,14 +158,14 @@ public class ScreenJoinParty extends Screen
 				return;
 			}
 
-			if (ip.inputText.startsWith("steam:") && Game.steamNetworkHandler.initialized)
+			if (ipText.startsWith("steam:") && Game.steamNetworkHandler.initialized)
 			{
 				Client.connectionID = UUID.randomUUID();
 				int id = 0;
 
 				try
 				{
-					id = Integer.parseInt(ip.inputText.substring("steam:".length()));
+					id = Integer.parseInt(ipText.substring("steam:".length()));
 				}
 				catch (Exception e)
 				{
@@ -243,17 +248,17 @@ public class ScreenJoinParty extends Screen
 
 				try
 				{
-					String ipaddress = ip.inputText;
+					String ipaddress = ipText;
 					int port = Game.port;
 
-					if (ip.inputText.contains(":"))
+					if (ipText.contains(":"))
 					{
-						int colon = ip.inputText.lastIndexOf(":");
-						ipaddress = ip.inputText.substring(0, colon);
-						port = Integer.parseInt(ip.inputText.substring(colon + 1));
+						int colon = ipText.lastIndexOf(":");
+						ipaddress = ipText.substring(0, colon);
+						port = Integer.parseInt(ipText.substring(colon + 1));
 					}
 
-					if (ip.inputText.isEmpty())
+					if (ipText.equals(""))
 						Client.connect("localhost", Game.port, false, connectionID);
 					else
 						Client.connect(ipaddress, port, false, connectionID);

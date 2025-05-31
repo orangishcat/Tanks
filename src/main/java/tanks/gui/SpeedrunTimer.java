@@ -26,27 +26,59 @@ public class SpeedrunTimer
         String levelDiff = "";
         String crusadeDiff = "";
 
-        if (Crusade.crusadeMode && ScreenGame.finishedQuick && Panel.win && Crusade.currentCrusade.bestTimes != null && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)
+        boolean showDiff = false;
+        if (Crusade.crusadeMode && ScreenGame.finishedQuick && Crusade.currentCrusade.bestTimes != null && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient && Game.showBestTime)
         {
+            showDiff = true;
             double time = 0;
             for (int i = 0; i <= Crusade.currentCrusade.currentLevel; i++)
+            {
                 time += Crusade.currentCrusade.bestTimes.get(i);
+            }
 
             double ltime = Crusade.currentCrusade.bestTimes.get(Crusade.currentCrusade.currentLevel);
 
             if (ltime > ScreenGame.lastTimePassed)
-                levelDiff = "\u00A7000255000255-" + getTime(ltime - ScreenGame.lastTimePassed);
+                levelDiff = "\u00A7000180000255-" + getTime(ltime - ScreenGame.lastTimePassed);
             else if (ScreenGame.lastTimePassed == ltime)
                 levelDiff = "\u00A7255255000255" + getTime(ScreenGame.lastTimePassed - ltime);
             else
                 levelDiff = "\u00A7255000000255+" + getTime(ScreenGame.lastTimePassed - ltime);
 
             if (time > Crusade.currentCrusade.timePassed)
-                crusadeDiff = "\u00A7000255000255-" + getTime(time - Crusade.currentCrusade.timePassed);
+                crusadeDiff = "\u00A7000180000255-" + getTime(time - Crusade.currentCrusade.timePassed);
             else if (time == Crusade.currentCrusade.timePassed)
                 crusadeDiff = "\u00A7255255000255" + getTime(Crusade.currentCrusade.timePassed - time);
             else
                 crusadeDiff = "\u00A7255000000255+" + getTime(Crusade.currentCrusade.timePassed - time);
+        }
+
+        if (showDiff)
+        {
+            if (Game.screen instanceof ScreenGame)
+            {
+                Drawing.drawing.setInterfaceFontSize(50);
+                Drawing.drawing.drawInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 30, "Level: " + levelDiff);
+
+                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+                    Drawing.drawing.setColor(255, 255, 255, alpha);
+                else
+                    Drawing.drawing.setColor(0, 0, 0, alpha);
+
+                Drawing.drawing.drawInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + 30, "Crusade: " + crusadeDiff);
+
+                levelDiff = "";
+                crusadeDiff = "";
+            }
+            else
+            {
+                String end = "\u00A7000000000255)";
+                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+                    end = "\u00A7255255255255)";
+
+                levelDiff = " (" + levelDiff + end;
+                crusadeDiff = " (" + crusadeDiff + end;
+            }
         }
 
         if (!Game.showSpeedrunTimer)

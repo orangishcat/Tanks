@@ -28,6 +28,14 @@ public class Drawing
 	public double playerX = sizeX / 2;
 	public double playerY = sizeY / 2;
 
+	public double lastPlayerX = sizeX / 2;
+	public double lastPlayerY = sizeY / 2;
+
+	public double lastSwitchedPlayerX = sizeX / 2;
+	public double lastSwitchedPlayerY = sizeY / 2;
+	public double spectateTransitionTime = 0;
+	public double spectateTransitionTimeBase = 200;
+
 	public double interfaceScaleZoomDefault = 1;
 	public double interfaceScaleZoom = 1;
 	public double baseInterfaceSizeX = 1400;
@@ -460,6 +468,22 @@ public class Drawing
 		Game.game.window.shapeRenderer.drawImage(drawX, drawY, drawZ, drawSizeX, drawSizeY, "/images/" + img, false);
 	}
 
+	public void drawImage(String img, double x, double y, double z, double sizeX, double sizeY, boolean depth)
+	{
+		double drawX = gameToAbsoluteX(x, sizeX);
+		double drawY = gameToAbsoluteY(y, sizeY);
+
+		if (isOutOfBounds(drawX, drawY))
+			return;
+
+		double drawSizeX = (sizeX * scale);
+		double drawSizeY = (sizeY * scale);
+
+		double drawZ = z * scale;
+
+		Game.game.window.shapeRenderer.drawImage(drawX, drawY, drawZ, drawSizeX, drawSizeY, 0, 0, 1, 1, "/images/" + img, false,  depth);
+	}
+
 	public void drawImage(double rotation, String img, double x, double y, double z, double sizeX, double sizeY)
 	{
 		double drawX = gameToAbsoluteX(x, 0);
@@ -819,6 +843,31 @@ public class Drawing
 		Game.game.window.shapeRenderer.fillOval(drawX, drawY, drawZ, drawSizeX, drawSizeY, false);
 	}
 
+	public void fillInterfacePartialRing(double x, double y, double size, double thickness, double frac)
+	{
+		fillInterfacePartialRing(x, y, size, thickness, 0, frac);
+	}
+
+	public void fillInterfacePartialRing(double x, double y, double size, double thickness, double start, double frac)
+	{
+		double drawX = (interfaceScale * x + Math.max(0, Panel.windowWidth - interfaceSizeX * interfaceScale) / 2);
+		double drawY = (interfaceScale * y + Math.max(0, Panel.windowHeight - statsHeight - interfaceSizeY * interfaceScale) / 2);
+		double drawSize = (size * interfaceScale);
+		double drawThickness = (thickness * interfaceScale);
+
+		Game.game.window.shapeRenderer.fillPartialRing(drawX, drawY, drawSize, drawThickness, start, start + frac);
+	}
+
+	public void fillPartialRing(double x, double y, double z, double size, double thickness, double start, double frac)
+	{
+		double drawX = gameToAbsoluteX(x, 0);
+		double drawY = gameToAbsoluteY(y, 0);
+		double drawZ = z * scale;
+		double drawSize = (size * scale);
+		double drawThickness = (thickness * scale);
+
+		Game.game.window.shapeRenderer.fillPartialRing(drawX, drawY, drawZ, drawSize, drawThickness, start, start + frac);
+	}
 
 	public void fillInterfaceGlow(double x, double y, double sizeX, double sizeY)
 	{
@@ -888,7 +937,6 @@ public class Drawing
 		Game.game.window.shapeRenderer.setBatchMode(false, true, false, true);
 
 	}
-
 
 	public void fillInterfaceGlow(double x, double y, double sizeX, double sizeY, boolean shade)
 	{
@@ -1044,6 +1092,11 @@ public class Drawing
 
 	public void drawText(double x, double y, double z, String text)
 	{
+		drawText(x, y, z, text, true);
+	}
+
+	public void drawText(double x, double y, double z, String text, boolean depth)
+	{
 		double sizeX = Game.game.window.fontRenderer.getStringSizeX(this.fontSize, text) / scale;
 		double sizeY = Game.game.window.fontRenderer.getStringSizeY(this.fontSize, text) / scale;
 
@@ -1051,7 +1104,24 @@ public class Drawing
 		double drawY = gameToAbsoluteY(y, sizeY);
 		double drawZ = z * scale;
 
-		Game.game.window.fontRenderer.drawString(drawX, drawY, drawZ, this.fontSize, this.fontSize, text);
+		Game.game.window.fontRenderer.drawString(drawX, drawY, drawZ, this.fontSize, this.fontSize, text, depth);
+	}
+
+	public void drawText(double x, double y, double z, String text, boolean rightAligned, boolean depth)
+	{
+		double sizeX = Game.game.window.fontRenderer.getStringSizeX(this.fontSize, text) / scale;
+		double sizeY = Game.game.window.fontRenderer.getStringSizeY(this.fontSize, text) / scale;
+
+		double offX = sizeX;
+
+		if (!rightAligned)
+			offX = 0;
+
+		double drawX = gameToAbsoluteX(x - offX, sizeX);
+		double drawY = gameToAbsoluteY(y, sizeY);
+		double drawZ = z * scale;
+
+		Game.game.window.fontRenderer.drawString(drawX, drawY, drawZ, this.fontSize, this.fontSize, text, depth);
 	}
 
 	public void drawInterfaceText(double x, double y, String text)
@@ -1367,7 +1437,7 @@ public class Drawing
 		return absoluteToGameY(interfaceToAbsoluteY(y));
 	}
 
-	public double toInterfaceCoordsX(double x)
+	public double gameToInterfaceCoordsX(double x)
 	{
 		return absoluteToInterfaceX(gameToAbsoluteX(x, 0));
 
@@ -1381,7 +1451,7 @@ public class Drawing
 		return x1;*/
 	}
 
-	public double toInterfaceCoordsY(double y)
+	public double gameToInterfaceCoordsY(double y)
 	{
 		return absoluteToInterfaceY(gameToAbsoluteY(y, 0));
 
@@ -1456,6 +1526,8 @@ public class Drawing
 			x = Panel.panel.pastPlayerX.get(0) * (1 - frac) + Panel.panel.pastPlayerX.get(1) * frac;
 		}
 
+		lastPlayerX = x;
+
 		double result = (x - (Panel.windowWidth) / scale / 2);
 
 		double margin = Obstacle.draw_size / Game.tile_size * Math.max(0, Math.min(Game.tile_size * 2, Game.currentSizeX * Game.tile_size * Drawing.drawing.scale - Panel.windowWidth)) / 2;
@@ -1503,6 +1575,8 @@ public class Drawing
 			double frac = Math.min(1, (Panel.panel.age - getTrackOffset() - Panel.panel.pastPlayerTime.get(0)) / (Panel.panel.pastPlayerTime.get(1) - Panel.panel.pastPlayerTime.get(0)));
 			y = Panel.panel.pastPlayerY.get(0) * (1 - frac) + Panel.panel.pastPlayerY.get(1) * frac;
 		}
+
+		lastPlayerY = y;
 
 		double result = (y - (Panel.windowHeight - statsHeight) / scale / 2);
 

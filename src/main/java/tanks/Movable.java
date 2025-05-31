@@ -10,6 +10,9 @@ import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.tank.NameTag;
 import tanks.tankson.MetadataProperty;
+import tanks.tankson.Property;
+
+import java.lang.reflect.Field;
 
 public abstract class Movable extends GameObject implements IDrawableForInterface, ISolidObject
 {
@@ -437,4 +440,34 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 	{
 		this.em = em;
 	}
+
+    public void randomize()
+    {
+        try
+        {
+            for (Field f: this.getClass().getFields())
+            {
+                if (f.getAnnotation(Property.class) == null || Math.random() < 0.999)
+                    continue;
+
+                if (f.getType().equals(double.class))
+                    f.set(this, (double) (f.get(this)) * Math.random() * 1.5 + 0.5);
+                else if (f.getType().equals(int.class))
+                    f.set(this, (int) ((int)(f.get(this)) * Math.random() * 1.5 + 0.5));
+                else if (f.getType().isEnum())
+                {
+                    Enum[] els = ((Enum) f.get(this)).getClass().getEnumConstants();
+                    f.set(this, els[(int) (Math.random() * els.length)]);
+                }
+                else if (Movable.class.isAssignableFrom(f.getType()) && f.get(this) != null)
+                {
+                    ((Movable) (f.get(this))).randomize();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Game.exitToCrash(e);
+        }
+    }
 }

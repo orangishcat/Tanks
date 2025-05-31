@@ -30,7 +30,7 @@ public class TankPlayerBot extends TankPurple implements IServerPlayerTank
         this.colorR = 0;
         this.colorG = 150;
         this.colorB = 255;
-        this.showName = true;
+        this.hasName = true;
         this.player = p;
 
         this.turretAimSpeed *= 2;
@@ -42,6 +42,7 @@ public class TankPlayerBot extends TankPurple implements IServerPlayerTank
         this.abilities.add(this.bulletItem);
         this.abilities.add(this.mineItem);
 
+        this.bulletAvoidBehvavior = BulletAvoidBehavior.aggressive_dodge;
         this.nameTag.name = p.username;
 
         this.cooldown = 0;

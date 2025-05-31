@@ -9,6 +9,7 @@ import tanks.gui.ScreenElement.Notification;
 import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
 import tanks.gui.screen.leveleditor.ScreenLevelEditorOverlay;
+import tanks.item.Item;
 import tanks.network.Client;
 import tanks.network.MessageReader;
 import tanks.network.NetworkEventMap;
@@ -495,8 +496,20 @@ public class Panel
 				}
 			}
 
-			this.pastPlayerX.add(Drawing.drawing.playerX);
-			this.pastPlayerY.add(Drawing.drawing.playerY);
+			if (Drawing.drawing.spectateTransitionTime > 0)
+			{
+				double frac = 0.5 + Math.cos(Drawing.drawing.spectateTransitionTime / Drawing.drawing.spectateTransitionTimeBase * Math.PI) / 2;
+				Drawing.drawing.spectateTransitionTime -= Panel.frameFrequency;
+
+				this.pastPlayerX.add(Drawing.drawing.playerX * frac + Drawing.drawing.lastSwitchedPlayerX * (1 - frac));
+				this.pastPlayerY.add(Drawing.drawing.playerY * frac + Drawing.drawing.lastSwitchedPlayerY * (1 - frac));
+			}
+			else
+			{
+				this.pastPlayerX.add(Drawing.drawing.playerX);
+				this.pastPlayerY.add(Drawing.drawing.playerY);
+			}
+
 			this.pastPlayerTime.add(this.age);
 
 			while (Panel.panel.pastPlayerTime.size() > 1 && Panel.panel.pastPlayerTime.get(1) < Panel.panel.age - Drawing.drawing.getTrackOffset())
@@ -627,7 +640,9 @@ public class Panel
 			{
 				for (int j = 0; j < ScreenPartyHost.server.connections.size(); j++)
 				{
-					ScreenPartyHost.server.connections.get(j).addEvents(Game.eventsOut);
+					if (ScreenPartyHost.server.connections.get(j).joined)
+						ScreenPartyHost.server.connections.get(j).addEvents(Game.eventsOut);
+
 					ScreenPartyHost.server.connections.get(j).reply();
 				}
 			}
@@ -920,6 +935,16 @@ public class Panel
 				Drawing.drawing.setColor(0, 0, 0);
 			}
 
+			if (Game.playerTank != null && Game.screen instanceof ScreenGame)
+			{
+				Item.ItemStack<?> i = Game.playerTank.player.hotbar.itemBar.getSelectedAction(false);
+				if (i == null || i.destroy)
+				{
+					Drawing.drawing.setColor(255, 0, 0);
+					Drawing.drawing.drawInterfaceImage("cursor_deny.png", mx, my, 48, 48);
+					return;
+				}
+			}
 			Drawing.drawing.drawInterfaceImage("cursor.png", mx, my, 48, 48);
 		}
 

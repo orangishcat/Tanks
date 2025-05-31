@@ -6,6 +6,7 @@ import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.network.event.EventTankControllerUpdateC;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 public class TankPlayerController extends TankPlayer implements ILocalPlayerTank
@@ -28,6 +29,10 @@ public class TankPlayerController extends TankPlayer implements ILocalPlayerTank
     public int maxLiveMines;
     public double bulletCooldownBase;
     public double bulletCooldown;
+    public double mineCooldownBase;
+    public double mineCooldown;
+
+    public boolean[] quickActions = new boolean[TankPlayer.max_abilities];
 
     public static final double interpolationTime = 25;
 
@@ -62,6 +67,7 @@ public class TankPlayerController extends TankPlayer implements ILocalPlayerTank
         this.posY = this.posY + this.interpolatedOffY * (interpolationTime - interpolatedProgress) / interpolationTime;
 
         Game.eventsOut.add(new EventTankControllerUpdateC(this));
+        Arrays.fill(this.quickActions, false);
     }
 
     @Override
@@ -73,12 +79,12 @@ public class TankPlayerController extends TankPlayer implements ILocalPlayerTank
             this.action2 = true;
 
         Item.ItemStack<?> p = this.getPrimaryAbility();
-        if (action1 && p != null && p.destroy && Game.player.hotbar.itemBar != null)
-            Game.player.hotbar.itemBar.setItem((Game.player.hotbar.itemBar.showItems ? ItemBar.item_bar_size : 0) + this.selectedPrimaryAbility);
+    }
 
-        Item.ItemStack<?> s = this.getSecondaryAbility();
-        if (action2 && s != null && s.destroy && Game.player.hotbar.itemBar != null)
-            Game.player.hotbar.itemBar.setItem((Game.player.hotbar.itemBar.showItems ? ItemBar.item_bar_size : 0) + this.selectedSecondaryAbility);
+    @Override
+    public void quickAction(int click)
+    {
+        this.quickActions[click] = true;
     }
 
     @Override

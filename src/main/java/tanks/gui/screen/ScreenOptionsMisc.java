@@ -2,16 +2,20 @@ package tanks.gui.screen;
 
 import tanks.Drawing;
 import tanks.Game;
-import tanks.Panel;
 import tanks.gui.Button;
+import tanks.hotbar.Hotbar;
 
 public class ScreenOptionsMisc extends Screen
 {
     public static final String autostartText = "Autostart: ";
     public static final String fullStatsText = "Stats animations: ";
     public static final String previewCrusadesText = "Crusade preview: ";
+    public static final String hotbarText = "Hotbar: ";
 
-    Button autostart = new Button(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    public static final String circularText = "\u00A7000100200255circular";
+    public static final String bottomText = "\u00A7200100000255bottom";
+
+    Button autostart = new Button(this.centerX, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -26,7 +30,7 @@ public class ScreenOptionsMisc extends Screen
     },
             "When enabled, levels will---start playing automatically---4 seconds after they are---loaded (if the play button---isn't clicked earlier)");
 
-    Button fullStats = new Button(this.centerX - this.objXSpace / 2, this.centerY + this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button fullStats = new Button(this.centerX, this.centerY - this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -41,7 +45,7 @@ public class ScreenOptionsMisc extends Screen
     },
             "When off, skips directly to the summary tab---of the crusade end stats screen");
 
-    Button previewCrusades = new Button(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button previewCrusades = new Button(this.centerX, this.centerY + this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -56,15 +60,22 @@ public class ScreenOptionsMisc extends Screen
     },
             "When enabled, the backgrounds of---the crusade preview and stats---screens display an animation of all---the crusade levels scrolling by.");
 
-    Button pauseOnDefocus = new Button(this.centerX + this.objXSpace / 2, this.centerY + this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button circularHotbar = new Button(this.centerX, this.centerY + this.objYSpace * 1.5, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
         {
-            Panel.pauseOnDefocus = !Panel.pauseOnDefocus;
-            pauseOnDefocus.setText("Pause on lost focus: ", Panel.pauseOnDefocus ? ScreenOptions.onText : ScreenOptions.offText);
+            Hotbar.circular = !Hotbar.circular;
+
+            if (Hotbar.circular)
+                circularHotbar.setText(hotbarText, circularText);
+            else
+                circularHotbar.setText(hotbarText, bottomText);
         }
-    });
+    },
+            "Configures the placement of item, health,---and ammunition information on the screen.------" +
+                    "In the 'bottom' setting, all this information---will be at the bottom of the screen.------" +
+                    "In the 'circular' setting, this information will---either be overlaid on your tank---or placed around your cursor.");
 
     Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenOptions());
 
@@ -88,7 +99,10 @@ public class ScreenOptionsMisc extends Screen
         else
             previewCrusades.setText(previewCrusadesText, ScreenOptions.offText);
 
-        pauseOnDefocus.setText("Pause on lost focus: ", Panel.pauseOnDefocus ? ScreenOptions.onText : ScreenOptions.offText);
+        if (Hotbar.circular)
+            circularHotbar.setText(hotbarText, circularText);
+        else
+            circularHotbar.setText(hotbarText, bottomText);
 
 //        if (Game.framework == Game.Framework.libgdx)
 //            previewCrusades.enabled = false;
@@ -100,8 +114,8 @@ public class ScreenOptionsMisc extends Screen
         back.update();
         autostart.update();
         fullStats.update();
-        pauseOnDefocus.update();
         previewCrusades.update();
+        circularHotbar.update();
     }
 
     @Override
@@ -111,9 +125,9 @@ public class ScreenOptionsMisc extends Screen
 
         back.draw();
         previewCrusades.draw();
-        pauseOnDefocus.draw();
         fullStats.draw();
         autostart.draw();
+        circularHotbar.draw();
 
         Drawing.drawing.setInterfaceFontSize(this.titleSize);
         Drawing.drawing.setColor(0, 0, 0);
