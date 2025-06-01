@@ -1289,8 +1289,8 @@ public class TankAIControlled extends Tank implements ITankField
 				g[x][y].interesting = true;
 		}
 
-		ArrayDeque<Tile> q = new ArrayDeque<>();
-		g[currX][currY].visited = true;
+		PriorityQueue<Tile> q = new PriorityQueue<>(Comparator.comparingInt((Tile a) -> a.cost).thenComparingInt(a -> a.priority));
+		g[currX][currY].cost = 0;
 		q.add(g[currX][currY]);
 
 		Tile endingTile = null;
@@ -1299,13 +1299,6 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			Tile.tilesChecked++;
 			Tile t = q.remove();
-
-			if (t.unfavorability > 0)
-			{
-				t.unfavorability--;
-				q.add(t);
-				continue;
-			}
 
 			if (t.interesting)
 			{
@@ -1322,7 +1315,7 @@ public class TankAIControlled extends Tank implements ITankField
 					continue;
 
 				Tile newTile = g[x][y];
-				if (newTile.visited || newTile.type == Tile.Type.solid || newTile.unfavorability >= 75 ||
+				if (newTile.type == Tile.Type.solid || newTile.unfavorability < 0 ||
 						(newTile.type == Tile.Type.destructible && !enableMineLaying))
 					continue;
 
@@ -1336,8 +1329,13 @@ public class TankAIControlled extends Tank implements ITankField
 						continue;
 				}
 
+				int newCost = t.cost + newTile.unfavorability;
+				if (newCost >= newTile.cost)
+					continue;
+
+				newTile.cost = newCost;
 				newTile.parent = t;
-				newTile.visited = true;
+				newTile.priority = i >= 4 ? 1 : 0;
 				q.add(newTile);
 			}
 		}
@@ -2828,9 +2826,8 @@ public class TankAIControlled extends Tank implements ITankField
 		public double shiftedX, shiftedY;
 		public int tileX, tileY;
 
-		public int unfavorability;
+		public int unfavorability, cost, priority;
 		public boolean interesting;
-		public boolean visited;
 
 		public Tile set(int x, int y)
 		{
@@ -2842,7 +2839,9 @@ public class TankAIControlled extends Tank implements ITankField
 
 			this.parent = null;
 			this.interesting = false;
-			this.visited = false;
+			this.unfavorability = 1;
+			this.priority = 0;
+			this.cost = Integer.MAX_VALUE;
 
 			setProperties(Game.getObstacle(x, y));
 
@@ -2853,9 +2852,10 @@ public class TankAIControlled extends Tank implements ITankField
 		{
 			if (o != null)
 			{
-				this.unfavorability = o.unfavorability;
 				if (o.destructible && o.unfavorability < 0)
 					this.unfavorability = 10;
+				if (o.unfavorability > 0)
+					this.unfavorability = o.unfavorability;
 			}
 
 			if (o == null || !o.tankCollision)
@@ -2874,6 +2874,7 @@ public class TankAIControlled extends Tank implements ITankField
 				}
 			}*/
 		}
+
 		public double shiftSides(Random r, boolean x)
 		{
 			boolean left, right;
@@ -2910,6 +2911,12 @@ public class TankAIControlled extends Tank implements ITankField
 				return false;
 
 			return Game.isSolid(x1, y1);
+		}
+
+		@Override
+		public String toString()
+		{
+			return String.format("% 2d", unfavorability);
 		}
 	}
 
