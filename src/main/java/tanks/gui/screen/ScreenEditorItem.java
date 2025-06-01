@@ -1,6 +1,7 @@
 package tanks.gui.screen;
 
 import basewindow.BaseFile;
+import tanks.Consumer;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
@@ -24,11 +25,16 @@ public class ScreenEditorItem extends ScreenEditorTanksONable<Item.ItemStack<?>>
 
     public Button itemTabButton;
 
+    @SuppressWarnings("Convert2Lambda")     // gradle won't compile this in lambda form for some reason
     public Button load = new Button(this.centerX - this.objXSpace, this.centerY + this.objYSpace * 6.5, this.objWidth, this.objHeight, "Load from template", () ->
-            Game.screen = new ScreenAddSavedItem(this, b ->
+            Game.screen = new ScreenAddSavedItem(this, new Consumer<Item.ItemStack<?>>()
             {
-                ScreenEditorItem.this.setTarget(b);
-                Game.screen = ScreenEditorItem.this;
+                @Override
+                public void accept(Item.ItemStack<?> b)
+                {
+                    ScreenEditorItem.this.setTarget(b);
+                    Game.screen = ScreenEditorItem.this;
+                }
             }, "My", Item.class)
     );
     public Button save = new Button(this.centerX + this.objXSpace, this.centerY + this.objYSpace * 6.5, this.objWidth, this.objHeight, "Save to template", () ->
