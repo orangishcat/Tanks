@@ -101,8 +101,9 @@ public class Ray
 
 		this.age = 0;
 		this.range = 0;
+		this.tankHitSizeMul = 1;
 		this.acquiredTarget = false;
-		this.tank = tank;
+		this.tank = tank.getBottomLevelPossessing();
 
 		this.bounceX.clear();
 		this.bounceY.clear();
@@ -139,6 +140,13 @@ public class Ray
 	public Ray setMaxChunks(int maxChunks)
 	{
 		this.maxChunkCheck = maxChunks;
+		return this;
+	}
+
+	public Ray setTrace(boolean trace, boolean dotted)
+	{
+		this.trace = trace;
+		this.dotted = dotted;
 		return this;
 	}
 
@@ -189,16 +197,16 @@ public class Ray
 
 			for (Movable m : c.movables)
 			{
-				if (m instanceof Tank && m != this.tank)
-				{
-					Tank t = (Tank) m;
-					if (this.posX + this.size / 2 >= t.posX - t.size / 2 &&
-							this.posX - this.size / 2 <= t.posX + t.size / 2 &&
-							this.posY + this.size / 2 >= t.posY - t.size / 2 &&
-							this.posY - this.size / 2 <= t.posY + t.size / 2)
-						return t;
-				}
-			}
+                if (!(m instanceof Tank) || m == this.tank)
+                    continue;
+
+                Tank t = (Tank) m;
+                if (this.posX + this.size / 2 >= t.posX - t.size / 2 &&
+                        this.posX - this.size / 2 <= t.posX + t.size / 2 &&
+                        this.posY + this.size / 2 >= t.posY - t.size / 2 &&
+                        this.posY - this.size / 2 <= t.posY + t.size / 2)
+                    return t;
+            }
 		}
 
 		boolean firstBounce = this.targetTank == null;
@@ -228,95 +236,99 @@ public class Ray
 
 			firstBounce = false;
 
-			if (result.collisionFace != null)
-			{
-				double dx = result.collisionX - posX, dy = result.collisionY - posY;
+            if (result.collisionFace == null)
+                return null;
 
-				if (this.range > 0)
-				{
-					double dist = Math.sqrt(dx * dx + dy * dy);
-					if (this.range < dist)
-					{
-						result.collisionX = posX + dx * range / dist;
-						result.collisionY = posY + dy * range / dist;
-						dx = result.collisionX - posX;
-						dy = result.collisionY - posY;
-						this.bounces = -1;
-					}
-					else
-						this.range -= dist;
-				}
+            double dx = result.collisionX - posX, dy = result.collisionY - posY;
 
-				if (trace && ScreenGame.isUpdatingGame())
-				{
-					double steps = (Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)) / (1 + Math.pow(this.vX, 2) + Math.pow(this.vY, 2))) + 1);
-
-					if (dotted)
-						steps /= 2;
-
-					double s;
-					for (s = remainder; s <= steps; s++)
-					{
-						double x = posX + dx * s / steps;
-						double y = posY + dy * s / steps;
-
-						this.traceAge++;
-
-						double frac = 1 / (1 + this.traceAge / 100.0);
-						double z = this.tank.size / 2 + this.tank.turretSize / 2 * frac + (Game.tile_size / 4) * (1 - frac);
-
-						if (Game.screen instanceof ScreenGame && !ScreenGame.finished)
-							Game.effects.add(Effect.createNewEffect(x, y, z, Effect.EffectType.ray));
-					}
-
-					remainder = s - steps;
-				}
-
-				this.posX = result.collisionX;
-				this.posY = result.collisionY;
-
-				if (Chunk.debug && trace)
-					Game.effects.add(Effect.createNewEffect(posX, posY, 50, Effect.EffectType.piece).setColor(0, 150, 0));
-
-				ISolidObject obj = result.collisionFace.owner;
-				if (obj instanceof Movable)
-				{
-					this.targetX = result.collisionX;
-					this.targetY = result.collisionY;
-					bounceX.add(result.collisionX);
-					bounceY.add(result.collisionY);
-
-					return (Movable) obj;
-				}
-
-                if (obj instanceof Obstacle && ((Obstacle) obj).bouncy)
-                    this.bouncyBounces--;
-                else if (obj instanceof Obstacle && !((Obstacle) obj).allowBounce)
+            if (this.range > 0)
+            {
+                double dist = Math.sqrt(dx * dx + dy * dy);
+                if (this.range < dist)
+                {
+                    result.collisionX = posX + dx * range / dist;
+                    result.collisionY = posY + dy * range / dist;
+                    dx = result.collisionX - posX;
+                    dy = result.collisionY - posY;
                     this.bounces = -1;
+                }
                 else
-                    this.bounces--;
+                    this.range -= dist;
+            }
 
+            if (trace && ScreenGame.isUpdatingGame())
+            {
+                double steps = (Math.sqrt((Math.pow(dx, 2) + Math.pow(dy, 2)) / (1 + Math.pow(this.vX, 2) + Math.pow(this.vY, 2))) / Math.max(this.size, 2) * 10 + 1);
+
+                if (dotted)
+                    steps /= 2;
+
+                double s;
+                for (s = remainder; s <= steps; s++)
+                {
+                    double x = posX + dx * s / steps;
+                    double y = posY + dy * s / steps;
+
+                    this.traceAge++;
+
+                    double frac = 1 / (1 + this.traceAge / 100.0);
+                    double z = this.tank.size / 2 + this.tank.turretSize / 2 * frac + (Game.tile_size / 4) * (1 - frac);
+                    if (Game.screen instanceof ScreenGame && !ScreenGame.finished)
+                    {
+                        Game.effects.add(Effect.createNewEffect(x, y, z, Effect.EffectType.ray)
+                                .setSize(Math.max(this.size, min_trace_size)));
+                    }
+                }
+
+                remainder = s - steps;
+            }
+
+            this.posX = result.collisionX;
+            this.posY = result.collisionY;
+
+            if (Chunk.debug && trace)
+            {
+                Game.effects.add(Effect.createNewEffect(posX, posY, 50, Effect.EffectType.piece).setColor(0, 150, 0));
+                Game.effects.add(Effect.createNewEffect(result.collisionFace.startX, result.collisionFace.startY, 50, Effect.EffectType.piece).setColor(255, 0, 0));
+                Game.effects.add(Effect.createNewEffect(result.collisionFace.endX, result.collisionFace.endY, 50, Effect.EffectType.piece).setColor(255, 0, 0));
+            }
+
+            ISolidObject obj = result.collisionFace.owner;
+            if (obj instanceof Movable)
+            {
+                this.targetX = result.collisionX;
+                this.targetY = result.collisionY;
                 bounceX.add(result.collisionX);
-				bounceY.add(result.collisionY);
+                bounceY.add(result.collisionY);
 
-				if (this.bounces >= 0)
-				{
-					if (result.corner)
-					{
-						this.vX = -this.vX;
-						this.vY = -this.vY;
-					}
-					else if (result.collisionFace.horizontal)
-						this.vY = -this.vY;
-					else
-						this.vX = -this.vX;
+                return (Movable) obj;
+            }
 
-					this.angle = Movable.getPolarDirection(this.vX, this.vY);
-				}
-			}
-			else
-				return null;
-		}
+            if (obj instanceof Obstacle && ((Obstacle) obj).bouncy)
+            this.bouncyBounces--;
+            else if (obj instanceof Obstacle && !((Obstacle) obj).allowBounce)
+            this.bounces = -1;
+            else
+            this.bounces--;
+
+            bounceX.add(result.collisionX);
+            bounceY.add(result.collisionY);
+
+            if (this.bounces >= 0)
+            {
+                if (result.corner)
+                {
+                    this.vX = -this.vX;
+                    this.vY = -this.vY;
+                }
+                else if (result.collisionFace.horizontal)
+                    this.vY = -this.vY;
+                else
+                    this.vX = -this.vX;
+
+                this.angle = Movable.getPolarDirection(this.vX, this.vY);
+            }
+        }
 
 		return null;
 	}
@@ -429,10 +441,7 @@ public class Ray
 				if (f.owner != null && f.owner == targetTank)
 					size *= targetTankSizeMul;
 
-				if (passesThrough(f))
-					continue;
-
-				if (f.startX < this.posX + size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
+				if (passesThrough(f, firstBounce) || f.startX < this.posX + size / 2)
 					continue;
 
 				double y = (f.startX - size / 2 - this.posX) * vY / vX + this.posY;
@@ -455,10 +464,7 @@ public class Ray
 				if (f.owner instanceof Movable)
 					size *= tankHitSizeMul;
 
-				if (passesThrough(f))
-					continue;
-
-				if (f.startX > this.posX - size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
+				if (passesThrough(f, firstBounce) || f.startX > this.posX - size / 2)
 					continue;
 
 				double y = (f.startX + size / 2 - this.posX) * vY / vX + this.posY;
@@ -482,10 +488,7 @@ public class Ray
 				if (f.owner instanceof Movable)
 					size *= tankHitSizeMul;
 
-				if (passesThrough(f))
-					continue;
-
-				if (f.startY < this.posY + size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
+				if (passesThrough(f, firstBounce) || f.startY < this.posY + size / 2)
 					continue;
 
 				double x = (f.startY - size / 2 - this.posY) * vX / vY + this.posX;
@@ -515,10 +518,7 @@ public class Ray
 				if (f.owner instanceof Movable)
 					size *= tankHitSizeMul;
 
-				if (passesThrough(f))
-					continue;
-
-				if (f.startY > this.posY - size / 2 || !collision(f) || (f.owner == this.tank && firstBounce))
+				if (passesThrough(f, firstBounce) || f.startY > this.posY - size / 2)
 					continue;
 
 				double x = (f.startY + size / 2 - this.posY) * vX / vY + this.posX;
@@ -543,20 +543,20 @@ public class Ray
 		result.set(t, collisionX, collisionY, collisionFace, corner);
 	}
 
-	private boolean passesThrough(Face f)
+	public boolean passesThrough(Face f, boolean firstBounce)
 	{
-		boolean passThrough = false;
+		if ((asBullet ? !f.solidBullet : !f.solidTank) ||
+				(f.owner == tank && firstBounce))
+			return true;
+
 		if (f.owner instanceof Obstacle && !((Obstacle) f.owner).bouncy)
         {
             Obstacle o = (Obstacle) f.owner;
-            passThrough = (this.ignoreDestructible && o.destructible) || (this.ignoreShootThrough && o.shouldShootThrough);
+            return (this.ignoreDestructible && o.destructible) || (this.ignoreShootThrough && o.shouldShootThrough);
         }
 
-		if ((ignoreTanks && f.owner instanceof Tank) || (ignoreBullets && f.owner instanceof Bullet))
-			passThrough = true;
-
-		return passThrough;
-	}
+        return (ignoreTanks && f.owner instanceof Tank) || (ignoreBullets && f.owner instanceof Bullet);
+    }
 
     public static final class Result
     {
@@ -637,11 +637,6 @@ public class Ray
 	{
 		Obstacle o = Game.getObstacle(x, y);
 		return o != null && collision(o) && !(ignoreShootThrough && o.shouldShootThrough) && !(ignoreDestructible && o.destructible);
-	}
-
-	public boolean collision(Face f)
-	{
-		return asBullet ? f.solidBullet : f.solidTank;
 	}
 
 	public boolean collision(Obstacle o)

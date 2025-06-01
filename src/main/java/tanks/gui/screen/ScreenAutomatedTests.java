@@ -53,6 +53,12 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
     private double fadeAge = -9999, posChangeAge = -9999;
     private int hoveredInd;
 
+    // Scrolling variables
+    private double scrollOffset = 0;
+    private double targetScrollOffset = 0;
+    private static final double SCROLL_SPEED = 2.0; // How many tests to scroll per scroll event
+    private static final double SCROLL_SMOOTHING = 0.15; // Smoothing factor for scroll interpolation
+
     public ScreenAutomatedTests()
     {
         this.music = testMusic;
@@ -90,6 +96,17 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         setAutoCont(false);
         paused = false;
         Test.runner.loadTest(i);
+
+        // Auto-scroll to the current test
+        scrollToTest(i);
+    }
+
+    private void scrollToTest(int testIndex)
+    {
+        // Scroll to center the test in the visible area
+        targetScrollOffset = Math.max(0, testIndex - 7); // Center around position 7
+        double maxScroll = Math.max(0, Test.registry.size() - 15);
+        targetScrollOffset = Math.min(maxScroll, targetScrollOffset);
     }
 
     @Override
@@ -128,9 +145,33 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
                 game = null;
         }
 
+        // Handle scroll events
+        if (Game.game.window.validScrollUp)
+        {
+            Game.game.window.validScrollUp = false;
+            targetScrollOffset -= SCROLL_SPEED;
+        }
+        else if (Game.game.window.validScrollDown)
+        {
+            Game.game.window.validScrollDown = false;
+            targetScrollOffset += SCROLL_SPEED;
+        }
+
+        // Clamp target scroll offset to valid bounds
+        double maxScroll = Math.max(0, Test.registry.size() - 15); // Show up to 15 tests at once
+        targetScrollOffset = Math.max(0, Math.min(maxScroll, targetScrollOffset));
+
+        // Smooth scroll interpolation
+        scrollOffset += (targetScrollOffset - scrollOffset) * SCROLL_SMOOTHING;
+
         double isx = isx();
         hoveredInd = -1;
-        for (int i = Math.max(0, Test.runner.pos - 8); i <= Math.min(Test.registry.size() - 1, Test.runner.pos + 6); i++)
+
+        // Calculate visible test range based on scroll offset
+        int startTest = Math.max(0, (int) Math.floor(scrollOffset));
+        int endTest = Math.min(Test.registry.size() - 1, startTest + 14); // Show 15 tests at once
+
+        for (int i = startTest; i <= endTest; i++)
         {
             if (i + 1 == Test.runner.pos && testOngoing) continue;
             double lineY = getTestDrawY(i);
@@ -194,6 +235,10 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         Test.runner.runNextTest();
         posChangeAge = screenAge;
         currentName = null;
+
+        // Auto-scroll to the new current test
+        if (Test.runner.pos <= Test.registry.size())
+            scrollToTest(Test.runner.pos - 1);
     }
 
     private void setCurrentMessage()
@@ -204,6 +249,9 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
         int i = 0;
         for (Test.TestFunction func : t.expectOnce)
             addTestDetails(i++, "Once", func, s);
+        i = 0;
+        for (Test.TestFunction func : t.expectAlways)
+            addTestDetails(i++, "A/N", func, s);
         i = 0;
         for (Test.TestFunction func : t.expectAtEnd)
             addTestDetails(i++, "End", func, s);
@@ -261,7 +309,12 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
                         Test.runner.passedCases + "/" + Test.registry.size() + " tests passed" : "Controls");
 
         Drawing.drawing.setInterfaceFontSize(24);
-        for (int i = Math.max(0, Test.runner.pos - 8); i <= Math.min(Test.registry.size() - 1, Test.runner.pos + 6); i++)
+
+        // Calculate visible test range based on scroll offset
+        int startTest = Math.max(0, (int) Math.floor(scrollOffset));
+        int endTest = Math.min(Test.registry.size() - 1, startTest + 14); // Show 15 tests at once
+
+        for (int i = startTest; i <= endTest; i++)
         {
             if (i == hoveredInd)
             {
@@ -269,7 +322,7 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
                 Drawing.drawing.fillInterfaceRect(isx * 0.85, getTestDrawY(i), isx * 0.3 - 20, 40);
             }
 
-            double a1 = 255 - Math.abs(i - Test.runner.pos + 1) * 32;
+            double a1 = 255 - Math.abs(i - Test.runner.pos + 1) * 12;
             switch (Test.runner.getState(i))
             {
                 case notRun:
@@ -342,7 +395,9 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
 
     private double getTestDrawY(int i)
     {
-        return centerY + 40 * (i - Test.runner.pos + 1 - Math.min(50, screenAge - posChangeAge) / 50);
+        // Apply scroll offset to the test position
+        double basePosition = i - scrollOffset;
+        return centerY + 40 * (basePosition - 7); // Center around position 7 in the visible area
     }
 
     public static void addTestDetails(int i, String testType, Test.TestFunction t, StringBuilder s)
@@ -360,6 +415,9 @@ public class ScreenAutomatedTests extends Screen implements IGameOverlayScreen
     {
         testOngoing = true;
         TestRunner.startTests();
+
+        // Scroll to the beginning when starting tests
+        scrollToTest(0);
     }
 
     @Override

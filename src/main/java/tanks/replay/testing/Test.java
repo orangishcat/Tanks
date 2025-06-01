@@ -9,12 +9,14 @@ import tanks.tank.TankPlayer;
 import java.util.ArrayList;
 import java.util.Objects;
 
+@SuppressWarnings("UnusedReturnValue")
 public abstract class Test
 {
     public static TestRegistry registry;
     public static TestRunner runner;
 
     public final ArrayList<TestFunction> expectOnce = new ArrayList<>();
+    public final ArrayList<TestFunction> expectAlways = new ArrayList<>();
     public final ArrayList<TestFunction> expectAtEnd = new ArrayList<>();
     public final TestType testType;
     public final String testResource;
@@ -23,11 +25,12 @@ public abstract class Test
 
     public TankReplayPlayer playerTank = new TankReplayPlayer(new TankPlayer(-1, -1, -1));
     public String name = "Test";
+    public double age = 0;
     public double maximumTime = 10 * 60 * 100;
     public boolean fixedFPS = false;
     private int expectOncePos = 0;
     public boolean finished = false;
-    protected int passedEndCases, totalCases;
+    protected int passedEndCases, passedNeverCases, totalCases;
 
     public Test(String name, TestType type)
     {
@@ -80,13 +83,32 @@ public abstract class Test
                 expectOncePos++;
         }
 
-        return finished = ((maximumTime -= Panel.frameFrequency) <= 0 || ScreenGame.finished);
+        for (TestFunction f : expectAlways)
+        {
+            if (f.passed)
+                f.checkPassed();
+        }
+
+        return finished = ((age += Panel.frameFrequency) >= maximumTime || ScreenGame.finished);
     }
 
     public TestFunction expectOnce(ToBooleanFunction condition)
     {
         totalCases++;
         return new TestFunction(condition).addTo(expectOnce);
+    }
+
+    public TestFunction expectNever(ToBooleanFunction condition)
+    {
+        return expectAlways(condition.not());
+    }
+
+    public TestFunction expectAlways(ToBooleanFunction condition)
+    {
+        totalCases++;
+        TestFunction testFunction = new TestFunction(condition).addTo(expectAlways);
+        testFunction.passed = true;
+        return testFunction;
     }
 
     public TestFunction expectAtEnd(ToBooleanFunction condition)
@@ -148,12 +170,21 @@ public abstract class Test
             else
                 passedEndCases++;
         }
+
+        for (TestFunction f : expectAlways)
+        {
+            if (!f.passed)
+                passed = false;
+            else
+                passedNeverCases++;
+        }
+
         return passed;
     }
 
     public int passedCases()
     {
-        return passedEndCases + expectOncePos;
+        return passedEndCases + passedNeverCases + expectOncePos;
     }
 
     public int totalCases()

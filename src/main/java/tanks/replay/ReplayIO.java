@@ -53,6 +53,8 @@ public class ReplayIO
 
     public static void save(Replay r, String path)
     {
+        ReplayEvents.registerEvents();
+
         try
         {
             File f = new File(path);

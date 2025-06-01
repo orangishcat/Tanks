@@ -1284,6 +1284,14 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	}
 
+	/**
+	 * @return true if the tank can be targeted (is targetable and not hidden)
+	 */
+	public boolean canTarget()
+	{
+		return this.targetable && !this.hidden;
+	}
+
 	public Tank getTopLevelPossessor()
 	{
 		if (this.possessor == null)
@@ -1305,7 +1313,6 @@ public abstract class Tank extends Movable implements ISolidObject
 		Tank p = this;
 		while (p.possessingTank != null)
             p = p.possessingTank;
-
 		return p;
 	}
 

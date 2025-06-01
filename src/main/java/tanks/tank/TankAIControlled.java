@@ -935,7 +935,7 @@ public class TankAIControlled extends Tank implements ITankField
 				continue;
 
 			boolean correctTeam = this.isSupportTank() == Team.isAllied(this, m);
-			if (m instanceof Tank && correctTeam && !((Tank) m).hidden && ((Tank) m).targetable && m != this)
+			if (m instanceof Tank && correctTeam && ((Tank) m).canTarget() && m != this)
 			{
 				if (this.bullet.damage < 0 && ((Tank) m).health - ((Tank) m).baseHealth >= this.bullet.maxExtraHealth && this.bullet.maxExtraHealth > 0)
 					continue;
@@ -970,7 +970,7 @@ public class TankAIControlled extends Tank implements ITankField
 		if (targetEnemy != nearest)
 			this.cooldownStacks = 0;
 
-		seesTargetEnemy = nearest != null && nearest == rayTowardsMovable(nearest);
+		seesTargetEnemy = nearest != null && hasLineOfSightTo(nearest);
         if (secondary == null || nearest == null || seesTargetEnemy)
         {
             targetEnemy = nearest;
@@ -978,14 +978,20 @@ public class TankAIControlled extends Tank implements ITankField
         else
 		{
 			targetEnemy = secondary;
-			seesTargetEnemy = rayTowardsMovable(secondary) == secondary;
+			seesTargetEnemy = hasLineOfSightTo(secondary);
 		}
     }
 
-	public Movable rayTowardsMovable(Movable target)
+	public boolean hasLineOfSightTo(Movable target)
+	{
+		return hasLineOfSightTo(target, true);
+	}
+
+	public boolean hasLineOfSightTo(Movable target, boolean checkAsBullet)
 	{
 		return Ray.newRay(posX, posY, getAngleInDirection(target.posX, target.posY), 0, this)
-				.setSize(this.bullet.size).setAsExplosive(this.bullet.hitExplosion != null).getTarget();
+				.setSize(checkAsBullet ? this.bullet.size : 10).setAsExplosive(checkAsBullet && this.bullet.hitExplosion != null)
+				.getTarget() == target;
 	}
 
 	public boolean updateTargetMimic()
@@ -994,32 +1000,33 @@ public class TankAIControlled extends Tank implements ITankField
 		Movable nearest = null;
 		this.hasTarget = false;
 
-		for (int i = 0; i < Game.movables.size(); i++)
+		for (Movable m : Game.getMovablesInRadius(posX, posY, mimicRange))
 		{
-			Movable m = Game.movables.get(i);
+			if (!(m instanceof Tank))
+				continue;
 
-			if (m instanceof Tank && !(m instanceof TankAIControlled && ((TankAIControlled) m).transformMimic) && (((Tank) m).getTopLevelPossessor() == null || !(((Tank) m).getTopLevelPossessor().getClass().equals(this.getClass())))
-					&& ((Tank) m).targetable && Movable.distanceBetween(m, this) < this.mimicRange && ((Tank) m).size == this.size && !m.destroy)
-			{
-				if (Ray.newRay(this.posX, this.posY, this.getAngleInDirection(m.posX, m.posY), 0, this)
-						.moveOut(5).getTarget() != m)
-					continue;
+			Tank t = (Tank) m;
+            if (m instanceof TankAIControlled && ((TankAIControlled) m).transformMimic ||
+					t.getTopLevelPossessor() != null && t.getTopLevelPossessor().getClass().equals(this.getClass())
+					|| !t.canTarget() || t.size != this.size || m.destroy)
+                continue;
 
-				double distance = Movable.distanceBetween(this, m);
+            if (!hasLineOfSightTo(m, false))
+                continue;
 
-				if (distance < nearestDist)
-				{
-					this.hasTarget = true;
-					nearestDist = distance;
-					nearest = m;
-				}
-			}
-		}
+            double distance = Movable.sqDistBetw(this, m);
+
+            if (distance < nearestDist)
+            {
+                this.hasTarget = true;
+                nearestDist = distance;
+                nearest = m;
+            }
+        }
 
 		targetEnemy = nearest;
-		this.canCurrentlyMimic = targetEnemy != null;
-
-		return targetEnemy != null;
+		this.canCurrentlyMimic = this.seesTargetEnemy = targetEnemy != null;
+		return this.canCurrentlyMimic;
 	}
 
 	public void updateMotionAI()
@@ -1152,9 +1159,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 		Tank p = this;
 		if (this.getTopLevelPossessor() != null)
-		{
-			p = this.getTopLevelPossessor();
-		}
+            p = this.getTopLevelPossessor();
 
 		if (p instanceof TankAIControlled && ((TankAIControlled) p).transformMimic)
 		{
@@ -1789,7 +1794,7 @@ public class TankAIControlled extends Tank implements ITankField
 		else
 		{
 			if (!(m == null))
-				if (!Team.isAllied(m, this) && m instanceof Tank && !((Tank) m).hidden)
+				if (!Team.isAllied(m, this) && m instanceof Tank && ((Tank) m).canTarget())
 					this.shoot();
 		}
 
@@ -2184,7 +2189,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public boolean isInterestingPathTarget(Movable m)
 	{
-		if (!(m instanceof Tank) || !((Tank) m).targetable)
+		if (!(m instanceof Tank) || !((Tank) m).canTarget())
 			return false;
 
 		if (this.transformMimic)
@@ -2547,7 +2552,7 @@ public class TankAIControlled extends Tank implements ITankField
 		else
 			this.transformRevertTimer = this.sightTransformRevertTime;
 
-		if (this.transformRevertTimer <= 0 && this.targetable)
+		if (this.transformRevertTimer <= 0 && this.canTarget())
 		{
 			Game.removeMovables.add(this.sightTransformTank);
 			Tank.idMap.put(this.networkID, this);
@@ -2592,16 +2597,9 @@ public class TankAIControlled extends Tank implements ITankField
 
 		if (targetEnemy != null)
 		{
-			Ray r = Ray.newRay(this.possessingTank.posX, this.possessingTank.posY, 0, 0, this);
-			r.vX = targetEnemy.posX - this.possessingTank.posX;
-			r.vY = targetEnemy.posY - this.possessingTank.posY;
-
-			double ma = Math.sqrt(r.vX * r.vX + r.vY * r.vY) / r.speed;
-			r.vX /= ma;
-			r.vY /= ma;
-
-			r.moveOut(5);
-
+			Ray r = Ray.newRay(this.possessingTank.posX, this.possessingTank.posY,
+					possessingTank.getAngleInDirection(targetEnemy.posX, targetEnemy.posY), 0, this)
+					.moveOut(5);
 			m = r.getTarget(2, (Tank) targetEnemy);
 
 			if (((Tank) targetEnemy).possessor != null)
@@ -2619,7 +2617,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.mimicRevertCounter = this.mimicRevertTime;
 
 		Tank t = this.possessingTank.getBottomLevelPossessing();
-		if (this.mimicRevertCounter <= 0 && this.targetable)
+		if (this.mimicRevertCounter <= 0 && this.canTarget())
 		{
 			Tank.idMap.put(this.networkID, this);
 			this.health = t.health;
@@ -2745,9 +2743,7 @@ public class TankAIControlled extends Tank implements ITankField
 			for (RegistryTank.TankEntry e: Game.registryTank.tankEntries)
 			{
 				if (e.tank.equals(c))
-				{
-					t.name = e.name;
-				}
+                    t.name = e.name;
 			}
 
 			Game.eventsOut.add(new EventTankMimicTransform(this, (Tank) targetEnemy));

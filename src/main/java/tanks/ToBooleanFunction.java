@@ -9,4 +9,9 @@ public interface ToBooleanFunction
     {
         return () -> apply() && other.apply();
     }
+
+    default ToBooleanFunction not()
+    {
+        return () -> !apply();
+    }
 }

@@ -6,6 +6,7 @@ import tanks.Game;
 import tanks.Panel;
 import tanks.item.ItemBullet;
 import tanks.network.event.EventBulletBounce;
+import tanks.replay.Replay;
 import tanks.tank.Tank;
 
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class BulletAirStrike extends Bullet
             this.posZ -= (this.posZ - 1100) * 2;
             this.stopTrails();
 
-            if (!this.isRemote)
+            if (!this.isRemote && Replay.currentPlaying == null)
             {
                 this.posX = this.finalX;
                 this.posY = this.finalY;

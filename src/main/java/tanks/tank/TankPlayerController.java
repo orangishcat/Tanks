@@ -2,7 +2,6 @@ package tanks.tank;
 
 import tanks.Game;
 import tanks.Panel;
-import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.network.event.EventTankControllerUpdateC;
 

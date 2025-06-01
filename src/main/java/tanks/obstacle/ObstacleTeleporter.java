@@ -143,7 +143,7 @@ public class ObstacleTeleporter extends Obstacle
 
         for (Movable m : Game.movables)
         {
-            if (m instanceof Tank && ((Tank) m).targetable && Movable.distanceBetween(this, m) < ((Tank) m).size)
+            if (m instanceof Tank && ((Tank) m).canTarget() && Movable.distanceBetween(this, m) < ((Tank) m).size)
             {
                 t = (Tank) m;
 

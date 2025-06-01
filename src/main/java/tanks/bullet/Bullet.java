@@ -1298,7 +1298,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		if (this.freezing || this.boosting)
 			this.playPopSound = false;
 
-		if (!this.isRemote && ScreenPartyHost.isServer && (this.vX != this.lastOriginalVX || this.vY != this.lastOriginalVY) && !justBounced)
+		if (!this.isRemote && (this.vX != this.lastOriginalVX || this.vY != this.lastOriginalVY) && !justBounced)
 			Game.eventsOut.add(new EventBulletUpdate(this));
 
 		this.justBounced = false;

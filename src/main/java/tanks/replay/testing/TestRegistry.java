@@ -24,6 +24,7 @@ public class TestRegistry
         registerTest(TestPathfinding.class);
         registerTest(TestDiagPathfind.class);
         registerTest(TestPerformance.class);
+        registerTest(TestMimic.class);
     }
 
     public void registerTest(Class<? extends Test> t)

@@ -60,6 +60,10 @@ public class Replay
             return isPlayer(((EventTankUpdate) e).tank);
         else if (e instanceof EventShootBullet)
             return isPlayer(((EventShootBullet) e).tank);
+        else if (e instanceof EventBulletUpdate)
+            return isPlayerBullet(((EventBulletUpdate) e).bullet);
+        else if (e instanceof EventBulletBounce)
+            return isPlayerBullet(((EventBulletBounce) e).bullet);
         else if (e instanceof EventLayMine)
             return isPlayer(((EventLayMine) e).tank);
         else if (e instanceof EventBulletInstantWaypoint)

@@ -216,7 +216,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
         boolean allyNear = false;
         for (Movable m: Game.getMovablesInRadius(posX, posY, explosion.radius))
         {
-            if (m instanceof Tank && !m.destroy && ((Tank) m).targetable)
+            if (m instanceof Tank && !m.destroy && ((Tank) m).canTarget())
             {
                 if (Team.isAllied(m, this.tank))
                     allyNear = true;

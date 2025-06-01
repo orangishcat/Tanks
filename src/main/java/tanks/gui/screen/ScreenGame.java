@@ -29,7 +29,6 @@ import tanks.tank.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGameScreen
 {
@@ -2230,7 +2229,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
                 ScreenInterlevel.tutorialInitial ? new Button[]{resumeLowerPos, restartTutorial} : null,
                 ScreenInterlevel.tutorial ? new Button[]{resumeLowerPos, restartTutorial, quitHigherPos} : null,
                 Crusade.crusadeMode ? getCrusadeButtons() : null,
-				Game.screen instanceof ScreenAutomatedTests ? new Button[]{resumeLowerPos} : null
+				Game.screen instanceof ScreenAutomatedTests ? new Button[]{resumeLowerPos, quitHigherPos} : null
         );
 		if (pauseMenuButtons.isEmpty())
 			addButtons(pauseMenuButtons, new Button[]{resume, newLevel, restart, quit});

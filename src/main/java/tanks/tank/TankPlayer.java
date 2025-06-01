@@ -252,7 +252,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 			else if (x == 1)
 				a = 7 * Math.PI / 4;
 
-			double intensity = 1;
+			double intensity;
 
 			if (a < 0 && Game.game.window.touchscreen)
 			{
@@ -451,8 +451,6 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 		if ((trace || lockTrace) && !Game.bulletLocked && !this.disabled && (Game.screen instanceof ScreenGame || Game.screen instanceof ScreenTitle))
 		{
-			boolean showTrace = true;
-
 			ItemBullet.ItemStackBullet i = null;
 
 			if (this.getPrimaryAbility() instanceof ItemBullet.ItemStackBullet)
@@ -473,7 +471,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 				double lifespan = b.lifespan > 0 ? b.lifespan * b.speed + this.turretLength : 0;
 				double rangeMax = b.getRangeMax();
 				double rangeMin = b.getRangeMin();
-				showTrace = b.showDefaultTrace;
+				boolean showTrace = b.showDefaultTrace;
 
 				if (lifespan > 0)
 					lifespan *= em().getAttributeValue(AttributeModifier.bullet_speed, 1);
@@ -500,25 +498,17 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 						}
 
 						Ray r = Ray.newRay(this.posX, this.posY, this.angle + baseOff + gasOff, b.bounces, this)
-								.setSize(k != 0 ? b.size / 2 : b.size);
-						r.bounces = b.bounces;
-						r.size = b.size;
-						if (k != 0)
-							r.size /= 2;
-
-						r.range = lifespan - this.turretLength;
+								.setSize(k != 0 ? b.size / 2 : b.size).setRange(lifespan - this.turretLength)
+								.setTrace(true, true);
+						r.vX /= 2;
+						r.vY /= 2;
+						r.moveOut(10 * this.size / Game.tile_size);
 
 						if (b instanceof BulletArc)
 							((BulletArc) b).drawTrace(this.posX, this.posY, this.mouseX, this.mouseY, this.angle + baseOff + gasOff);
 
 						if (b instanceof BulletAirStrike)
 							((BulletAirStrike) b).drawTrace(this.posX, this.posY, this.mouseX, this.mouseY);
-
-						r.vX /= 2;
-						r.vY /= 2;
-						r.trace = true;
-						r.dotted = true;
-						r.moveOut(10 * this.size / Game.tile_size);
 
 						if (rangeMax > 0)
 							this.drawRangeMax = rangeMax;
@@ -534,9 +524,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 					}
 				}
 			}
-			else
-				showTrace = false;
-		}
+        }
 
 		super.update();
 	}

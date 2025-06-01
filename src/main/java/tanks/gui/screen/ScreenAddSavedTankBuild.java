@@ -5,7 +5,6 @@ import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.Button;
 import tanks.gui.ButtonObject;
-import tanks.gui.screen.leveleditor.OverlayObjectMenu;
 import tanks.gui.screen.leveleditor.OverlayPlayerBuilds;
 import tanks.tank.Tank;
 import tanks.tank.TankAIControlled;

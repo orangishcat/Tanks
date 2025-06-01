@@ -15,6 +15,7 @@ import tanks.tank.Tank;
 import tanks.tank.TankPlayer;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ReplayEvents
@@ -182,16 +183,14 @@ public class ReplayEvents
     public static int get(Class<? extends INetworkEvent> c)
     {
         Integer i = inst.map2.get(c);
-
         if (i == null)
-            return -1;
-
+            throw new RuntimeException("The network event " + c + " has not been registered!");
         return i;
     }
 
     public static Class<? extends INetworkEvent> get(int i)
     {
-        return inst.map1.get(i);
+        return Objects.requireNonNull(inst.map1.get(i), "The network event " + i + " has not been registered!");
     }
 
     private static boolean registered = false;
