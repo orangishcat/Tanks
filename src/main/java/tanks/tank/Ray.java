@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import tanks.Effect;
 import tanks.Game;
 import tanks.Movable;
@@ -7,7 +8,6 @@ import tanks.gui.screen.ScreenGame;
 import tanks.obstacle.Face;
 import tanks.obstacle.Obstacle;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 public class Ray
@@ -39,8 +39,8 @@ public class Ray
 	public Tank tank;
 	public Tank targetTank;
 
-	public ArrayList<Double> bounceX = new ArrayList<>();
-	public ArrayList<Double> bounceY = new ArrayList<>();
+	public DoubleArrayList bounceX = new DoubleArrayList();
+	public DoubleArrayList bounceY = new DoubleArrayList();
 
 	public double targetX;
 	public double targetY;
@@ -478,7 +478,7 @@ public class Ray
 		double dist = 0;
 		for (int i = 0; i < this.bounceX.size() - 1; i++)
 		{
-			dist += Math.sqrt(Math.pow(this.bounceX.get(i + 1) - this.bounceX.get(i), 2) + Math.pow(this.bounceY.get(i + 1) - this.bounceY.get(i), 2));
+			dist += Math.sqrt(Math.pow(this.bounceX.getDouble(i + 1) - this.bounceX.getDouble(i), 2) + Math.pow(this.bounceY.getDouble(i + 1) - this.bounceY.getDouble(i), 2));
 		}
 
 		return dist;
@@ -492,7 +492,7 @@ public class Ray
 		double dist = 0;
 		for (int i = 0; i < this.bounceX.size() - 1; i++)
 		{
-			dist += Math.sqrt(Math.pow(this.bounceX.get(i + 1) - this.bounceX.get(i), 2) + Math.pow(this.bounceY.get(i + 1) - this.bounceY.get(i), 2));
+			dist += Math.sqrt(Math.pow(this.bounceX.getDouble(i + 1) - this.bounceX.getDouble(i), 2) + Math.pow(this.bounceY.getDouble(i + 1) - this.bounceY.getDouble(i), 2));
 		}
 
 		return dist;
