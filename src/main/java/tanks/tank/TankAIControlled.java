@@ -1319,17 +1319,23 @@ public class TankAIControlled extends Tank implements ITankField
 						(newTile.type == Tile.Type.destructible && !enableMineLaying))
 					continue;
 
+				int extraCost = 0;
 				if (i >= 4)
 				{
 					// diagonal check
 					int signX = x < t.tileX ? 1 : -1;
 					int signY = y < t.tileY ? 1 : -1;
-					if (g[x][y + signY].type != Tile.Type.empty ||
-							g[x + signX][y].type != Tile.Type.empty)
+					Tile diag1 = g[x][y + signY], diag2 = g[x + signX][y];
+					if (diag1.type != Tile.Type.empty || diag2.type != Tile.Type.empty)
 						continue;
+
+					extraCost = diag1.unfavorability + diag2.unfavorability - 2;
 				}
 
-				int newCost = t.cost + newTile.unfavorability;
+				int newCost = t.cost + newTile.unfavorability + extraCost;
+				if (t.cost > newCost)
+					throw new AssertionError("Cost is lower than parent cost; infinite loop detected");
+
 				if (newCost >= newTile.cost)
 					continue;
 
@@ -1347,9 +1353,8 @@ public class TankAIControlled extends Tank implements ITankField
 			this.currentlySeeking = true;
 			this.seekTimer = this.seekTimerBase;
 
-			while (endingTile.parent != null)
+			while ((endingTile = endingTile.parent) != null)
 			{
-				endingTile = endingTile.parent;
 				endingTile.shiftedX = endingTile.shiftSides(this.random, true);
 				endingTile.shiftedY = endingTile.shiftSides(this.random, false);
 				this.path.addFirst(endingTile);
@@ -1379,7 +1384,10 @@ public class TankAIControlled extends Tank implements ITankField
 		}
 
 		Tile t = this.path.get(0);
-		this.setAccelInDirWithOffset(t.shiftedX, t.shiftedY, this.acceleration, (seekTimerBase - seekTimer) % 100 < 50 ? 0.2 : -0.2);
+		double offset = 0;
+		if (seekTimerBase - seekTimer > 75)
+			offset = (seekTimerBase - seekTimer) % 100 > 50 ? 0.4 : -0.4;
+		this.setAccelInDirWithOffset(t.shiftedX, t.shiftedY, this.acceleration, offset);
 
 		double useMineRadius = size * 1.4;
         if (Math.pow(t.shiftedX - this.posX, 2) + Math.pow(t.shiftedY - this.posY, 2) <= Math.pow(useMineRadius, 2))

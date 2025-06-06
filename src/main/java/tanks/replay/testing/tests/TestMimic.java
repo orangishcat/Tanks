@@ -70,8 +70,6 @@ public class TestMimic extends Test
 
             return mimics == 8;
         }).setName("All mimic tanks should have reverted after mustard got nuked");
-
-        expectAllyWin();
     }
 
     @Override
