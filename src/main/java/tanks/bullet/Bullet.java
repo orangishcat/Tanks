@@ -1,6 +1,5 @@
 package tanks.bullet;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.gui.ChatMessage;
 import tanks.gui.IFixedMenu;
@@ -20,13 +19,14 @@ import tanks.tankson.Property;
 import tanks.tankson.TanksONable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @TanksONable("bullet")
 public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditable
 {
 	public static int currentID = 0;
 	public static ArrayList<Integer> freeIDs = new ArrayList<>();
-	public static Int2ObjectOpenHashMap<Bullet> idMap = new Int2ObjectOpenHashMap<>();
+	public static HashMap<Integer, Bullet> idMap = new HashMap<>();
 
 	public static String bullet_class_name = "bullet";
 

@@ -1,16 +1,19 @@
 package lwjglwindow;
 
-import basewindow.*;
+import basewindow.BaseShapeBatchRenderer;
+import basewindow.IBatchRenderableObject;
+import basewindow.ShaderGroup;
 import basewindow.transformation.Rotation;
 import basewindow.transformation.Scale;
 import basewindow.transformation.Translation;
+import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -18,12 +21,12 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 {
     public int vertVBO = -1;
     public int colVBO = -1;
-    public HashMap<ShaderGroup.Attribute, Integer> attributeVBOs = new HashMap<>();
+    public Object2IntLinkedOpenHashMap<ShaderGroup.Attribute> attributeVBOs = new Object2IntLinkedOpenHashMap<>();
 
     public boolean initialized = false;
 
-    public LinkedHashMap<IBatchRenderableObject, Integer> bufferStartPoints = new LinkedHashMap<>();
-    public LinkedHashMap<IBatchRenderableObject, Integer> bufferSizes = new LinkedHashMap<>();
+    public Object2IntLinkedOpenHashMap<IBatchRenderableObject> bufferStartPoints = new Object2IntLinkedOpenHashMap<>();
+    public Object2IntLinkedOpenHashMap<IBatchRenderableObject> bufferSizes = new Object2IntLinkedOpenHashMap<>();
 
     public int size = 0;
     public int capacity = 6000;
@@ -31,8 +34,8 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 
     public FloatBuffer vertBuffer = BufferUtils.createFloatBuffer(capacity * 3);
     public FloatBuffer colBuffer = BufferUtils.createFloatBuffer(capacity * 4);
-    protected HashMap<ShaderGroup.Attribute, FloatBuffer> attributeBuffers = new HashMap<>();
-    protected HashMap<ShaderGroup.Attribute, float[]> floatAttributes = new HashMap<>();
+    protected Object2ObjectOpenHashMap<ShaderGroup.Attribute, FloatBuffer> attributeBuffers = new Object2ObjectOpenHashMap<>();
+    protected Object2ObjectOpenHashMap<ShaderGroup.Attribute, float[]> floatAttributes = new Object2ObjectOpenHashMap<>();
 
     public LWJGLWindow window;
 
@@ -156,13 +159,11 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
             this.attributeBuffers.get(a).rewind();
         }
 
-        LinkedHashMap<IBatchRenderableObject, Integer> newBufferStartPoints = new LinkedHashMap<>();
+        Object2IntLinkedOpenHashMap<IBatchRenderableObject> newBufferStartPoints = new Object2IntLinkedOpenHashMap<>();
 
         int totalSize = 0;
         for (IBatchRenderableObject o : this.bufferStartPoints.keySet())
-        {
-            totalSize += this.bufferSizes.get(o);
-        }
+            totalSize += this.bufferSizes.getInt(o);
 
         int newCapacity = this.capacity * 2;
 
@@ -181,8 +182,8 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         int newPos = 0;
         for (IBatchRenderableObject o : this.bufferStartPoints.keySet())
         {
-            int start = this.bufferStartPoints.get(o);
-            int size = this.bufferSizes.get(o);
+            int start = this.bufferStartPoints.getInt(o);
+            int size = this.bufferSizes.getInt(o);
 
             while (pos < start)
             {
@@ -258,13 +259,13 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         if (this.modifyingSize >= 0 && this.modifyingWritten >= this.modifyingSize)
             this.migrate(o);
 
-        if (this.bufferStartPoints.get(o) == null)
+        if (!this.bufferStartPoints.containsKey(o))
         {
             this.bufferStartPoints.put(o, this.size);
             this.bufferSizes.put(o, 1);
         }
         else if (this.modifyingSize < 0)
-            this.bufferSizes.put(o, this.bufferSizes.get(o) + 1);
+            this.bufferSizes.put(o, this.bufferSizes.getInt(o) + 1);
 
         this.vertBuffer.put(x);
         this.vertBuffer.put(y);
@@ -292,10 +293,10 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 
     public void endModification()
     {
-        if (this.modifying == null || this.modifyingSize < 0 || this.bufferStartPoints.get(this.modifying) == null)
+        if (this.modifying == null || this.modifyingSize < 0 || !this.bufferStartPoints.containsKey(this.modifying))
             return;
 
-        int start = this.bufferStartPoints.get(this.modifying);
+        int start = this.bufferStartPoints.getInt(this.modifying);
         for (int i = this.modifyingWritten + start; i < start + this.modifyingSize; i++)
         {
             this.vertBuffer.put(i * 3, 0f);
@@ -333,7 +334,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * start * 4, this.colBuffer);
         for (ShaderGroup.Attribute a: attributeBuffers.keySet())
         {
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.get(a));
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.getInt(a));
             GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * start * a.count, this.attributeBuffers.get(a));
         }
 
@@ -371,14 +372,14 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
                 this.endModification();
                 this.modifyingWritten = 0;
 
-                if (this.bufferStartPoints.get(o) != null)
+                if (!this.bufferStartPoints.containsKey(o))
                 {
-                    this.modifyingSize = this.bufferSizes.get(o);
-                    this.vertBuffer.position(this.bufferStartPoints.get(o) * 3);
-                    this.colBuffer.position(this.bufferStartPoints.get(o) * 4);
+                    this.modifyingSize = this.bufferSizes.getInt(o);
+                    this.vertBuffer.position(this.bufferStartPoints.getInt(o) * 3);
+                    this.colBuffer.position(this.bufferStartPoints.getInt(o) * 4);
                     for (ShaderGroup.Attribute a: attributeBuffers.keySet())
                     {
-                        this.attributeBuffers.get(a).position(this.bufferStartPoints.get(o) * a.count);
+                        this.attributeBuffers.get(a).position(this.bufferStartPoints.getInt(o) * a.count);
                     }
                 }
                 else
@@ -420,7 +421,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
                 b.flip();
                 b.limit(b.capacity());
 
-                this.window.vertexBufferDataDynamic(this.attributeVBOs.get(a), b);
+                this.window.vertexBufferDataDynamic(this.attributeVBOs.getInt(a), b);
             }
 
             this.justExpanded = false;
@@ -448,7 +449,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
             GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * this.initSize * 4, this.colBuffer);
             for (ShaderGroup.Attribute a : attributeBuffers.keySet())
             {
-                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.get(a));
+                GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.getInt(a));
                 GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * this.initSize * a.count, this.attributeBuffers.get(a));
             }
 
@@ -467,8 +468,8 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         if (this.adding != null)
             this.endAdd();
 
-        int pos = this.bufferStartPoints.remove(o);
-        int size = this.bufferSizes.remove(o);
+        int pos = this.bufferStartPoints.removeInt(o);
+        int size = this.bufferSizes.removeInt(o);
 
         this.vertBuffer.position(pos * 3);
         this.colBuffer.position(pos * 4);
@@ -489,12 +490,8 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
             this.colBuffer.put(i * 4 + 3, 0f);
 
             for (ShaderGroup.Attribute a: attributeBuffers.keySet())
-            {
                 for (int j = 0; j < a.count; j++)
-                {
                     this.attributeBuffers.get(a).put(i * a.count + j, 0);
-                }
-            }
         }
 
 
@@ -504,7 +501,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * pos * 4, new float[4 * size]);
         for (ShaderGroup.Attribute a: attributeBuffers.keySet())
         {
-            Integer v = this.attributeVBOs.get(a);
+            Integer v = this.attributeVBOs.getInt(a);
             if (v != null)
             {
                 GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, v);
@@ -528,11 +525,11 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 
     public void migrate(IBatchRenderableObject o)
     {
-        if (this.capacity <= this.size + this.bufferSizes.get(o))
+        if (this.capacity <= this.size + this.bufferSizes.getInt(o))
             this.expand();
 
-        int pos = this.bufferStartPoints.get(o);
-        int size = this.bufferSizes.get(o);
+        int pos = this.bufferStartPoints.getInt(o);
+        int size = this.bufferSizes.getInt(o);
 
         this.vertBuffer.position(pos * 3);
         this.colBuffer.position(pos * 4);
@@ -577,7 +574,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * pos * 4, new float[4 * size]);
         for (ShaderGroup.Attribute a: attributeBuffers.keySet())
         {
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.get(a));
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.attributeVBOs.getInt(a));
             GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, (long) Float.BYTES * pos * a.count, new float[a.count * size]);
         }
     }
@@ -626,7 +623,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
             for (ShaderGroup.Attribute a: this.attributeBuffers.keySet())
             {
                 this.attributeBuffers.get(a).limit(this.attributeBuffers.get(a).capacity());
-                this.window.vertexBufferDataDynamic(this.attributeVBOs.get(a), this.attributeBuffers.get(a));
+                this.window.vertexBufferDataDynamic(this.attributeVBOs.getInt(a), this.attributeBuffers.get(a));
             }
         }
         else
@@ -636,7 +633,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 
             for (ShaderGroup.Attribute a: this.attributeBuffers.keySet())
             {
-                this.window.vertexBufferData(this.attributeVBOs.get(a), this.attributeBuffers.get(a));
+                this.window.vertexBufferData(this.attributeVBOs.getInt(a), this.attributeBuffers.get(a));
             }
         }
     }
@@ -659,7 +656,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 
             for (ShaderGroup.Attribute a : this.shader.attributes)
             {
-                this.shader.setCustomBuffer(a, this.attributeVBOs.get(a), a.count);
+                this.shader.setCustomBuffer(a, this.attributeVBOs.getInt(a), a.count);
             }
 
             this.shader.drawVBO(this.size);
