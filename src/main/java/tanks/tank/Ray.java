@@ -27,7 +27,7 @@ public class Ray
 	public double posX, posY, vX, vY, angle;
 	public double startX, startY;
 
-	public int maxChunkCheck = 12;
+	public int maxChunkCheck = 100;
 
 	public boolean enableBounciness = true;
 	public boolean asBullet = true;
@@ -97,7 +97,7 @@ public class Ray
 		this.ignoreBullets = true;
 		this.asBullet = true;
 		this.ignoreDestructible = false;
-		this.ignoreShootThrough = false;
+		this.ignoreShootThrough = true;
 
 		this.age = 0;
 		this.range = 0;
@@ -121,7 +121,6 @@ public class Ray
 	public Ray setAsExplosive(boolean explosive)
 	{
 		this.ignoreDestructible = explosive;
-		this.ignoreShootThrough = explosive;
 		return this;
 	}
 
