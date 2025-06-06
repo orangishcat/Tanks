@@ -48,9 +48,9 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
     public static Effect createNewEffect(double x, double y, double z, EffectType type)
     {
-        while (Game.recycleEffects.size() > 0)
+        while (!Game.recycleEffects.isEmpty())
         {
-            Effect e = Game.recycleEffects.remove();
+            Effect e = Game.recycleEffects.dequeue();
 
             if (e.state == State.recycle)
             {

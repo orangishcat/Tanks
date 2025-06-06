@@ -3,6 +3,7 @@ package tanks.gui.screen.leveleditor;
 import basewindow.BaseFile;
 import basewindow.InputCodes;
 import basewindow.InputPoint;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.gui.Button;
 import tanks.gui.input.InputBindingGroup;
@@ -1708,7 +1709,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		level.append(this.level.sizeX).append(",").append(this.level.sizeY).append(",").append(this.level.colorR).append(",").append(this.level.colorG).append(",").append(this.level.colorB).append(",").append(this.level.colorVarR).append(",").append(this.level.colorVarG).append(",").append(this.level.colorVarB)
 				.append(",").append((int) (this.level.timer / 100)).append(",").append((int) Math.round(this.level.light * 100)).append(",").append((int) Math.round(this.level.shadow * 100)).append("|");
 
-		ArrayList<Obstacle> unmarked = (ArrayList<Obstacle>) Game.obstacles.clone();
+		ObjectArrayList<Obstacle> unmarked = Game.obstacles.clone();
 		String[][][] obstacles = new String[Game.registryObstacle.obstacleEntries.size()][this.level.sizeX][this.level.sizeY];
 
 		for (int h = 0; h < Game.registryObstacle.obstacleEntries.size(); h++)

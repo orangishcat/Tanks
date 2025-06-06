@@ -1,6 +1,7 @@
 package tanks.tank;
 
 import basewindow.Model;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.gui.screen.ScreenGame;
@@ -28,7 +29,7 @@ public abstract class Tank extends Movable implements ISolidObject
 {
 	public static int currentID = 0;
 	public static ArrayList<Integer> freeIDs = new ArrayList<>();
-	public static HashMap<Integer, Tank> idMap = new HashMap<>();
+	public static Int2ObjectOpenHashMap<Tank> idMap = new Int2ObjectOpenHashMap<>();
 
 	public static Model health_model;
 

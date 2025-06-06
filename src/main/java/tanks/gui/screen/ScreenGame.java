@@ -2079,7 +2079,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			{
 				e.state = Effect.State.recycle;
 				Game.effects.remove(e);
-				Game.recycleEffects.add(e);
+				Game.recycleEffects.enqueue(e);
 			}
 		}
 
@@ -2092,7 +2092,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			{
 				e.state = Effect.State.recycle;
 				Game.tracks.remove(e);
-				Game.recycleEffects.add(e);
+				Game.recycleEffects.enqueue(e);
 			}
 		}
 

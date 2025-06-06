@@ -1,7 +1,12 @@
 package tanks;
 
-import basewindow.*;
+import basewindow.BaseFile;
+import basewindow.BaseFileManager;
+import basewindow.BaseWindow;
+import basewindow.ShaderGroup;
 import com.codedisaster.steamworks.SteamMatchmaking;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.bullet.*;
 import tanks.extension.Extension;
 import tanks.extension.ExtensionRegistry;
@@ -21,7 +26,10 @@ import tanks.item.Item;
 import tanks.item.ItemBullet;
 import tanks.item.ItemMine;
 import tanks.item.ItemShield;
-import tanks.minigames.*;
+import tanks.minigames.ArcadeBeatBlocks;
+import tanks.minigames.ArcadeClassic;
+import tanks.minigames.CastleRampage;
+import tanks.minigames.Minigame;
 import tanks.network.Client;
 import tanks.network.NetworkEventMap;
 import tanks.network.SteamNetworkHandler;
@@ -35,7 +43,10 @@ import tanks.rendering.ShaderGroundOutOfBounds;
 import tanks.rendering.ShaderTracks;
 import tanks.tank.*;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 
 public class Game
@@ -53,8 +64,8 @@ public class Game
 
 	public static final int absoluteDepthBase = 1000;
 
-	public static ArrayList<Face> horizontalFaces = new ArrayList<>();
-	public static ArrayList<Face> verticalFaces = new ArrayList<>();
+	public static ObjectArrayList<Face> horizontalFaces = new ObjectArrayList<>();
+	public static ObjectArrayList<Face> verticalFaces = new ObjectArrayList<>();
 
 	public boolean[][] solidGrid;
 	public boolean[][] unbreakableGrid;
@@ -64,8 +75,8 @@ public class Game
 
 	public double[][] lastHeightGrid;
 
-	public static ArrayList<Movable> movables = new ArrayList<>();
-	public static ArrayList<Obstacle> obstacles = new ArrayList<>();
+	public static ObjectArrayList<Movable> movables = new ObjectArrayList<>();
+	public static ObjectArrayList<Obstacle> obstacles = new ObjectArrayList<>();
 	public static ArrayList<IAvoidObject> avoidObjects = new ArrayList<>();
 	public static ArrayList<Effect> effects = new ArrayList<>();
 	public static ArrayList<Effect> tracks = new ArrayList<>();
@@ -106,18 +117,18 @@ public class Game
 		}
 	}
 
-	public static HashSet<GroundTile> redrawGroundTiles = new HashSet<>();
+	public static ObjectArrayList<GroundTile> redrawGroundTiles = new ObjectArrayList<>();
 
 	public static Player player;
 
-	public static HashSet<Movable> removeMovables = new HashSet<>();
-	public static HashSet<Obstacle> removeObstacles = new HashSet<>();
-	public static HashSet<Effect> removeEffects = new HashSet<>();
-	public static HashSet<Effect> removeTracks = new HashSet<>();
-	public static HashSet<Cloud> removeClouds = new HashSet<>();
+	public static ObjectArrayList<Movable> removeMovables = new ObjectArrayList<>();
+	public static ObjectArrayList<Obstacle> removeObstacles = new ObjectArrayList<>();
+	public static ObjectArrayList<Effect> removeEffects = new ObjectArrayList<>();
+	public static ObjectArrayList<Effect> removeTracks = new ObjectArrayList<>();
+	public static ObjectArrayList<Cloud> removeClouds = new ObjectArrayList<>();
 
 	public static ArrayList<Effect> addEffects = new ArrayList<>();
-	public static Queue<Effect> recycleEffects = new LinkedList<>();
+	public static ObjectArrayFIFOQueue<Effect> recycleEffects = new ObjectArrayFIFOQueue<>();
 
 	public static final SynchronizedList<INetworkEvent> eventsOut = new SynchronizedList<>();
 	public static final SynchronizedList<INetworkEvent> eventsIn = new SynchronizedList<>();

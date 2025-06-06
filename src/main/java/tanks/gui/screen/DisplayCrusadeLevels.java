@@ -4,6 +4,7 @@ import basewindow.transformation.RotationAboutPoint;
 import basewindow.transformation.ScaleAboutPoint;
 import basewindow.transformation.Transformation;
 import basewindow.transformation.Translation;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.obstacle.Obstacle;
 import tanks.rendering.StaticTerrainRenderer;
@@ -19,8 +20,8 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
 {
     public static class ScreenLevel
     {
-        public ArrayList<Movable> movables = new ArrayList<>();
-        public ArrayList<Obstacle> obstacles = new ArrayList<>();
+        public ObjectArrayList<Movable> movables = new ObjectArrayList<>();
+        public ObjectArrayList<Obstacle> obstacles = new ObjectArrayList<>();
         public ArrayList<TankAIControlled> tanks = new ArrayList<>();
         public String levelString;
         public Level level;
@@ -88,8 +89,8 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
         l.renderer = new StaticTerrainRenderer();
         l.renderer.asPreview = true;
 
-        ArrayList<Movable> movables = Game.movables;
-        ArrayList<Obstacle> obstacles = Game.obstacles;
+        ObjectArrayList<Movable> movables = Game.movables;
+        ObjectArrayList<Obstacle> obstacles = Game.obstacles;
 
         Game.cleanUp();
 
@@ -195,8 +196,8 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
         if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
             this.age += Panel.frameFrequency;
 
-        ArrayList<Movable> movables = Game.movables;
-        ArrayList<Obstacle> obstacles = Game.obstacles;
+        ObjectArrayList<Movable> movables = Game.movables;
+        ObjectArrayList<Obstacle> obstacles = Game.obstacles;
 
         if (!initialized)
         {
