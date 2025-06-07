@@ -719,8 +719,8 @@ public class LWJGLWindow extends BaseWindow
 		return result;
 	}
 
-	public InputStream getResource(String path) throws FileNotFoundException
-	{
+	public InputStream getResource(String path) throws IOException
+    {
 		return ComputerFileManager.getResource(this.overrideLocations, path);
 	}
 

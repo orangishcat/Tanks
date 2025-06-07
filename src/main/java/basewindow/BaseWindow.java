@@ -144,6 +144,10 @@ public abstract class BaseWindow
         this.setupKeyCodes();
     }
 
+    protected BaseWindow()
+    {
+    }
+
     public void startTiming()
     {
         long milliTime = System.currentTimeMillis();

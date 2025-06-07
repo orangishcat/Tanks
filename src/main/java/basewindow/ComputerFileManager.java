@@ -1,6 +1,10 @@
 package basewindow;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Scanner;
@@ -65,19 +69,19 @@ public class ComputerFileManager extends BaseFileManager
         }
     }
 
-    public InputStream getResource(String path) throws FileNotFoundException
+    public InputStream getResource(String path) throws IOException
     {
         return getResource(this.overrideLocations, path);
     }
 
-    public static InputStream getResource(ArrayList<String> overrideLocations, String path) throws FileNotFoundException
+    public static InputStream getResource(ArrayList<String> overrideLocations, String path) throws IOException
     {
         for (String overridesDir: overrideLocations)
         {
             File f = new File(overridesDir + path);
 
             if (f.exists())
-                return new FileInputStream(f);
+                return Files.newInputStream(f.toPath());
         }
 
         return ComputerFileManager.class.getResourceAsStream(path);

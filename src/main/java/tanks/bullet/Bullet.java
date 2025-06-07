@@ -811,7 +811,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 				double bound = s / 2 + Game.tile_size / 2;
 
-				if (horizontalDist < bound && verticalDist < bound)
+				if (horizontalDist <= bound && verticalDist <= bound)
 				{
 					if (o.checkForObjects)
 						o.onObjectEntry(this);

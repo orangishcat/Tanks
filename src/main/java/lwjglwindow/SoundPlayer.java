@@ -75,14 +75,11 @@ public class SoundPlayer extends BaseSoundPlayer
             // Start with some reasonable size
             ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
 
-            int totalRead = 0;
             while (true)
             {
                 int bytesRead = channel.read(buffer);
                 if (bytesRead == -1)
                     break;  // EOF
-
-                totalRead += bytesRead;
 
                 // Expand buffer if there’s no more room
                 if (!buffer.hasRemaining())

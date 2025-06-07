@@ -13,14 +13,12 @@ import tanks.network.NetworkEventMap;
 import tanks.network.event.*;
 import tanks.network.event.online.IOnlineServerEvent;
 import tanks.obstacle.Obstacle;
-import tanks.obstacle.ObstacleTeleporter;
 import tanks.rendering.*;
 import tanks.tank.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.UUID;
 
 public class Panel
 {
@@ -230,6 +228,12 @@ public class Panel
 			{
 				Game.exitToCrash(e);
 			}
+		}
+
+		if (Game.game.window.validPressedKeys.contains(InputCodes.KEY_F12) && Game.game.window.validPressedKeys.contains(InputCodes.KEY_LEFT_ALT) && Game.debug)
+		{
+			Game.game.window.validPressedKeys.clear();
+			Game.exitToCrash(new Exception("Manually initiated crash"));
 		}
 
 		if (Game.game.input.screenshot.isValid())
@@ -661,12 +665,6 @@ public class Panel
 		}
 
 		forceRefreshMusic = false;
-
-		if (Game.game.window.validPressedKeys.contains(InputCodes.KEY_F12) && Game.game.window.validPressedKeys.contains(InputCodes.KEY_LEFT_ALT) && Game.debug)
-		{
-			Game.game.window.validPressedKeys.clear();
-			Game.exitToCrash(new Exception("Manually initiated crash"));
-		}
 
 		if (!ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)
 			Game.eventsOut.clear();

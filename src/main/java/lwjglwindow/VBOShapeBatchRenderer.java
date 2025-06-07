@@ -7,6 +7,7 @@ import basewindow.transformation.Rotation;
 import basewindow.transformation.Scale;
 import basewindow.transformation.Translation;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL15;
@@ -21,7 +22,7 @@ public class VBOShapeBatchRenderer extends BaseShapeBatchRenderer
 {
     public int vertVBO = -1;
     public int colVBO = -1;
-    public Object2IntLinkedOpenHashMap<ShaderGroup.Attribute> attributeVBOs = new Object2IntLinkedOpenHashMap<>();
+    public Object2IntOpenHashMap<ShaderGroup.Attribute> attributeVBOs = new Object2IntOpenHashMap<>();
 
     public boolean initialized = false;
 
