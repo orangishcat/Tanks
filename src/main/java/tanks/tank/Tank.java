@@ -591,8 +591,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		double boost = 0;
 
 		EffectManager em = getEffectManager();
-		AttributeModifier.Instance a = em.getAttribute(AttributeModifier.healray);
-		if (a != null && health < baseHealth)
+		if (health < baseHealth)
 			em.removeAttribute(AttributeModifier.healray);
 
 		this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
@@ -1032,10 +1031,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			this.health = Math.max(prev, Math.min(this.health, this.baseHealth + ((Bullet) source).maxExtraHealth));
 
 		if (this.health <= 1)
-		{
-			AttributeModifier.Instance a = em().getAttribute(AttributeModifier.healray);
-			if (a != null) em().removeAttribute(AttributeModifier.healray);
-		}
+            em().removeAttribute(AttributeModifier.healray);
 
 		Game.eventsOut.add(new EventTankUpdateHealth(this));
 

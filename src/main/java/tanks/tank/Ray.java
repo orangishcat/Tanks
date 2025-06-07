@@ -365,14 +365,14 @@ public class Ray
 			// move forward one chunk in the ray's direction
 			Chunk mid = chunksChecked > 0 ? Chunk.getChunk(posX + moveX, posY + moveY) : null;
 			// add current chunk and chunk in front
-			addChunks(current, mid);
+			addChunk(current, mid);
 
 			// if the ray moved diagonally, add the chunks on the sides
 			if (mid == null || current.manhattanDist(mid) > 1)
-				addChunks(current,
-						Chunk.getChunk(posX + moveXPrev, posY + moveY),
-						Chunk.getChunk(posX + moveX, posY + moveYPrev)
-				);
+			{
+				addChunk(current, Chunk.getChunk(posX + moveXPrev, posY + moveY));
+				addChunk(current, Chunk.getChunk(posX + moveX, posY + moveYPrev));
+			}
 
 			if (chunksAdded == 0)
 				break;
@@ -612,16 +612,13 @@ public class Ray
 		return dist;
 	}
 
-	private void addChunks(Chunk compare, Chunk... chunks)
+	private void addChunk(Chunk compare, Chunk c)
 	{
-		for (Chunk c : chunks)
-		{
-			if (c == null || (chunksAdded > 0 && c == chunkCache[chunksAdded - 1]))
-				continue;
+		if (c == null || (chunksAdded > 0 && c == chunkCache[chunksAdded - 1]))
+			return;
 
-			c.compareTo = compare;
-			chunkCache[chunksAdded++] = c;
-		}
+		c.compareTo = compare;
+		chunkCache[chunksAdded++] = c;
 	}
 
 	public double getAngleInDirection(double x, double y)

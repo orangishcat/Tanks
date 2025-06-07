@@ -831,7 +831,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                     if (Item.ItemStack.class.isAssignableFrom(p.getType()))
                         b.image = ((Item.ItemStack<?>) p.get()).item.icon;
 
-                    b.optionText = Game.formatString(o.getName());
+                    b.optionText = o.getName().replace("_", " ");
                 }
             });
         };
@@ -859,7 +859,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
                 b.image = ((Item.ItemStack<?>) p.get()).item.icon;
             }
 
-            b.optionText = Game.formatString(o.getName());
+            b.optionText = o.getName().replace("_", " ");
         }
 
         return b;

@@ -293,9 +293,10 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		if (!this.tank.isRemote && this.affectsMaxLiveBullets)
 			this.item.liveBullets++;
 
-		AttributeModifier.Instance a = this.tank.em().getAttribute(AttributeModifier.bullet_boost);
+		AttributeModifier a = this.tank.em().getAttribute(AttributeModifier.bullet_boost);
 		if (a != null)
-			em().addStatusEffect(StatusEffect.boost_bullet, a.age(), 0, a.deteriorationAge(), a.duration());
+			em().addStatusEffect(StatusEffect.boost_bullet, a.age, 0, a.deteriorationAge, a.duration);
+		AttributeModifier.recycle(a);
 
 		if (!this.tank.isRemote)
 		{
@@ -445,7 +446,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 					Drawing.drawing.playGlobalSound("heal2.ogg", pitch, freq);
 				}
 
-				t.em().addAttribute(new AttributeModifier("healray", AttributeModifier.healray, AttributeModifier.Operation.add, 1.0));
+				t.em().addAttribute(AttributeModifier.newInstance("healray", AttributeModifier.healray, AttributeModifier.Operation.add, 1.0));
 			}
 
 			if (kill)
@@ -528,27 +529,27 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 				if (this.boosting)
 				{
 					EffectManager tem = t.getEffectManager();
-					AttributeModifier c = new AttributeModifier("boost_speed", AttributeModifier.velocity, AttributeModifier.Operation.multiply, 3);
+					AttributeModifier c = AttributeModifier.newInstance("boost_speed", AttributeModifier.velocity, AttributeModifier.Operation.multiply, 3);
 					c.duration = 10 * this.size;
 					c.deteriorationAge = 5 * this.size;
 					tem.addUnduplicateAttribute(c);
 
-					AttributeModifier e = new AttributeModifier("bullet_boost", AttributeModifier.bullet_boost, AttributeModifier.Operation.multiply, 1);
+					AttributeModifier e = AttributeModifier.newInstance("bullet_boost", AttributeModifier.bullet_boost, AttributeModifier.Operation.multiply, 1);
 					e.duration = 10 * this.size;
 					e.deteriorationAge = 5 * this.size;
 					tem.addUnduplicateAttribute(e);
 
-					AttributeModifier a = new AttributeModifier("boost_glow", AttributeModifier.glow, AttributeModifier.Operation.multiply, 1);
+					AttributeModifier a = AttributeModifier.newInstance("boost_glow", AttributeModifier.glow, AttributeModifier.Operation.multiply, 1);
 					a.duration = 10 * this.size;
 					a.deteriorationAge = 5 * this.size;
 					tem.addUnduplicateAttribute(a);
 
-					AttributeModifier b = new AttributeModifier("boost_slip", AttributeModifier.friction, AttributeModifier.Operation.multiply, -0.75);
+					AttributeModifier b = AttributeModifier.newInstance("boost_slip", AttributeModifier.friction, AttributeModifier.Operation.multiply, -0.75);
 					b.duration = 10 * this.size;
 					b.deteriorationAge = 5 * this.size;
 					tem.addUnduplicateAttribute(b);
 
-					AttributeModifier d = new AttributeModifier("boost_effect", AttributeModifier.ember_effect, AttributeModifier.Operation.add, 1);
+					AttributeModifier d = AttributeModifier.newInstance("boost_effect", AttributeModifier.ember_effect, AttributeModifier.Operation.add, 1);
 					d.duration = 10 * this.size;
 					d.deteriorationAge = 5 * this.size;
 					tem.addUnduplicateAttribute(d);
@@ -1151,7 +1152,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 	public void applyStun(Movable movable)
 	{
-		AttributeModifier a = new AttributeModifier(AttributeModifier.velocity, AttributeModifier.Operation.multiply, -1);
+		AttributeModifier a = AttributeModifier.newInstance(AttributeModifier.velocity, AttributeModifier.Operation.multiply, -1);
 		a.duration = this.hitStun;
 		movable.em().addAttribute(a);
 		if (!this.tank.isRemote)

@@ -970,7 +970,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			return;
 
 		ItemBar b = Game.player.hotbar.itemBar;
-		selectedArcBullet = b.selected > -1 && b.slots[b.selected].item instanceof ItemBullet && ((ItemBullet) b.slots[b.selected].item).bullet instanceof BulletArc;
+		selectedArcBullet = b.selected > -1 && b.selected < 5 && b.slots[b.selected].item instanceof ItemBullet && ((ItemBullet) b.slots[b.selected].item).bullet instanceof BulletArc;
 
 		Game.playerTank.angle += (Drawing.drawing.getInterfaceMouseX() - prevCursorX) * sensitivity / 150;
 		Game.game.window.setCursorLocked(true);
