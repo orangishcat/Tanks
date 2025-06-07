@@ -584,24 +584,26 @@ public abstract class Tank extends Movable implements ISolidObject
 			this.drawTread();
 		}
 
-		this.accelerationModifier = 1;
-		this.frictionModifier = 1;
-		this.maxSpeedModifier = 1;
-
-		double boost = 0;
-
 		EffectManager em = getEffectManager();
-		if (health < baseHealth)
-			em.removeAttribute(AttributeModifier.healray);
 
-		this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
+		if (!Game.game.window.drawingShadow)
+		{
+			this.accelerationModifier = 1;
+			this.frictionModifier = 1;
+			this.maxSpeedModifier = 1;
 
-		if (!(this instanceof TankAIControlled))
-			this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
+			if (health < baseHealth)
+				em.removeAttribute(AttributeModifier.healray);
 
-		this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
+			this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
 
-		boost = em.getAttributeValue(AttributeModifier.ember_effect, boost);
+			if (!(this instanceof TankAIControlled))
+				this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
+
+			this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
+		}
+
+		double boost = em.getAttributeValue(AttributeModifier.ember_effect, 0);
 
 		if (Math.random() * Panel.frameFrequency < boost * Game.effectMultiplier && Game.effectsEnabled && !ScreenGame.finishedQuick)
 		{
@@ -1019,6 +1021,8 @@ public abstract class Tank extends Movable implements ISolidObject
 			this.explodeOnDestroy.clonePropertiesTo(e);
 			e.explode();
 		}
+
+		em().recycle();
 	}
 
 	public boolean damage(double amount, GameObject source)

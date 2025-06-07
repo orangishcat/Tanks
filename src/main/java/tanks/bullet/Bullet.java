@@ -1826,6 +1826,8 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 				}
 			}
 		}
+
+		em().recycle();
 	}
 
 	public void addDestroyEffect()

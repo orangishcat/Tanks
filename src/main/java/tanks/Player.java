@@ -125,6 +125,9 @@ public class Player
 
             for (int i = 0; i < items.length; i++)
             {
+                if (items[i].isEmpty())
+                    continue;
+
                 String[] sec = items[i].split(",");
                 String itemName = sec[0];
                 int count = Integer.parseInt(sec[1]);

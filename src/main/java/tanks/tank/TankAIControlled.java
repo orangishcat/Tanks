@@ -990,7 +990,7 @@ public class TankAIControlled extends Tank implements ITankField
 	public boolean hasLineOfSightTo(Movable target, boolean checkAsBullet)
 	{
 		return Ray.newRay(posX, posY, getAngleInDirection(target.posX, target.posY), 0, this)
-				.setSize(checkAsBullet ? this.bullet.size : 10).setAsExplosive(checkAsBullet && this.bullet.hitExplosion != null)
+				.setSize(checkAsBullet ? this.bullet.size : 1).setAsExplosive(checkAsBullet && this.bullet.hitExplosion != null)
 				.getTarget() == target;
 	}
 

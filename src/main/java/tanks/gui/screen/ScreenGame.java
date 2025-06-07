@@ -2607,7 +2607,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		for (Cloud c : Game.clouds)
 			c.draw();
 
-		if (isUpdatingGame())
+		if (isUpdatingGame() && !Game.game.window.drawingShadow)
 		{
 			for (Chunk c : Chunk.chunkList)
 				c.faces.clear();

@@ -400,7 +400,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 				for (int i = 0; i < this.level.customTanks.size(); i++)
 				{
-					if (this.level.customTanks.get(i).name.equals(t.name))
+					if (Objects.equals(this.level.customTanks.get(i).name, t.name))
 					{
 						tankNum = Game.registryTank.tankEntries.size() + i;
 						this.currentPlaceable = Placeable.enemyTank;

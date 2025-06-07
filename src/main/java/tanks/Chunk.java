@@ -3,6 +3,7 @@ package tanks;
 import basewindow.IBatchRenderableObject;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectAVLTreeSet;
+import it.unimi.dsi.fastutil.objects.ObjectArrayFIFOQueue;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import tanks.obstacle.Face;
@@ -98,21 +99,24 @@ public class Chunk implements Comparable<Chunk>
         return iterateOutwards((int) (posX / Game.tile_size), (int) (posY / Game.tile_size), maxChunks);
     }
 
+    static ObjectArrayFIFOQueue<Chunk> queue = new ObjectArrayFIFOQueue<>();
+    static ObjectOpenHashSet<Chunk> visited = new ObjectOpenHashSet<>();
+
     /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
      * @return the chunks within the range */
     public static ObjectArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxChunks)
     {
         chunkCache.clear();
-        ArrayDeque<Chunk> queue = new ArrayDeque<>();
-        ObjectOpenHashSet<Chunk> visited = new ObjectOpenHashSet<>();
+        queue.clear();
+        visited.clear();
 
         Chunk start = Chunk.getChunk(tileX, tileY);
         if (start != null)
-            queue.add(start);
+            queue.enqueue(start);
 
         while (!queue.isEmpty())
         {
-            Chunk c = queue.poll();
+            Chunk c = queue.dequeue();
             for (int i = 0; i < 4; i++)
             {
                 int newX = c.chunkX + Game.dirX[i];
@@ -121,7 +125,7 @@ public class Chunk implements Comparable<Chunk>
                 if (next != null && start.manhattanDist(next) < maxChunks && visited.add(next))
                 {
                     chunkCache.add(next);
-                    queue.add(next);
+                    queue.enqueue(next);
                 }
             }
         }
