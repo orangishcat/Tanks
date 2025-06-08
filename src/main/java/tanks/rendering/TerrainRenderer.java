@@ -2,6 +2,7 @@ package tanks.rendering;
 
 import basewindow.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import lwjglwindow.VBOShapeBatchRenderer;
 import tanks.*;
 import tanks.gui.ScreenIntro;
 import tanks.gui.screen.*;
@@ -13,24 +14,29 @@ import java.util.HashMap;
 public class TerrainRenderer
 {
     public static final int section_size = 2000;
+
     protected final HashMap<Class<? extends ShaderGroup>, Int2ObjectOpenHashMap<RegionRenderer>> renderers = new HashMap<>();
     protected final HashMap<IBatchRenderableObject, RegionRenderer> renderersByObj = new HashMap<>();
     protected final Int2ObjectOpenHashMap<RegionRenderer> outOfBoundsRenderers = new Int2ObjectOpenHashMap<>();
+
     public double age = 0;
     public boolean staged = false;
-    public double offX;
-    public double offY;
+
+    public double offX, offY;
     public boolean asPreview = false;
     public int previewWidth = 0;
+
     public boolean allowPartialLoading = false;
-    public int stagedCount = 0;
-    public int totalObjectsCount = 0;
+    public int stagedCount = 0, totalObjectsCount = 0;
+    protected boolean bgStaged = false;
+
     public boolean hasContinuationed = false;
     protected float[] currentColor = new float[3];
     protected double currentDepth;
+
     protected ShaderGroundOutOfBounds outsideShader;
     protected ShaderGroundIntro introShader;
-    protected boolean bgStaged = false;
+
     int[] bx = {0, 1, 0, -1}, by = {-1, 0, 1, 0};
     int[] bsx = {2, 1, 2, 1}, bsy = {1, 2, 1, 0};
 
@@ -46,6 +52,8 @@ public class TerrainRenderer
 
             Game.game.shaderInstances.put(this.outsideShader.getClass(), this.outsideShader);
             Game.game.shaderInstances.put(this.introShader.getClass(), this.introShader);
+
+            VBOShapeBatchRenderer.BufferProperty.recycle();
         }
         catch (Exception e)
         {
@@ -483,6 +491,8 @@ public class TerrainRenderer
         for (RegionRenderer r : this.outOfBoundsRenderers.values())
             r.renderer.free();
 
+        VBOShapeBatchRenderer.BufferProperty.recycle();
+
         totalObjectsCount = Game.currentSizeX * Game.currentSizeY + Game.obstacles.size();
         this.renderers.clear();
         this.renderersByObj.clear();
@@ -730,11 +740,12 @@ public class TerrainRenderer
                 {
                     double sizeX = (bf.endX - bf.startX), sizeY = (bf.endY - bf.startY);
                     double x = bf.startX + sizeX / 2, y = bf.startY + sizeY / 2;
-                    Drawing.drawing.fillBox(Game.screen,
+                    addBox(Game.screen,
                             x + Game.tile_size * 0.5 * bx[side],
                             y + Game.tile_size * 0.5 * by[side], -Game.tile_size,
                             sizeX + Game.tile_size * bsx[side],
-                            sizeY + Game.tile_size * bsy[side], Obstacle.draw_size * 2, (byte) 1);
+                            sizeY + Game.tile_size * bsy[side], Obstacle.draw_size * 2,
+                            (byte) 1, true);
                 }
             }
         }
