@@ -3,6 +3,7 @@ package tanks.rendering;
 import basewindow.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lwjglwindow.VBOShapeBatchRenderer;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.ScreenIntro;
@@ -56,6 +57,8 @@ public class TerrainRenderer
 
             Game.game.shaderInstances.put(this.outsideShader.getClass(), this.outsideShader);
             Game.game.shaderInstances.put(this.introShader.getClass(), this.introShader);
+
+            VBOShapeBatchRenderer.BufferProperty.recycle();
         }
         catch (Exception e)
         {
@@ -508,6 +511,8 @@ public class TerrainRenderer
 
         for (RegionRenderer r : this.outOfBoundsRenderers.values())
             r.renderer.free();
+
+        VBOShapeBatchRenderer.BufferProperty.recycle();
 
         this.tiles = null;
         this.renderers.clear();
