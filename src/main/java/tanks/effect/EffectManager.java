@@ -132,8 +132,10 @@ public class EffectManager
 
     public void updateAttributes()
     {
-        for (AttributeModifier a : this.attributes)
+        ObjectArrayList<AttributeModifier> attributeModifiers = this.attributes;
+        for (int i = 0, attributeModifiersSize = attributeModifiers.size(); i < attributeModifiersSize; i++)
         {
+            AttributeModifier a = attributeModifiers.get(i);
             a.age += Panel.frameFrequency;
             if (a.duration > 0 && a.age > a.duration)
             {
@@ -143,8 +145,10 @@ public class EffectManager
         }
 
         // Remove expired attributes and recycle them
-        for (AttributeModifier a : this.removeAttributes)
+        ObjectArrayList<AttributeModifier> modifiers = this.removeAttributes;
+        for (int i = 0, modifiersSize = modifiers.size(); i < modifiersSize; i++)
         {
+            AttributeModifier a = modifiers.get(i);
             this.attributes.remove(a);
             AttributeModifier.recycle(a);
         }
@@ -226,8 +230,9 @@ public class EffectManager
 
     public double getAttributeValue(AttributeModifier.Type type, double value)
     {
-        for (AttributeModifier a : attributes)
+        for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++)
         {
+            AttributeModifier a = attributes.get(i);
             if (!a.expired && a.type.equals(type))
                 value = a.getValue(value);
         }
@@ -246,8 +251,9 @@ public class EffectManager
         AttributeModifier best = null;
         double bestTime = Double.MIN_VALUE;
 
-        for (AttributeModifier a : attributes)
+        for (int i = 0, attributesSize = attributes.size(); i < attributesSize; i++)
         {
+            AttributeModifier a = attributes.get(i);
             if (!a.expired && a.type.equals(type))
             {
                 if (a.deteriorationAge - a.age > bestTime || a.deteriorationAge <= 0)

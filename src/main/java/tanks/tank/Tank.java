@@ -105,9 +105,8 @@ public abstract class Tank extends Movable implements ISolidObject
 	@TankBuildProperty @Property(category = movementGeneral, id = "friction", name = "Friction", minValue = 0.0, maxValue = 1.0)
 	public double friction = 0.05;
 
-	public double accelerationModifier = 1;
-	public double frictionModifier = 1;
-	public double maxSpeedModifier = 1;
+	public double accelerationModifier = 1, frictionModifier = 1, maxSpeedModifier = 1;
+	public double luminanceModifier, glowModifier;
 
 	@TankBuildProperty @Property(category = appearanceGeneral, id = "size", name = "Tank size", minValue = 0.0, desc = "1 tile = 50 units")
 	public double size;
@@ -597,6 +596,9 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
 		this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
 
+		this.luminanceModifier = em().getAttributeValue(AttributeModifier.glow, this.luminance);
+		this.glowModifier = em().getAttributeValue(AttributeModifier.glow, 1);
+
 		double boost = em.getAttributeValue(AttributeModifier.ember_effect, 0);
 
 		if (Math.random() * Panel.frameFrequency < boost * Game.effectMultiplier && Game.effectsEnabled && !ScreenGame.finishedQuick)
@@ -770,9 +772,6 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public void drawTank(boolean forInterface, boolean in3d, boolean transparent)
 	{
-		double luminance = em().getAttributeValue(AttributeModifier.glow, this.luminance);
-		double glow = em().getAttributeValue(AttributeModifier.glow, 1);
-
 		double s = (this.size * (Game.tile_size - destroyTimer) / Game.tile_size) * Math.min(this.drawAge / Game.tile_size, 1);
 		double sizeMod = 1;
 
@@ -782,7 +781,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		Drawing drawing = Drawing.drawing;
 		double[] teamColor = Team.getObjectColor(this.secondaryColorR, this.secondaryColorG, this.secondaryColorB, this);
 
-		Drawing.drawing.setColor(teamColor[0] * glow * this.glowIntensity, teamColor[1] * glow * this.glowIntensity, teamColor[2] * glow * this.glowIntensity, 255, 1);
+		Drawing.drawing.setColor(teamColor[0] * this.glowModifier * this.glowIntensity, teamColor[1] * this.glowModifier * this.glowIntensity, teamColor[2] * this.glowModifier * this.glowIntensity, 255, 1);
 
 		if (Game.glowEnabled && !transparent)
 		{
