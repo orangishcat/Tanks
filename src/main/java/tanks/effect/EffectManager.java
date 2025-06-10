@@ -1,7 +1,10 @@
 package tanks.effect;
 
-import it.unimi.dsi.fastutil.objects.*;
-import tanks.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import tanks.BiConsumer;
+import tanks.Game;
+import tanks.Movable;
+import tanks.Panel;
 import tanks.bullet.Bullet;
 import tanks.gui.screen.ScreenPartyHost;
 import tanks.network.event.EventStatusEffectBegin;
@@ -9,23 +12,116 @@ import tanks.network.event.EventStatusEffectDeteriorate;
 import tanks.network.event.EventStatusEffectEnd;
 import tanks.tank.Tank;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
 
+@SuppressWarnings("ForLoopReplaceableByForEach")
 public class EffectManager
 {
+    // Parallel array for status effects
+    public ObjectArrayList<StatusEffectProperty> statusEffectProperties = new ObjectArrayList<>();
+
     public Movable movable;
 
     public BiConsumer<AttributeModifier, Boolean> addAttributeCallback = (a, b) -> {};
 
     public HashSet<String> attributeImmunities = new HashSet<>();
     public ObjectArrayList<AttributeModifier> attributes = new ObjectArrayList<>();
-    public Object2ObjectArrayMap<StatusEffect, StatusEffect.Instance> statusEffects = new Object2ObjectArrayMap<>();
+
+    /**
+     * Linear search function to find status effect property by status effect reference
+     */
+    private StatusEffectProperty findStatusEffectProperty(StatusEffect statusEffect)
+    {
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            if (prop.statusEffect == statusEffect)
+                return prop;
+        }
+        return null;
+    }
     public ObjectArrayList<StatusEffect> removeStatusEffects = new ObjectArrayList<>();
     public ObjectArrayList<AttributeModifier> removeAttributes = new ObjectArrayList<>();
 
     public EffectManager(Movable m)
     {
         this.movable = m;
+    }
+
+    public StatusEffect findEffect(String name)
+    {
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            if (prop.statusEffect.name.equals(name))
+                return prop.statusEffect;
+        }
+        return null;
+    }
+
+    public int indexOf(StatusEffect statusEffect)
+    {
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            if (prop.statusEffect == statusEffect)
+                return i;
+        }
+        return -1;
+    }
+
+    public boolean contains(StatusEffect statusEffect)
+    {
+        return indexOf(statusEffect) >= 0;
+    }
+
+    public void addStatusEffect(StatusEffect s, double age, double warmup, double deterioration, double duration)
+    {
+        if (deterioration > duration)
+            throw new RuntimeException("Deterioration age > duration");
+
+        StatusEffect prevEffect = null;
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            if (prop.statusEffect.family != null && prop.statusEffect.family.equals(s.family))
+                prevEffect = prop.statusEffect;
+        }
+
+        if (prevEffect != null)
+        {
+            int prevIndex = indexOf(prevEffect);
+            if (prevIndex >= 0)
+            {
+                StatusEffectProperty prevProp = statusEffectProperties.remove(prevIndex);
+                if (prevProp.instance != null)
+                    StatusEffect.Instance.recycle(prevProp.instance);
+            }
+        }
+
+        boolean dontAdd = false;
+        StatusEffectProperty existingProp = findStatusEffectProperty(s);
+        if (warmup <= age && existingProp != null)
+        {
+            StatusEffect.Instance i = existingProp.instance;
+            if (i.age >= i.warmupAge && i.age < i.deteriorationAge)
+                dontAdd = true;
+        }
+
+        if (!dontAdd && (this.movable instanceof Bullet || this.movable instanceof Tank) && ScreenPartyHost.isServer)
+            Game.eventsOut.add(new EventStatusEffectBegin(this.movable, s, age, warmup));
+
+        // Remove existing property if it exists, then add new one
+        int existingIndex = indexOf(s);
+        if (existingIndex >= 0)
+        {
+            StatusEffectProperty oldProp = statusEffectProperties.remove(existingIndex);
+            if (oldProp.instance != null)
+                StatusEffect.Instance.recycle(oldProp.instance);
+        }
+
+        statusEffectProperties.add(new StatusEffectProperty(s, StatusEffect.Instance.newInstance(s, age, warmup, deterioration, duration)));
     }
 
     public void update()
@@ -88,46 +184,15 @@ public class EffectManager
         this.addStatusEffect(s, 0, warmup, deterioration, duration);
     }
 
-    public void addStatusEffect(StatusEffect s, double age, double warmup, double deterioration, double duration)
-    {
-        if (deterioration > duration)
-            throw new RuntimeException("Deterioration age > duration");
-
-        StatusEffect prevEffect = null;
-        for (StatusEffect e: this.statusEffects.keySet())
-        {
-            if (e.family != null && e.family.equals(s.family))
-                prevEffect = e;
-        }
-
-        if (prevEffect != null)
-        {
-            StatusEffect.Instance prevInstance = this.statusEffects.remove(prevEffect);
-            if (prevInstance != null)
-                StatusEffect.Instance.recycle(prevInstance);
-        }
-
-        boolean dontAdd = false;
-        if (warmup <= age && this.statusEffects.get(s) != null)
-        {
-            StatusEffect.Instance i = this.statusEffects.get(s);
-            if (i.age >= i.warmupAge && i.age < i.deteriorationAge)
-                dontAdd = true;
-        }
-
-        if (!dontAdd && (this.movable instanceof Bullet || this.movable instanceof Tank) && ScreenPartyHost.isServer)
-            Game.eventsOut.add(new EventStatusEffectBegin(this.movable, s, age, warmup));
-
-        this.statusEffects.put(s, StatusEffect.Instance.newInstance(s, age, warmup, deterioration, duration));
-    }
-
     public void updateStatusEffects()
     {
         double frameFrequency = this.movable.affectedByFrameFrequency ? Panel.frameFrequency : 1;
 
-        for (StatusEffect s: this.statusEffects.keySet())
+        for (int j = 0; j < statusEffectProperties.size(); j++)
         {
-            StatusEffect.Instance i = this.statusEffects.get(s);
+            StatusEffectProperty prop = statusEffectProperties.get(j);
+            StatusEffect s = prop.statusEffect;
+            StatusEffect.Instance i = prop.instance;
 
             if (i.age < i.deteriorationAge && i.age + frameFrequency >= i.deteriorationAge && ScreenPartyHost.isServer && (this.movable instanceof Bullet || this.movable instanceof Tank))
             {
@@ -147,9 +212,13 @@ public class EffectManager
 
         for (StatusEffect s: this.removeStatusEffects)
         {
-            StatusEffect.Instance instance = this.statusEffects.remove(s);
-            if (instance != null)
-                StatusEffect.Instance.recycle(instance);
+            int index = indexOf(s);
+            if (index >= 0)
+            {
+                StatusEffectProperty prop = statusEffectProperties.remove(index);
+                if (prop.instance != null)
+                    StatusEffect.Instance.recycle(prop.instance);
+            }
         }
 
         removeStatusEffects.clear();
@@ -163,8 +232,11 @@ public class EffectManager
                 value = a.getValue(value);
         }
 
-        for (StatusEffect.Instance s : this.statusEffects.values())
-            value = s.getValue(value, type);
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            value = prop.instance.getValue(value, type);
+        }
 
         return value;
     }
@@ -193,9 +265,11 @@ public class EffectManager
             }
         }
 
-        for (StatusEffect s : this.statusEffects.keySet())
+        for (int j = 0; j < statusEffectProperties.size(); j++)
         {
-            StatusEffect.Instance i = this.statusEffects.get(s);
+            StatusEffectProperty prop = statusEffectProperties.get(j);
+            StatusEffect s = prop.statusEffect;
+            StatusEffect.Instance i = prop.instance;
 
             if (i != null)
             {
@@ -224,6 +298,27 @@ public class EffectManager
     }
 
     @SuppressWarnings("UnusedReturnValue")
+    public boolean removeStatusEffect(String effect)
+    {
+        boolean removed = false;
+        for (int i = 0; i < statusEffectProperties.size(); i++)
+        {
+            StatusEffectProperty prop = statusEffectProperties.get(i);
+            if (prop.statusEffect.name.equals(effect))
+            {
+                statusEffectProperties.remove(i);
+                if (prop.instance != null)
+                {
+                    StatusEffect.Instance.recycle(prop.instance);
+                    removed = true;
+                }
+                i--; // Adjust index since we removed an element
+            }
+        }
+        return removed;
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removeAttribute(AttributeModifier.Type type)
     {
         boolean removed = false;
@@ -241,35 +336,29 @@ public class EffectManager
         return removed;
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean removeStatusEffect(String effect)
-    {
-        boolean removed = false;
-        for (StatusEffect e : Collections.unmodifiableSet(statusEffects.keySet()))
-        {
-            if (e.name.equals(effect))
-            {
-                StatusEffect.Instance instance = statusEffects.remove(e);
-                if (instance != null)
-                {
-                    StatusEffect.Instance.recycle(instance);
-                    removed = true;
-                }
-            }
-        }
-        return removed;
-    }
-
     public void recycle()
     {
-        for (StatusEffect.Instance i: this.statusEffects.values())
-            StatusEffect.Instance.recycle(i);
+        for (StatusEffectProperty i : this.statusEffectProperties)
+            StatusEffect.Instance.recycle(i.instance);
 
         for (AttributeModifier a: this.attributes)
             AttributeModifier.recycle(a);
 
-        statusEffects.clear();
+        statusEffectProperties.clear();
         attributes.clear();
+    }
+
+    // Property class for parallel arrays
+    public static class StatusEffectProperty
+    {
+        public StatusEffect statusEffect;
+        public StatusEffect.Instance instance;
+
+        public StatusEffectProperty(StatusEffect statusEffect, StatusEffect.Instance instance)
+        {
+            this.statusEffect = statusEffect;
+            this.instance = instance;
+        }
     }
 
     public void addImmunities(String... immunities)

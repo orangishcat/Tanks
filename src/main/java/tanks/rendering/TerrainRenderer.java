@@ -525,7 +525,7 @@ public class TerrainRenderer
                 double x1 = Drawing.drawing.gameToAbsoluteX(x, 0);
                 double y1 = Drawing.drawing.gameToAbsoluteY(y, 0);
                 s.renderer.setPosition(x1, y1, z * Drawing.drawing.scale);
-                s.renderer.setScale(Drawing.drawing.scale * sc, Drawing.drawing.scale * sc, Drawing.drawing.scale * sc);
+                s.renderer.setScale(Drawing.drawing.scale * sc, tanks.Drawing.drawing.scale * sc, tanks.Drawing.drawing.scale * sc);
 
                 if (s.shader instanceof IGlowShader)
                     s.renderer.setGlow(((IGlowShader) s.shader).getGlow());
@@ -591,7 +591,7 @@ public class TerrainRenderer
         age += Panel.frameFrequency;
 
         double width = (Game.game.window.absoluteWidth / Drawing.drawing.unzoomedScale / Game.tile_size);
-        double height = ((Game.game.window.absoluteHeight - Drawing.drawing.statsHeight) / Drawing.drawing.unzoomedScale / Game.tile_size);
+        double height = ((Game.game.window.absoluteHeight - Drawing.drawing.statsHeight) / tanks.Drawing.drawing.unzoomedScale / Game.tile_size);
 
         double iStart = ((Game.currentSizeX - width) / 2.0) / Game.currentSizeX;
         double iEnd = width / Game.currentSizeX + iStart;
@@ -740,12 +740,12 @@ public class TerrainRenderer
                 {
                     double sizeX = (bf.endX - bf.startX), sizeY = (bf.endY - bf.startY);
                     double x = bf.startX + sizeX / 2, y = bf.startY + sizeY / 2;
-                    addBox(Game.screen,
+                    Drawing.drawing.fillBox(Game.screen,
                             x + Game.tile_size * 0.5 * bx[side],
                             y + Game.tile_size * 0.5 * by[side], -Game.tile_size,
                             sizeX + Game.tile_size * bsx[side],
                             sizeY + Game.tile_size * bsy[side], Obstacle.draw_size * 2,
-                            (byte) 1, true);
+                            (byte) 1);
                 }
             }
         }

@@ -2629,6 +2629,7 @@ public class TankAIControlled extends Tank implements ITankField
 			this.health = t.health;
 			this.orientation = t.orientation;
 			this.drawAge = t.drawAge;
+			this.possessingTank = null;
 			this.setEffectManager(t.em());
 			targetEnemy = null;
 

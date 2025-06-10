@@ -22,8 +22,8 @@ public class TestAttribute extends Test
 
         this.name = "Attribute test";
 
-        for (StatusEffect type : attributes)
-            expectOnce(() -> playerTank.em().statusEffects.containsKey(type.name)).setName(type.name + " check");
+        for (StatusEffect e : attributes)
+            expectOnce(() -> playerTank.em().contains(e)).setName(e.name + " check");
         expectOnce(() -> playerTank.em().getAttributeValue(AttributeModifier.velocity, 1) == 16)
                 .setName("double boost check").setFailMessage("Double boost not found (!=9)");
 

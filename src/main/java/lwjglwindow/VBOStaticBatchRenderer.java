@@ -12,20 +12,21 @@ import org.lwjgl.BufferUtils;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class VBOStaticBatchRenderer extends BaseShapeBatchRenderer
 {
     // Property class for parallel arrays
-    public static class AttributeProperty {
+    public static class AttributeProperty
+    {
         public int vboId;
         public FloatBuffer buffer;
         public float[] floatArray;
         public ShaderGroup.Attribute attribute;
 
-        public AttributeProperty(int vboId, FloatBuffer buffer, float[] floatArray, ShaderGroup.Attribute attribute) {
+        public AttributeProperty(int vboId, FloatBuffer buffer, float[] floatArray, ShaderGroup.Attribute attribute)
+        {
             this.vboId = vboId;
             this.buffer = buffer;
             this.floatArray = floatArray;

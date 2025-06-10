@@ -586,22 +586,16 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		EffectManager em = getEffectManager();
 
-		if (!Game.game.window.drawingShadow)
-		{
-			this.accelerationModifier = 1;
-			this.frictionModifier = 1;
-			this.maxSpeedModifier = 1;
+		this.accelerationModifier = 1;
+		this.frictionModifier = 1;
+		this.maxSpeedModifier = 1;
 
-			if (health < baseHealth)
-				em.removeAttribute(AttributeModifier.healray);
+		if (health < baseHealth)
+			em.removeAttribute(AttributeModifier.healray);
 
-			this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
-
-			if (!(this instanceof TankAIControlled))
-				this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
-
-			this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
-		}
+		this.accelerationModifier = em.getAttributeValue(AttributeModifier.acceleration, this.accelerationModifier);
+		this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
+		this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
 
 		double boost = em.getAttributeValue(AttributeModifier.ember_effect, 0);
 
