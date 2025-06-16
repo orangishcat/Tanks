@@ -10,7 +10,9 @@ import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
+import java.util.Random;
 
 @SuppressWarnings("UnusedReturnValue")
 public class Chunk implements Comparable<Chunk>
@@ -270,10 +272,19 @@ public class Chunk implements Comparable<Chunk>
         populateChunks(defaultLevel);
     }
 
+    /**
+     * @param pix Coordinate in pixels
+     * @return The tile position relative to the top left corner of the chunk the coordinate is in
+     */
+    public static int pixelToPosInChunk(double pix)
+    {
+        return  (int) (pix / Game.tile_size) % chunkSize;
+    }
+
     public void removeExtraIfEquals(Obstacle o)
     {
-        int x = toChunkTileCoords(o.posX);
-        int y = toChunkTileCoords(o.posY);
+        int x = pixelToPosInChunk(o.posX);
+        int y = pixelToPosInChunk(o.posY);
 
         if (Objects.equals(tileGrid[x][y].extraObstacle, o))
         {
@@ -284,30 +295,12 @@ public class Chunk implements Comparable<Chunk>
 
     public void removeSurfaceIfEquals(Obstacle o)
     {
-        int x = toChunkTileCoords(o.posX);
-        int y = toChunkTileCoords(o.posY);
+        int x = pixelToPosInChunk(o.posX);
+        int y = pixelToPosInChunk(o.posY);
 
         if (Objects.equals(tileGrid[x][y].surfaceObstacle, o))
         {
             tileGrid[x][y].surfaceObstacle = null;
-            removeObstacle(o);
-        }
-    }
-
-    public void removeObstacleIfEquals(Obstacle o)
-    {
-        int x = toChunkTileCoords(o.posX);
-        int y = toChunkTileCoords(o.posY);
-
-        if (Objects.equals(tileGrid[x][y].obstacle, o))
-        {
-            tileGrid[x][y].obstacle = null;
-            if (tileGrid[x][y].surfaceObstacle != null)
-            {
-                tileGrid[x][y].obstacle = tileGrid[x][y].surfaceObstacle;
-                tileGrid[x][y].surfaceObstacle = null;
-            }
-
             removeObstacle(o);
         }
     }
@@ -321,13 +314,22 @@ public class Chunk implements Comparable<Chunk>
         return tileGrid[posX % chunkSize][posY % chunkSize];
     }
 
-    /** Automatically converts to tile coordinates and then chunk coordinates. */
-    public Tile getChunkTile(double posX, double posY)
+    public void removeObstacleIfEquals(Obstacle o)
     {
-        if (posX < 0 || posX >= Game.currentSizeX * Game.tile_size || posY < 0 || posY >= Game.currentSizeY * Game.tile_size)
-            return null;
+        int x = pixelToPosInChunk(o.posX);
+        int y = pixelToPosInChunk(o.posY);
 
-        return tileGrid[toChunkTileCoords(posX)][toChunkTileCoords(posY)];
+        if (Objects.equals(tileGrid[x][y].obstacle, o))
+        {
+            tileGrid[x][y].obstacle = null;
+            if (tileGrid[x][y].surfaceObstacle != null)
+            {
+                tileGrid[x][y].obstacle = tileGrid[x][y].surfaceObstacle;
+                tileGrid[x][y].surfaceObstacle = null;
+            }
+
+            removeObstacle(o);
+        }
     }
 
     public void setObstacle(int x, int y, Obstacle o)
@@ -365,9 +367,13 @@ public class Chunk implements Comparable<Chunk>
         return c.getChunkTile(posX, posY);
     }
 
-    public static int toChunkTileCoords(double a)
+    /** Automatically converts to tile coordinates and then chunk coordinates. */
+    public Tile getChunkTile(double posX, double posY)
     {
-        return  (int) (a / Game.tile_size) % chunkSize;
+        if (posX < 0 || posX >= Game.currentSizeX * Game.tile_size || posY < 0 || posY >= Game.currentSizeY * Game.tile_size)
+            return null;
+
+        return tileGrid[pixelToPosInChunk(posX)][pixelToPosInChunk(posY)];
     }
 
     public static double addCoords(double chunk, double tile)

@@ -12,6 +12,7 @@ import tanks.item.ItemMine;
 import tanks.network.event.*;
 import tanks.obstacle.Obstacle;
 import tanks.registry.RegistryTank;
+import tanks.replay.TankReplayPlayer;
 import tanks.tankson.ICopyable;
 import tanks.tankson.Property;
 import tanks.tankson.Serializer;
@@ -989,9 +990,8 @@ public class TankAIControlled extends Tank implements ITankField
 
 	public boolean hasLineOfSightTo(Movable target, boolean checkAsBullet)
 	{
-		return Ray.newRay(posX, posY, getAngleInDirection(target.posX, target.posY), 0, this)
-				.setSize(checkAsBullet ? this.bullet.size : 1).setAsExplosive(checkAsBullet && this.bullet.hitExplosion != null)
-				.getTarget() == target;
+		return Ray.newRay(posX, posY, 0, 0, this).setSize(checkAsBullet ? this.bullet.size : 1)
+				.setExplosive(checkAsBullet && this.bullet.hitExplosion != null).isInSight(target);
 	}
 
 	public boolean updateTargetMimic()
@@ -2684,7 +2684,7 @@ public class TankAIControlled extends Tank implements ITankField
 			if (c.equals(TankRemote.class))
 				c = ((TankRemote) targetEnemy).tank.getClass();
 
-			if (c.equals(TankPlayer.class) || c.equals(TankPlayerRemote.class))
+			if (c.equals(TankPlayer.class) || c.equals(TankPlayerRemote.class) || c.equals(TankReplayPlayer.class))
 			{
 				c = TankPlayerMimic.class;
 				player = true;

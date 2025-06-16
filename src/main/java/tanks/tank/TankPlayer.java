@@ -499,7 +499,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 						Ray r = Ray.newRay(this.posX, this.posY, this.angle + baseOff + gasOff, b.bounces, this)
 								.setSize(k != 0 ? b.size / 2 : b.size).setRange(lifespan - this.turretLength)
-								.setTrace(true, true);
+								.setTrace(true, true).setShootThrough(false);
 						r.vX /= 2;
 						r.vY /= 2;
 						r.moveOut(10 * this.size / Game.tile_size);

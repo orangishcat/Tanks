@@ -118,7 +118,26 @@ public class Ray
 		return this.getTarget();
 	}
 
-	public Ray setAsExplosive(boolean explosive)
+	public boolean isInSight(Movable target)
+	{
+		return setVelocity(target.posX - this.posX, target.posY - this.posY).getTarget() == target;
+	}
+
+	public Ray setVelocity(double vX, double vY)
+	{
+		this.vX = vX;
+		this.vY = vY;
+		this.angle = Movable.getPolarDirection(vX, vY);
+		return this;
+	}
+
+	public Ray setShootThrough(boolean shootThrough)
+	{
+		this.ignoreShootThrough = shootThrough;
+		return this;
+	}
+
+	public Ray setExplosive(boolean explosive)
 	{
 		this.ignoreDestructible = explosive;
 		return this;
@@ -217,8 +236,13 @@ public class Ray
 			if (current == null)
 				return null;
 
-			checkFaceList(current, dynamic, Ray::dynamicFaces, firstBounce);
-			checkFaceList(current, stat, Ray::staticFaces, firstBounce);
+			int maxChunks = maxChunkCheck;
+			checkFaceList(current, stat, Ray::staticFaces, maxChunks, firstBounce);
+
+			if (stat.collisionFace != null)
+				maxChunks = (int) ((Math.abs(stat.collisionX - posX) + Math.abs(stat.collisionY - posY)) / Game.tile_size / Chunk.chunkSize + 1);
+
+			checkFaceList(current, dynamic, Ray::dynamicFaces, maxChunks, firstBounce);
 
 			if (dynamic.collisionFace != null && stat.collisionFace != null)
 			{
@@ -304,11 +328,11 @@ public class Ray
             }
 
             if (obj instanceof Obstacle && ((Obstacle) obj).bouncy)
-            this.bouncyBounces--;
+            	this.bouncyBounces--;
             else if (obj instanceof Obstacle && !((Obstacle) obj).allowBounce)
-            this.bounces = -1;
+            	this.bounces = -1;
             else
-            this.bounces--;
+            	this.bounces--;
 
             bounceX.add(result.collisionX);
             bounceY.add(result.collisionY);
@@ -345,7 +369,8 @@ public class Ray
 	}
 
 	private static boolean isDynamic = false;
-	public void checkFaceList(Chunk current, Result result, Function<Chunk, Chunk.FaceList> faceList, boolean firstBounce)
+
+	public void checkFaceList(Chunk current, Result result, Function<Chunk, Chunk.FaceList> faceList, int maxChunks, boolean firstBounce)
 	{
 		if (current == null)
 			return;
@@ -353,7 +378,7 @@ public class Ray
 		int totalChunksChecked = 0;
 
 		chunkCheck:
-		for (int chunksChecked = 0; chunksChecked < maxChunkCheck; chunksChecked++)
+		for (int chunksChecked = 0; chunksChecked < maxChunks; chunksChecked++)
 		{
 			double moveXBase = Chunk.chunkSize * Game.tile_size * Math.cos(angle);
 			double moveYBase = Chunk.chunkSize * Game.tile_size * Math.sin(angle);

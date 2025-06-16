@@ -1245,7 +1245,7 @@ public class Game
 	{
 		Chunk c = Chunk.getChunk(posX, posY);
 		if (c != null)
-			c.setObstacle(Chunk.toChunkTileCoords(posX), Chunk.toChunkTileCoords(posY), o);
+			c.setObstacle(Chunk.pixelToPosInChunk(posX), Chunk.pixelToPosInChunk(posY), o);
 	}
 
 	public static double sampleGroundHeight(double px, double py)
