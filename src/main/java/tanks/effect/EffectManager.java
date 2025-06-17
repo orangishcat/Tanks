@@ -248,7 +248,8 @@ public class EffectManager
 
     /** Returns the attribute modifier object of the same type, or null if it doesn't exist.
      * @apiNote The attribute modifier object returned is mutable. Create a copy using
-     * {@link AttributeModifier#copy} if you want to modify it.
+     * {@link AttributeModifier#copy copy} if you want to modify it, and make sure to
+     * {@link AttributeModifier#recycle recycle} it when you're done.
      */
     public AttributeModifier getAttribute(AttributeModifier.Type type)
     {

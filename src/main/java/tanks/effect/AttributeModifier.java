@@ -120,6 +120,10 @@ public class AttributeModifier
 		return modifier;
 	}
 
+	/**
+	 * Creates a copy of an AttributeModifier instance
+	 * @apiNote Remember to {@link #recycle(AttributeModifier) recycle} the copy when you're done with it
+	 */
 	public static AttributeModifier copy(AttributeModifier a)
 	{
 		AttributeModifier copy = newInstance(a.name, a.type, a.effect, a.age);
