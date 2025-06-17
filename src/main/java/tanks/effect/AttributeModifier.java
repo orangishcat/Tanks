@@ -120,12 +120,27 @@ public class AttributeModifier
 		return modifier;
 	}
 
+	public static AttributeModifier copy(AttributeModifier a)
+	{
+		AttributeModifier copy = newInstance(a.name, a.type, a.effect, a.age);
+		copy.duration = a.duration;
+		copy.deteriorationAge = a.deteriorationAge;
+		copy.warmupAge = a.warmupAge;
+		copy.value = a.value;
+		copy.age = a.age;
+		copy.expired = a.expired;
+		return copy;
+	}
+
 	/**
 	 * Recycle this AttributeModifier instance for reuse
 	 */
 	public static void recycle(AttributeModifier modifier)
 	{
-		if (modifier != null && recycleQueue.size() < MAX_POOL_SIZE)
+		if (modifier == null || !modifier.expired)
+			return;
+
+		if (recycleQueue.size() < MAX_POOL_SIZE)
 			recycleQueue.offer(modifier);
 	}
 

@@ -2472,6 +2472,7 @@ public class TankAIControlled extends Tank implements ITankField
 			if (die)
 			{
 				this.suicidal = true;
+				this.dealsDamage = true;
 				this.timeUntilDeath = this.random.nextDouble() * this.suicideTimerRandom + this.suicideTimerBase;
 			}
 

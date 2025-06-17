@@ -470,7 +470,7 @@ public class Panel
 		{
 			if (!(Game.screen instanceof ScreenGame) || Panel.zoomTarget < 0 ||
 					((Game.playerTank == null || Game.playerTank.destroy) && (((ScreenGame) Game.screen).spectatingTank == null)) || !((ScreenGame) Game.screen).playing)
-				this.zoomTimer -= 0.01 * Panel.frameFrequency;
+				this.zoomTimer -= 0.03 * Panel.frameFrequency;
 		}
 
 		if (((Game.playerTank != null && !Game.playerTank.destroy) || (Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).spectatingTank != null)) && !ScreenGame.finished

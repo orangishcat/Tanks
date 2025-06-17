@@ -231,6 +231,8 @@ public abstract class Tank extends Movable implements ISolidObject
 	public long lastFarthestInSightUpdate = 0;
 	public Tank lastFarthestInSight = null;
 
+	public boolean drawHealray;
+
 	public Tank(String name, double x, double y, double size, double r, double g, double b)
 	{
 		super(x, y);
@@ -519,6 +521,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		this.age += Panel.frameFrequency;
 		this.invulnerabilityTimer = Math.max(0, this.invulnerabilityTimer - Panel.frameFrequency);
+		this.drawHealray = em().getAttribute(AttributeModifier.healray) != null;
 
 		this.treadAnimation += Math.sqrt(this.lastFinalVX * this.lastFinalVX + this.lastFinalVY * this.lastFinalVY) * Panel.frameFrequency;
 
@@ -823,7 +826,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		if (this.fullBrightness)
 			luminance = 1;
 
-		if (!forInterface && em().getAttribute(AttributeModifier.healray) != null)
+		if (!forInterface && drawHealray)
 		{
 			double mod = 1 + 0.4 * Math.min(1, this.health - this.baseHealth);
 
@@ -1177,7 +1180,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
             double xDist = Math.abs(m.posX - boundedX);
             double yDist = Math.abs(m.posY - boundedY);
-            double dist = Math.max(xDist / Drawing.drawing.interfaceSizeX, yDist / Drawing.drawing.interfaceSizeY) * 2;
+            double dist = Math.max(xDist / Drawing.drawing.interfaceSizeX, yDist / Drawing.drawing.interfaceSizeY) * 1.5 + 0.2;
 
             if (dist < nearest)
             {
