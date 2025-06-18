@@ -1173,16 +1173,9 @@ public abstract class Tank extends Movable implements ISolidObject
 			if (m instanceof TankAIControlled && !m.dealsDamage)
 				continue;
 
-            double boundedX = Math.min(Math.max(this.posX, Drawing.drawing.interfaceSizeX * 0.4),
-                    Game.currentSizeX * Game.tile_size - Drawing.drawing.interfaceSizeX * 0.4);
-            double boundedY = Math.min(Math.max(this.posY, Drawing.drawing.interfaceSizeY * 0.4),
-                    Game.currentSizeY * Game.tile_size - Drawing.drawing.interfaceSizeY * 0.4);
+			double dist = getDist(m);
 
-            double xDist = Math.abs(m.posX - boundedX);
-            double yDist = Math.abs(m.posY - boundedY);
-            double dist = Math.max(xDist / Drawing.drawing.interfaceSizeX, yDist / Drawing.drawing.interfaceSizeY) * 1.5 + 0.2;
-
-            if (dist < nearest)
+			if (dist < nearest)
             {
                 nearest = dist;
                 nearestM = m;
@@ -1232,6 +1225,17 @@ public abstract class Tank extends Movable implements ISolidObject
 		}
 
 		return Math.max(nearest, farthestInSight);
+	}
+
+	protected double getDist(Movable m)
+	{
+		double boundedX = Math.min(Math.max(this.posX, Drawing.drawing.interfaceSizeX * 0.4),
+				Game.currentSizeX * Game.tile_size - Drawing.drawing.interfaceSizeX * 0.4);
+		double boundedY = Math.min(Math.max(this.posY, Drawing.drawing.interfaceSizeY * 0.4),
+				Game.currentSizeY * Game.tile_size - Drawing.drawing.interfaceSizeY * 0.4);
+
+        return Math.max(Math.abs(m.posX - boundedX) / Drawing.drawing.interfaceSizeX,
+				Math.abs(m.posY - boundedY) / Drawing.drawing.interfaceSizeY) * 1.5 + 0.2;
 	}
 
 	private double autoZoomCache = -1;
