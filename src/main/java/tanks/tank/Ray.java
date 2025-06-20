@@ -1,5 +1,6 @@
 package tanks.tank;
 
+import tanks.Chunk;
 import tanks.Effect;
 import tanks.Game;
 import tanks.Movable;
@@ -524,7 +525,11 @@ public class Ray
 		int ox = (int) (x / Game.tile_size);
 		int oy = (int) (y / Game.tile_size);
 
-		return !(ox >= 0 && ox < Game.currentSizeX && oy >= 0 && oy < Game.currentSizeY) || Game.game.solidGrid[ox][oy];
+		if (!(ox >= 0 && ox < Game.currentSizeX && oy >= 0 && oy < Game.currentSizeY))
+			return true;
+
+		Chunk.Tile tile = Game.game.tileGrid[ox][oy];
+		return tile != null && tile.solid();
 	}
 
 	public void moveOut(double amount)

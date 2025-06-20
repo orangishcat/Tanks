@@ -1007,8 +1007,11 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 				if (o.bulletCollision)
 				{
-					Game.game.solidGrid[x][y] = false;
-					Game.game.unbreakableGrid[x][y] = false;
+					if (Game.game.tileGrid[x][y] != null)
+					{
+						Game.game.tileGrid[x][y].obstacle = null;
+						Game.game.tileGrid[x][y].tankSolid = false;
+					}
 				}
 			}
 
@@ -2490,8 +2493,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		this.replaceSpawns();
 
-		Game.game.solidGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
-		Game.game.unbreakableGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
+		Game.game.tileGrid = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
 
 		Game.currentLevel = new Level(Game.currentLevelString);
 		Game.currentLevel.timed = level.timer > 0;
@@ -2504,10 +2506,10 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 			if (o.bulletCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 			{
-				Game.game.solidGrid[x][y] = true;
+				if (Game.game.tileGrid[x][y] == null)
+					Game.game.tileGrid[x][y] = new Chunk.Tile();
 
-				if (!o.shouldShootThrough)
-					Game.game.unbreakableGrid[x][y] = true;
+				Game.game.tileGrid[x][y].obstacle = o;
 			}
 
 			if (o instanceof ObstacleBeatBlock)

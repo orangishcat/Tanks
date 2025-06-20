@@ -190,10 +190,14 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 		if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 		{
+			Chunk.Tile tile = Game.game.tileGrid[x][y];
+			if (tile == null)
+				return false;
+
 			if (unbreakable)
-				return Game.game.unbreakableGrid[x][y];
+				return tile.unbreakable();
 			else
-				return Game.game.solidGrid[x][y];
+				return tile.solid();
 		}
 
 		return false;
@@ -239,10 +243,13 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		int x = (int)(this.posX / Game.tile_size);
 		int y = (int)(this.posY / Game.tile_size);
 
-		if (x >= 0 && x < Game.tileDrawables.length && y >= 0 && y < Game.tileDrawables[0].length)
+		if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 		{
-			if (Game.tileDrawables[x][y] == null || Game.tileDrawables[x][y].type != ObstacleType.ground)
-				Game.tileDrawables[x][y] = this;
+			if (Game.tiles[x][y] == null)
+				Game.tiles[x][y] = new Chunk.Tile();
+
+			if (Game.tiles[x][y].obstacle == null || Game.tiles[x][y].obstacle.type != ObstacleType.ground)
+				Game.tiles[x][y].obstacle = this;
 		}
 	}
 

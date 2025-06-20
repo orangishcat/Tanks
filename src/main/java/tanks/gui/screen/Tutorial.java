@@ -202,7 +202,13 @@ public class Tutorial extends Minigame
                 }
             }
 
-            if (!Game.game.solidGrid[27][10] || !Game.game.solidGrid[27][11] || !Game.game.solidGrid[27][12] || !Game.game.solidGrid[27][13] || !Game.game.solidGrid[27][14])
+            boolean solid10 = Game.game.tileGrid[27][10] != null && Game.game.tileGrid[27][10].solid();
+        boolean solid11 = Game.game.tileGrid[27][11] != null && Game.game.tileGrid[27][11].solid();
+        boolean solid12 = Game.game.tileGrid[27][12] != null && Game.game.tileGrid[27][12].solid();
+        boolean solid13 = Game.game.tileGrid[27][13] != null && Game.game.tileGrid[27][13].solid();
+        boolean solid14 = Game.game.tileGrid[27][14] != null && Game.game.tileGrid[27][14].solid();
+
+        if (!solid10 || !solid11 || !solid12 || !solid13 || !solid14)
                 step = 6;
         }
         else if (step == 6 && brown.destroy)

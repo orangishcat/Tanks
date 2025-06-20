@@ -56,13 +56,7 @@ public class Game
 	public static ArrayList<Face> horizontalFaces = new ArrayList<>();
 	public static ArrayList<Face> verticalFaces = new ArrayList<>();
 
-	public boolean[][] solidGrid;
-	public boolean[][] unbreakableGrid;
-	public double[][] heightGrid;
-	public double[][] groundHeightGrid;
-	public double[][] groundEdgeHeightGrid;
-
-	public double[][] lastHeightGrid;
+	public Chunk.Tile[][] tileGrid;
 
 	public static ArrayList<Movable> movables = new ArrayList<>();
 	public static ArrayList<Obstacle> obstacles = new ArrayList<>();
@@ -135,14 +129,7 @@ public class Game
 	public static int currentSizeY = 18;
 	public static double bgResMultiplier = 1;
 
-	public static double[][] tilesR = new double[28][18];
-	public static double[][] tilesG = new double[28][18];
-	public static double[][] tilesB = new double[28][18];
-	public static double[][] tilesFlash = new double[28][18];
-
-	public static Obstacle[][] tileDrawables = new Obstacle[28][18];
-
-	public static double[][] tilesDepth = new double[28][18];
+	public static Chunk.Tile[][] tiles = new Chunk.Tile[28][18];
 
 	//Remember to change the version in android's build.gradle and ios's robovm.properties
 	//Versioning has moved to version.txt
@@ -844,26 +831,33 @@ public class Game
 			if (y < Game.currentSizeY - 1) Game.redrawGroundTiles.add(new GroundTile(x, y + 1));
 		}
 
-		if (o.bulletCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
+		if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 		{
-			Game.game.solidGrid[x][y] = true;
+			if (Game.game.tileGrid[x][y] == null)
+				Game.game.tileGrid[x][y] = new Chunk.Tile();
 
-			if (!o.shouldShootThrough)
-				Game.game.unbreakableGrid[x][y] = true;
+			if (o.bulletCollision)
+				Game.game.tileGrid[x][y].obstacle = o;
+
+			if (o.tankCollision)
+				Game.game.tileGrid[x][y].tankSolid = true;
 		}
-
-		if (o.tankCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-			Game.game.solidGrid[x][y] = true;
 	}
 
 	public static void recomputeHeightGrid()
 	{
-		for (int i = 0; i < Game.game.heightGrid.length; i++)
+		for (int i = 0; i < Game.currentSizeX; i++)
 		{
-			Arrays.fill(Game.game.heightGrid[i], -1000);
-			Arrays.fill(Game.game.groundHeightGrid[i], -1000);
-			Arrays.fill(Game.game.groundEdgeHeightGrid[i], -1000);
-			Arrays.fill(Game.tileDrawables[i], null);
+			for (int j = 0; j < Game.currentSizeY; j++)
+			{
+				if (Game.game.tileGrid[i][j] == null)
+					Game.game.tileGrid[i][j] = new Chunk.Tile();
+
+				Chunk.Tile tile = Game.game.tileGrid[i][j];
+				tile.obstacle = null;
+				tile.surfaceObstacle = null;
+				tile.extraObstacle = null;
+			}
 		}
 
 		for (int i = 0; i < Game.obstacles.size(); i++)
@@ -878,21 +872,12 @@ public class Game
 
 			if (!(!Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY))
 			{
-				Game.game.heightGrid[x][y] = Math.max(o.getTileHeight(), Game.game.heightGrid[x][y]);
-				Game.game.groundHeightGrid[x][y] = Math.max(o.getGroundHeight(), Game.game.groundHeightGrid[x][y]);
-				Game.game.groundEdgeHeightGrid[x][y] = Math.max(o.getEdgeDrawDepth(), Game.game.groundEdgeHeightGrid[x][y]);
-			}
-		}
+				if (Game.game.tileGrid[x][y] == null)
+					Game.game.tileGrid[x][y] = new Chunk.Tile();
 
-		for (int i = 0; i < Game.currentSizeX; i++)
-		{
-			for (int j = 0; j < Game.currentSizeY; j++)
-			{
-				if (Game.game.groundHeightGrid[i][j] <= -1000)
-					Game.game.groundHeightGrid[i][j] = Game.tilesDepth[i][j];
-
-				if (Game.game.groundEdgeHeightGrid[i][j] <= -1000)
-					Game.game.groundEdgeHeightGrid[i][j] = 0;
+				Chunk.Tile tile = Game.game.tileGrid[x][y];
+				if (tile.obstacle == null || o.getTileHeight() > tile.height())
+					tile.obstacle = o;
 			}
 		}
 	}
@@ -1101,15 +1086,8 @@ public class Game
 	{
 		Drawing.drawing.setScreenBounds(Game.tile_size * 28, Game.tile_size * 18);
 
-		Game.tilesR = new double[28][18];
-		Game.tilesG = new double[28][18];
-		Game.tilesB = new double[28][18];
-		Game.tilesDepth = new double[28][18];
-		Game.tilesFlash = new double[28][18];
-		Game.game.heightGrid = new double[28][18];
-		Game.game.groundHeightGrid = new double[28][18];
-		Game.game.groundEdgeHeightGrid = new double[28][18];
-		Game.tileDrawables = new Obstacle[28][18];
+		Game.tiles = new Chunk.Tile[28][18];
+		Game.game.tileGrid = new Chunk.Tile[28][18];
 
 		double var = 0;
 
@@ -1121,11 +1099,14 @@ public class Game
 		{
 			for (int j = 0; j < 18; j++)
 			{
-				Game.tilesR[i][j] = (235 + tilesRandom.nextDouble() * var);
-				Game.tilesG[i][j] = (207 + tilesRandom.nextDouble() * var);
-				Game.tilesB[i][j] = (166 + tilesRandom.nextDouble() * var);
+				Game.tiles[i][j] = new Chunk.Tile();
+				Game.game.tileGrid[i][j] = new Chunk.Tile();
+
+				Game.tiles[i][j].colR = (235 + tilesRandom.nextDouble() * var);
+				Game.tiles[i][j].colG = (207 + tilesRandom.nextDouble() * var);
+				Game.tiles[i][j].colB = (166 + tilesRandom.nextDouble() * var);
 				double rand = tilesRandom.nextDouble() * var / 2;
-				Game.tilesDepth[i][j] = Game.enable3dBg ? rand : 0;
+				Game.tiles[i][j].depth = Game.enable3dBg ? rand : 0;
 			}
 		}
 
@@ -1174,7 +1155,7 @@ public class Game
 		if (!Game.enable3dBg || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			return 0;
 		else
-			return Game.tilesDepth[x][y] + 0;
+			return Game.tiles[x][y] != null ? Game.tiles[x][y].depth : 0;
 	}
 
 	public static double sampleTerrainGroundHeight(double px, double py)
@@ -1192,7 +1173,7 @@ public class Game
 		if (!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			r = 0;
 		else
-			r = Game.game.groundHeightGrid[x][y];
+			r = Game.game.tileGrid[x][y] != null ? Game.game.tileGrid[x][y].groundHeight() : 0;
 
 		return r;
 	}
@@ -1212,7 +1193,7 @@ public class Game
 		if (!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			r = 0;
 		else
-			r = Game.game.heightGrid[x][y];
+			r = Game.game.tileGrid[x][y] != null ? Game.game.tileGrid[x][y].height() : -1000;
 
 		return r;
 	}
@@ -1223,7 +1204,7 @@ public class Game
 		if (!Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			r = 0;
 		else
-			r = Game.game.groundEdgeHeightGrid[x][y];
+			r = Game.game.tileGrid[x][y] != null ? Game.game.tileGrid[x][y].edgeDepth() : 0;
 
 		return r;
 	}
@@ -1356,7 +1337,8 @@ public class Game
 		removeEffects.clear();
 		removeTracks.clear();
 		removeClouds.clear();
-		Game.tileDrawables = new Obstacle[Game.currentSizeX][Game.currentSizeY];
+		Game.tiles = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
+		Game.game.tileGrid = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
 
 		resetNetworkIDs();
 

@@ -821,12 +821,19 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             if (!(collidedX || collidedY))
             {
-                collided = this.posZ <= Game.game.lastHeightGrid[x][y];
+                Chunk.Tile tile = Game.game.tileGrid[x][y];
+                double lastHeight = tile != null ? tile.lastHeight : 0;
+                collided = this.posZ <= lastHeight;
 
-                if (collided && prevGridX >= 0 && prevGridX < Game.currentSizeX && prevGridY >= 0 && prevGridY < Game.currentSizeY && Game.game.lastHeightGrid[x][y] != Game.game.lastHeightGrid[prevGridX][prevGridY])
+                if (collided && prevGridX >= 0 && prevGridX < Game.currentSizeX && prevGridY >= 0 && prevGridY < Game.currentSizeY)
                 {
-                    collidedX = this.prevGridX != x;
-                    collidedY = this.prevGridY != y;
+                    Chunk.Tile prevTile = Game.game.tileGrid[prevGridX][prevGridY];
+                    double prevLastHeight = prevTile != null ? prevTile.lastHeight : 0;
+                    if (lastHeight != prevLastHeight)
+                    {
+                        collidedX = this.prevGridX != x;
+                        collidedY = this.prevGridY != y;
+                    }
                 }
             }
             else
@@ -865,10 +872,15 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
                     this.posY = this.posY - dist;
                 }
 
-                if (!collidedX && !collidedY && (x != this.initialGridX || y != initialGridY) && Math.abs(this.posZ - Game.game.lastHeightGrid[x][y]) < Game.tile_size / 2)
+                if (!collidedX && !collidedY && (x != this.initialGridX || y != initialGridY))
                 {
-                    this.vZ = -0.6 * this.vZ;
-                    this.posZ = (2 * Game.game.lastHeightGrid[x][y] - this.posZ);
+                    Chunk.Tile tile = Game.game.tileGrid[x][y];
+                    double lastHeight = tile != null ? tile.lastHeight : 0;
+                    if (Math.abs(this.posZ - lastHeight) < Game.tile_size / 2)
+                    {
+                        this.vZ = -0.6 * this.vZ;
+                        this.posZ = (2 * lastHeight - this.posZ);
+                    }
                 }
             }
 

@@ -2065,8 +2065,11 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 				if (o.bulletCollision)
 				{
-					Game.game.solidGrid[x][y] = false;
-					Game.game.unbreakableGrid[x][y] = false;
+					if (Game.game.tileGrid[x][y] != null)
+					{
+						Game.game.tileGrid[x][y].obstacle = null;
+						Game.game.tileGrid[x][y].tankSolid = false;
+					}
 				}
 			}
 
@@ -2571,16 +2574,12 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		Game.recomputeHeightGrid();
 
-		if (Game.game.lastHeightGrid == null || Game.game.heightGrid.length != Game.game.lastHeightGrid.length || Game.game.heightGrid[0].length != Game.game.lastHeightGrid[0].length)
+		for (int i = 0; i < Game.currentSizeX; i++)
 		{
-			Game.game.lastHeightGrid = new double[Game.game.heightGrid.length][Game.game.heightGrid[0].length];
-		}
-
-		for (int i = 0; i < Game.game.heightGrid.length; i++)
-		{
-			for (int j = 0; j < Game.game.heightGrid[i].length; j++)
+			for (int j = 0; j < Game.currentSizeY; j++)
 			{
-				Game.game.lastHeightGrid[i][j] = Game.game.heightGrid[i][j];
+				if (Game.game.tileGrid[i][j] != null)
+					Game.game.tileGrid[i][j].lastHeight = Game.game.tileGrid[i][j].height();
 			}
 		}
 

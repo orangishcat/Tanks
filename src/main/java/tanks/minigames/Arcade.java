@@ -678,7 +678,8 @@ public class Arcade extends Minigame
             else if (other)
                 y += Game.currentSizeY - 4;
 
-            if (!Game.game.solidGrid[x][y])
+            Chunk.Tile tile = Game.game.tileGrid[x][y];
+            if (tile == null || !tile.solid())
             {
                 found = true;
 

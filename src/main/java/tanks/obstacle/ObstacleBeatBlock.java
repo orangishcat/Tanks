@@ -1,5 +1,6 @@
 package tanks.obstacle;
 
+import tanks.Chunk;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.Panel;
@@ -76,7 +77,16 @@ public class ObstacleBeatBlock extends ObstacleStackable
             int y = (int) (this.posY / Game.tile_size);
 
             if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-                Game.game.solidGrid[x][y] = this.tankCollision;
+            {
+                if (Game.game.tileGrid[x][y] == null)
+                    Game.game.tileGrid[x][y] = new Chunk.Tile();
+
+                Game.game.tileGrid[x][y].tankSolid = this.tankCollision;
+                if (this.tankCollision)
+                    Game.game.tileGrid[x][y].obstacle = this;
+                else
+                    Game.game.tileGrid[x][y].obstacle = null;
+            }
 
             this.verticalFaces = null;
             this.horizontalFaces = null;

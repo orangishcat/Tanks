@@ -17,57 +17,34 @@ public class Level
 {
 	public String levelString;
 
-	public String[] preset;
-	public String[] screen;
-	public String[] obstaclesPos;
-	public String[] tanks;
-	public String[] teams;
+	public String[] preset, screen, obstaclesPos, tanks, teams;
 
 	public Team[] tankTeams;
 	public boolean enableTeams = false;
 
-	public static double currentColorR = 235;
-	public static double currentColorG = 207;
-	public static double currentColorB = 166;
-
-	public static double currentColorVarR = 235;
-	public static double currentColorVarG = 207;
-	public static double currentColorVarB = 166;
-
-	public static double currentLightIntensity = 1;
-	public static double currentShadowIntensity = 0.5;
+	public static double currentColorR = 235, currentColorG = 207, currentColorB = 166;
+	public static double currentColorVarR = 235, currentColorVarG = 207, currentColorVarB = 166;
+	public static double currentLightIntensity = 1, currentShadowIntensity = 0.5;
 
 	public static int currentCloudCount = 0;
 
 	public static Random random = new Random();
 
-	public boolean editable = true;
-	public boolean remote = false;
-	public boolean preview = false;
+	public boolean editable = true, remote = false, preview = false;
 
 	public boolean timed = false;
 	public double timer;
 
-	public int sizeX;
-	public int sizeY;
-
-	public int colorR = 235;
-	public int colorG = 207;
-	public int colorB = 166;
-
-	public int colorVarR = 20;
-	public int colorVarG = 20;
-	public int colorVarB = 20;
+	public int sizeX, sizeY;
+	public int colorR = 235, colorG = 207, colorB = 166;
+	public int colorVarR = 20, colorVarG = 20, colorVarB = 20;
 
 	public int tilesRandomSeed = 0;
 
-	public double light = 1.0;
-	public double shadow = 0.5;
+	public double light = 1.0, shadow = 0.5;
 
 	public HashMap<String, Team> teamsMap = new HashMap<>();
-
 	public ArrayList<Team> teamsList = new ArrayList<>();
-
 	public ArrayList<Integer> availablePlayerSpawns = new ArrayList<>();
 
 	public ArrayList<Double> playerSpawnsX = new ArrayList<>();
@@ -413,8 +390,7 @@ public class Level
 			}
 		}
 
-		Game.game.solidGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
-		Game.game.unbreakableGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
+		Game.game.tileGrid = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
 		boolean[][] solidGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
 
 		for (Obstacle o : Game.obstacles)
@@ -424,10 +400,10 @@ public class Level
 
 			if (o.bulletCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 			{
-				Game.game.solidGrid[x][y] = true;
+				if (Game.game.tileGrid[x][y] == null)
+					Game.game.tileGrid[x][y] = new Chunk.Tile();
 
-				if (!o.shouldShootThrough)
-					Game.game.unbreakableGrid[x][y] = true;
+				Game.game.tileGrid[x][y].obstacle = o;
 			}
 
 			if (o.tankCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
@@ -778,43 +754,35 @@ public class Level
 		currentLightIntensity = light;
 		currentShadowIntensity = shadow;
 
-		Game.tilesR = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.tilesG = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.tilesB = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.tilesDepth = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.tilesFlash = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.tileDrawables = new Obstacle[Game.currentSizeX][Game.currentSizeY];
+		Game.tiles = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
 
 		Random tilesRandom = new Random(this.tilesRandomSeed);
 		for (int i = 0; i < Game.currentSizeX; i++)
 		{
 			for (int j = 0; j < Game.currentSizeY; j++)
 			{
+				Game.tiles[i][j] = new Chunk.Tile();
+
 				if (Game.fancyTerrain)
 				{
-					Game.tilesR[i][j] = (colorR + tilesRandom.nextDouble() * colorVarR);
-					Game.tilesG[i][j] = (colorG + tilesRandom.nextDouble() * colorVarG);
-					Game.tilesB[i][j] = (colorB + tilesRandom.nextDouble() * colorVarB);
+					Game.tiles[i][j].colR = (colorR + tilesRandom.nextDouble() * colorVarR);
+					Game.tiles[i][j].colG = (colorG + tilesRandom.nextDouble() * colorVarG);
+					Game.tiles[i][j].colB = (colorB + tilesRandom.nextDouble() * colorVarB);
 					double rand = tilesRandom.nextDouble() * 10;
-					Game.tilesDepth[i][j] = Game.enable3dBg ? rand : 0;
+					Game.tiles[i][j].depth = Game.enable3dBg ? rand : 0;
 				}
 				else
 				{
-					Game.tilesR[i][j] = colorR;
-					Game.tilesG[i][j] = colorG;
-					Game.tilesB[i][j] = colorB;
-					Game.tilesDepth[i][j] = 0;
+					Game.tiles[i][j].colR = colorR;
+					Game.tiles[i][j].colG = colorG;
+					Game.tiles[i][j].colB = colorB;
+					Game.tiles[i][j].depth = 0;
 				}
 			}
 		}
 
-		Game.game.heightGrid = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.game.groundHeightGrid = new double[Game.currentSizeX][Game.currentSizeY];
-		Game.game.groundEdgeHeightGrid = new double[Game.currentSizeX][Game.currentSizeY];
+		Game.game.tileGrid = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
 		Drawing.drawing.setScreenBounds(Game.tile_size * sizeX, Game.tile_size * sizeY);
-
-		Game.game.solidGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
-		Game.game.unbreakableGrid = new boolean[Game.currentSizeX][Game.currentSizeY];
 
 		for (Obstacle o: Game.obstacles)
 		{
@@ -823,10 +791,10 @@ public class Level
 
 			if (o.bulletCollision && x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
 			{
-				Game.game.solidGrid[x][y] = true;
+				if (Game.game.tileGrid[x][y] == null)
+					Game.game.tileGrid[x][y] = new Chunk.Tile();
 
-				if (!o.shouldShootThrough)
-					Game.game.unbreakableGrid[x][y] = true;
+				Game.game.tileGrid[x][y].obstacle = o;
 			}
 		}
 

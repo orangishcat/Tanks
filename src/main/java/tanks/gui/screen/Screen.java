@@ -1,6 +1,7 @@
 package tanks.gui.screen;
 
 import basewindow.IBatchRenderableObject;
+import tanks.Chunk;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
@@ -100,11 +101,15 @@ public abstract class Screen implements IBatchRenderableObject
 		{
 			for (int j = 0; j < Game.currentSizeY; j++)
 			{
-				if (Game.game.heightGrid[i][j] <= -1000)
-					Game.game.heightGrid[i][j] = 0;
+				if (Game.game.tileGrid[i][j] == null)
+					Game.game.tileGrid[i][j] = new Chunk.Tile();
 
-				if (Game.game.groundEdgeHeightGrid[i][j] <= -1000)
-					Game.game.groundEdgeHeightGrid[i][j] = 0;
+				Chunk.Tile tile = Game.game.tileGrid[i][j];
+				if (tile.height() <= -1000)
+					tile.obstacle = null;
+
+				if (tile.edgeDepth() <= -1000)
+					tile.extraObstacle = null;
 			}
 		}
 

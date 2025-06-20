@@ -2,6 +2,7 @@ package tanks.rendering;
 
 import basewindow.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import tanks.Chunk;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.ScreenIntro;
@@ -18,7 +19,7 @@ public class TerrainRenderer
     protected final HashMap<IBatchRenderableObject, RegionRenderer> renderersByObj = new HashMap<>();
     protected final Int2ObjectOpenHashMap<RegionRenderer> outOfBoundsRenderers = new Int2ObjectOpenHashMap<>();
 
-    public Tile[][] tiles;
+    public Chunk.Tile[][] tiles;
 
     public boolean staged = false;
 
@@ -123,10 +124,10 @@ public class TerrainRenderer
             sg = ((Obstacle) o).renderer;
             num = ((Obstacle) o).rendererNumber;
         }
-        else if (o instanceof Tile && ((Tile) o).obstacleAbove != null)
+        else if (o instanceof Chunk.Tile && ((Chunk.Tile) o).obstacle != null)
         {
-            sg = ((Tile) o).obstacleAbove.tileRenderer;
-            num = ((Tile) o).obstacleAbove.tileRendererNumber;
+            sg = ((Chunk.Tile) o).obstacle.tileRenderer;
+            num = ((Chunk.Tile) o).obstacle.tileRendererNumber;
         }
 
         if (!outOfBounds)
@@ -483,14 +484,14 @@ public class TerrainRenderer
 
     public void populateTiles()
     {
-        this.tiles = new Tile[Game.currentSizeX][Game.currentSizeY];
+        this.tiles = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
         this.totalObjectsCount = this.tiles.length * this.tiles[0].length + Game.obstacles.size();
 
         for (int i = 0; i < Game.currentSizeX; i++)
         {
             for (int j = 0; j < Game.currentSizeY; j++)
             {
-                this.tiles[i][j] = new Tile();
+                this.tiles[i][j] = new Chunk.Tile();
             }
         }
     }
@@ -579,10 +580,11 @@ public class TerrainRenderer
             {
                 int i = Math.max(0, Math.min(Game.currentSizeX - 1, (int) (o.posX / Game.tile_size)));
                 int j = Math.max(0, Math.min(Game.currentSizeY - 1, (int) (o.posY / Game.tile_size)));
-                double r = Game.tilesR[i][j];
-                double g = Game.tilesG[i][j];
-                double b = Game.tilesB[i][j];
-                this.currentDepth = Game.tilesDepth[i][j];
+                Chunk.Tile tile = Game.tiles[i][j];
+                double r = tile != null ? tile.colR : 235;
+                double g = tile != null ? tile.colG : 207;
+                double b = tile != null ? tile.colB : 166;
+                this.currentDepth = tile != null ? tile.depth : 0;
                 currentColor[0] = (float) (r / 255.0);
                 currentColor[1] = (float) (g / 255.0);
                 currentColor[2] = (float) (b / 255.0);
@@ -703,10 +705,11 @@ public class TerrainRenderer
 
     public void drawTile(int i, int j)
     {
-        double r = Game.tilesR[i][j];
-        double g = Game.tilesG[i][j];
-        double b = Game.tilesB[i][j];
-        double depth = Game.tilesDepth[i][j];
+        Chunk.Tile tile = Game.tiles[i][j];
+        double r = tile != null ? tile.colR : 235;
+        double g = tile != null ? tile.colG : 207;
+        double b = tile != null ? tile.colB : 166;
+        double depth = tile != null ? tile.depth : 0;
 
         this.currentDepth = depth;
         currentColor[0] = (float) (r / 255.0);
@@ -719,10 +722,11 @@ public class TerrainRenderer
 
         if (Game.enable3d)
         {
-            if (Game.tileDrawables[i][j] != null && !Game.tileDrawables[i][j].removed)
+            Chunk.Tile gameTile = Game.tiles[i][j];
+            if (gameTile != null && gameTile.obstacle != null && !gameTile.obstacle.removed)
             {
-                this.tiles[i][j].obstacleAbove = Game.tileDrawables[i][j];
-                Game.tileDrawables[i][j].drawTile(this.tiles[i][j], r, g, b, depth, Game.tile_size);
+                this.tiles[i][j].obstacle = gameTile.obstacle;
+                gameTile.obstacle.drawTile(this.tiles[i][j], r, g, b, depth, Game.tile_size);
             }
             else
             {
@@ -735,7 +739,7 @@ public class TerrainRenderer
                     if (Game.sampleEdgeGroundDepth(i, j + 1) >= 0) o |= BaseShapeRenderer.hide_low_face;
                 }
 
-                this.tiles[i][j].obstacleAbove = null;
+                this.tiles[i][j].obstacle = null;
                 this.addBox(this.tiles[i][j],
                         i * Game.tile_size,
                         j * Game.tile_size,
@@ -797,8 +801,12 @@ public class TerrainRenderer
                 int x = (int) (o.posX / Game.tile_size);
                 int y = (int) (o.posY / Game.tile_size);
 
-                if (!(!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY))
-                    Game.game.heightGrid[x][y] = Math.max(o.getTileHeight(), Game.game.heightGrid[x][y]);
+                if (!(!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY) && Game.game.tileGrid[x][y] == null)
+                    Game.game.tileGrid[x][y] = new Chunk.Tile();
+
+                Chunk.Tile tile = Game.game.tileGrid[x][y];
+                if (tile.obstacle == null || o.getTileHeight() > tile.height())
+                    tile.obstacle = o;
             }
         }
 
@@ -807,9 +815,7 @@ public class TerrainRenderer
         for (; i < this.tiles.length; i++)
         {
             for (int j = 0; j < this.tiles[i].length; j++)
-            {
                 this.drawTile(i, j);
-            }
 
             if (System.currentTimeMillis() - startTime > (this.hasContinuationed ? 50 : 100) && allowPartialLoading)
             {
@@ -834,10 +840,11 @@ public class TerrainRenderer
             Obstacle o = Game.obstacles.get(oi);
             int i = Math.max(0, Math.min(Game.currentSizeX - 1, (int) (o.posX / Game.tile_size)));
             int j = Math.max(0, Math.min(Game.currentSizeY - 1, (int) (o.posY / Game.tile_size)));
-            double r = Game.tilesR[i][j];
-            double g = Game.tilesG[i][j];
-            double b = Game.tilesB[i][j];
-            this.currentDepth = Game.tilesDepth[i][j];
+            Chunk.Tile tile = Game.tiles[i][j];
+            double r = tile != null ? tile.colR : 235;
+            double g = tile != null ? tile.colG : 207;
+            double b = tile != null ? tile.colB : 166;
+            this.currentDepth = tile != null ? tile.depth : 0;
             currentColor[0] = (float) (r / 255.0);
             currentColor[1] = (float) (g / 255.0);
             currentColor[2] = (float) (b / 255.0);

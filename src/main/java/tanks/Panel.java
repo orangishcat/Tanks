@@ -360,11 +360,17 @@ public class Panel
 		}
 		stackedEventsIn.clear();
 
-		for (int i = 0; i < Game.game.heightGrid.length; i++)
+		for (int i = 0; i < Game.currentSizeX; i++)
 		{
-			Arrays.fill(Game.game.heightGrid[i], -1000);
-			Arrays.fill(Game.game.groundHeightGrid[i], -1000);
-			Arrays.fill(Game.game.groundEdgeHeightGrid[i], -1000);
+			for (int j = 0; j < Game.currentSizeY; j++)
+			{
+				if (Game.game.tileGrid[i][j] == null)
+					Game.game.tileGrid[i][j] = new Chunk.Tile();
+
+				Game.game.tileGrid[i][j].obstacle = null;
+				Game.game.tileGrid[i][j].surfaceObstacle = null;
+				Game.game.tileGrid[i][j].extraObstacle = null;
+			}
 		}
 
 		if (ScreenPartyHost.isServer)

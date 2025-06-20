@@ -4,6 +4,7 @@ import basewindow.BaseShapeBatchRenderer;
 import basewindow.BaseWindow;
 import basewindow.IBatchRenderableObject;
 import basewindow.ShaderGroup;
+import tanks.Chunk;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.screen.ILevelPreviewScreen;
@@ -100,8 +101,8 @@ public class StaticTerrainRenderer extends TerrainRenderer
 
         if (o instanceof Obstacle)
             sg = ((Obstacle) o).renderer;
-        else if (o instanceof Tile && ((Tile) o).obstacleAbove != null)
-            sg = ((Tile) o).obstacleAbove.tileRenderer;
+        else if (o instanceof Chunk.Tile && ((Chunk.Tile) o).obstacle != null)
+            sg = ((Chunk.Tile) o).obstacle.tileRenderer;
 
         if (!outOfBounds)
         {
@@ -272,12 +273,12 @@ public class StaticTerrainRenderer extends TerrainRenderer
 
     public void populateTiles()
     {
-        this.tiles = new Tile[Game.currentSizeX][Game.currentSizeY];
+        this.tiles = new Chunk.Tile[Game.currentSizeX][Game.currentSizeY];
         for (int i = 0; i < Game.currentSizeX; i++)
         {
             for (int j = 0; j < Game.currentSizeY; j++)
             {
-                this.tiles[i][j] = new Tile();
+                this.tiles[i][j] = new Chunk.Tile();
             }
         }
     }
@@ -446,7 +447,14 @@ public class StaticTerrainRenderer extends TerrainRenderer
             int y = (int) (o.posY / Game.tile_size);
 
             if (!(!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY))
-                Game.game.heightGrid[x][y] = Math.max(o.getTileHeight(), Game.game.heightGrid[x][y]);
+            {
+                if (Game.game.tileGrid[x][y] == null)
+                    Game.game.tileGrid[x][y] = new Chunk.Tile();
+
+                Chunk.Tile tile = Game.game.tileGrid[x][y];
+                if (tile.obstacle == null || o.getTileHeight() > tile.height())
+                    tile.obstacle = o;
+            }
         }
 
         for (int i = 0; i < this.tiles.length; i++)
@@ -471,10 +479,11 @@ public class StaticTerrainRenderer extends TerrainRenderer
         {
             int i = Math.max(0, Math.min(Game.currentSizeX - 1, (int) (o.posX / Game.tile_size)));
             int j = Math.max(0, Math.min(Game.currentSizeY - 1, (int) (o.posY / Game.tile_size)));
-            double r = Game.tilesR[i][j];
-            double g = Game.tilesG[i][j];
-            double b = Game.tilesB[i][j];
-            this.currentDepth = Game.tilesDepth[i][j];
+            Chunk.Tile tile = Game.tiles[i][j];
+            double r = tile != null ? tile.colR : 235;
+            double g = tile != null ? tile.colG : 207;
+            double b = tile != null ? tile.colB : 166;
+            this.currentDepth = tile != null ? tile.depth : 0;
             currentColor[0] = (float) (r / 255.0);
             currentColor[1] = (float) (g / 255.0);
             currentColor[2] = (float) (b / 255.0);
