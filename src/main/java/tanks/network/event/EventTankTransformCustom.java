@@ -110,8 +110,8 @@ public class EventTankTransformCustom extends PersonalEvent
 
         if (newTank instanceof TankAIControlled)
         {
-            this.bulletCount = ((TankAIControlled) newTank).bullet.shotCount;
-            this.bulletSpread = ((TankAIControlled) newTank).bullet.multishotSpread;
+            this.bulletCount = ((TankAIControlled) newTank).getBullet().shotCount;
+            this.bulletSpread = ((TankAIControlled) newTank).getBullet().multishotSpread;
         }
 
         this.enableTracks = newTank.enableTracks;
@@ -132,10 +132,10 @@ public class EventTankTransformCustom extends PersonalEvent
             t.turretSize = turretSize;
             t.turretLength = turretLength;
 
-            t.baseModel = Drawing.drawing.createModel(baseModel);
-            t.colorModel = Drawing.drawing.createModel(colorModel);
-            t.turretBaseModel = Drawing.drawing.createModel(turretBaseModel);
-            t.turretModel = Drawing.drawing.createModel(turretModel);
+            t.baseModel = Drawing.drawing.getModel(baseModel);
+            t.colorModel = Drawing.drawing.getModel(colorModel);
+            t.turretBaseModel = Drawing.drawing.getModel(turretBaseModel);
+            t.turretModel = Drawing.drawing.getModel(turretModel);
 
             t.emblem = emblem;
             t.emblemR = emblemRed;
@@ -150,8 +150,8 @@ public class EventTankTransformCustom extends PersonalEvent
 
             if (((TankRemote) t).tank instanceof TankAIControlled)
             {
-                ((TankAIControlled) ((TankRemote) t).tank).bullet.shotCount = bulletCount;
-                ((TankAIControlled) ((TankRemote) t).tank).bullet.multishotSpread = bulletSpread;
+                ((TankAIControlled) ((TankRemote) t).tank).getBullet().shotCount = bulletCount;
+                ((TankAIControlled) ((TankRemote) t).tank).getBullet().multishotSpread = bulletSpread;
             }
 
             t.mandatoryKill = requiredKill;

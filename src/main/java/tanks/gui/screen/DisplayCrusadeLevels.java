@@ -241,6 +241,7 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
                         Game.obstacles = obstacles;
 
                         initialize(n);
+
                         this.levelsLoaded++;
 
                         if (levels.indexOf(n) == levels.size() - 1)

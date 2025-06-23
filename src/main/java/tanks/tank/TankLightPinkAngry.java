@@ -1,7 +1,7 @@
 package tanks.tank;
 
 import tanks.Game;
-import tanks.bullet.DefaultBullets;
+import tanks.bullet.DefaultItems;
 
 import java.util.HashSet;
 
@@ -28,8 +28,8 @@ public class TankLightPinkAngry extends TankAIControlled
         this.cooldownBase = 150;
         this.cooldownRandom = 0;
 
-        this.setBullet(DefaultBullets.rocket);
-        this.bullet.maxLiveBullets = 0;
+        this.setBullet(DefaultItems.rocket);
+        this.getBullet().maxLiveBullets = 0;
 
         this.bulletAvoidBehvavior = BulletAvoidBehavior.aggressive_dodge;
         this.targetEnemySightBehavior = TargetEnemySightBehavior.sidewind;
@@ -38,7 +38,7 @@ public class TankLightPinkAngry extends TankAIControlled
         {
             this.emblem = "emblems/angry.png";
             this.emblemR = 200;
-            this.baseModel = TankModels.diagonalStripes.base;
+            this.baseSkin = TankModels.diagonalStripes;
         }
 
         HashSet<String> musics = Game.registryTank.tankMusics.get("lightpink_angry");

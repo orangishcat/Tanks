@@ -3,7 +3,6 @@ package tanks.gui.screen.leveleditor;
 import basewindow.BaseFile;
 import basewindow.InputCodes;
 import basewindow.InputPoint;
-import tanks.Panel;
 import tanks.*;
 import tanks.gui.Button;
 import tanks.gui.input.InputBindingGroup;
@@ -11,6 +10,7 @@ import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.EditorButtons.EditorButton;
 import tanks.gui.screen.leveleditor.selector.MetadataSelector;
 import tanks.item.Item;
+import tanks.network.event.INetworkEvent;
 import tanks.obstacle.Obstacle;
 import tanks.obstacle.ObstacleBeatBlock;
 import tanks.obstacle.ObstacleStackable;
@@ -18,8 +18,8 @@ import tanks.obstacle.ObstacleUnknown;
 import tanks.registry.RegistryObstacle;
 import tanks.registry.RegistryTank;
 import tanks.tank.*;
+import tanks.tankson.Serializer;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
@@ -71,7 +71,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 	public enum BuildTool {normal, circle, rectangle, line}
 	public BuildTool buildTool = BuildTool.normal;
-
+	public enum SelectTool {normal, wand_contiguous, wand_discontiguous}
 	public SelectTool selectTool = SelectTool.normal;
 
 	public double selectX1, selectY1, selectX2, selectY2;
@@ -380,7 +380,9 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			{
 				this.currentPlaceable = Placeable.playerTank;
 				this.setMousePlaceable();
-				((TankPlayer) mousePlaceable).setDefaultColor().setMetadata(t.getMetadata());
+				setMousePlaceableMetadata(t.getMetadata());
+
+				((TankPlayer) mousePlaceable).setDefaultColor();
 				return true;
 			}
 			else
@@ -393,7 +395,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 						tankNum = i;
 						this.currentPlaceable = Placeable.enemyTank;
 						this.setMousePlaceable();
-						mousePlaceable.setMetadata(t.getMetadata());
+						setMousePlaceableMetadata(t.getMetadata());
 						return true;
 					}
 				}
@@ -405,7 +407,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 						tankNum = Game.registryTank.tankEntries.size() + i;
 						this.currentPlaceable = Placeable.enemyTank;
 						this.setMousePlaceable();
-						mousePlaceable.setMetadata(t.getMetadata());
+						setMousePlaceableMetadata(t.getMetadata());
 						return true;
 					}
 				}
@@ -435,11 +437,18 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			this.currentPlaceable = Placeable.obstacle;
 			obstacleNum = i;
 			this.setMousePlaceable();
-			mousePlaceable.setMetadata(o.getMetadata());
+			setMousePlaceableMetadata(o.getMetadata());
 			return true;
 		}
 
 		return false;
+	}
+
+	public void setMousePlaceableMetadata(String meta)
+	{
+		mousePlaceable.setMetadata(meta);
+		for (String s: mousePlaceable.getMetadataProperties().keySet())
+            currentMetadata.put(s, mousePlaceable.getMetadataProperty(s).getMetadata(mousePlaceable));
 	}
 
 	@Override
@@ -1221,7 +1230,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		public final ArrayList<Integer> xs = new ArrayList<>();
 		public final ArrayList<Integer> ys = new ArrayList<>();
 
-		private Shape() {}
+		protected Shape() {}
 
 		public int size()
 		{
@@ -1379,7 +1388,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		handled[0] = handled[1] = true;
 	}
 
-	private void placeObstacle(boolean batch, boolean paste)
+	protected void placeObstacle(boolean batch, boolean paste)
 	{
 		Obstacle o = !paste ? Game.registryObstacle.getEntry(obstacleNum)
 				.getObstacle(mousePlaceable.posX / Game.tile_size - 0.5, mousePlaceable.posY / Game.tile_size - 0.5)
@@ -1402,7 +1411,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			Drawing.drawing.playVibration("click");
 	}
 
-	private void placePlayerTank(boolean batch, boolean paste)
+	protected void placePlayerTank(boolean batch, boolean paste)
 	{
 		ArrayList<TankSpawnMarker> spawnsClone = (ArrayList<TankSpawnMarker>) spawns.clone();
 		if (this.movePlayer && !paste)
@@ -1436,7 +1445,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			t.drawAge = 50;
 	}
 
-	private void placeEnemyTank(boolean batch, boolean paste)
+	protected void placeEnemyTank(boolean batch, boolean paste)
 	{
 		Tank t;
 
@@ -1459,7 +1468,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			Drawing.drawing.playVibration("click");
 	}
 
-	private void placeErase(boolean[] handled, boolean validLeft, boolean validRight, boolean batch)
+	private void handleErase(boolean[] handled, boolean validLeft, boolean validRight, boolean batch)
 	{
 		boolean skip = false;
 
@@ -1523,7 +1532,6 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				break;
 			}
 		}
-
 
 		if (!batch && !Game.game.window.touchscreen && !skip && validRight)
 		{
@@ -1789,9 +1797,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		}
 
 		if (Game.movables.isEmpty())
-		{
-			level.append("|");
-		}
+            level.append("|");
 
 		level = new StringBuilder(level.substring(0, level.length() - 1));
 
@@ -1837,7 +1843,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				level.append("\n").append(t.toString());
 		}
 
-		if (!this.level.playerBuilds.isEmpty())
+		if (!this.level.playerBuilds.isEmpty() && !(this.level.playerBuilds.size() == 1 && Serializer.equivalent(this.level.playerBuilds.get(0), new TankPlayer.ShopTankBuild())))
 		{
 			level.append("\nbuilds");
 
@@ -2014,6 +2020,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				for (Obstacle o : clipboard.obstacles)
 				{
 					Drawing.drawing.setColor(o.colorR, o.colorG, o.colorB, 64, 0.5);
+
 					Drawing.drawing.fillRect(o.posX + mousePlaceable.posX, o.posY + mousePlaceable.posY, /*0,*/ Game.tile_size, Game.tile_size/*, ((Obstacle) o).stackHeight * Game.tile_size, (byte) 64*/);
 				}
 
@@ -2182,9 +2189,6 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			m.changeMetadata(this, mousePlaceable, add);
 	}
 
-	public enum SelectTool
-	{normal, wand_contiguous, wand_discontiguous}
-
 	public void magicSelect(int x, int y, boolean contiguous)
 	{
 		boolean obs = Game.getObstacle(x, y) != null || Game.getSurfaceObstacle(x, y) == null;
@@ -2297,6 +2301,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		Game.screen = new ScreenGame(this.name);
 		Game.player.hotbar.coins = this.level.startingCoins;
+
 		Game.currentLevel.playerBuilds.get(0).clonePropertiesTo(Game.playerTank);
 		Game.player.buildName = Game.currentLevel.playerBuilds.get(0).buildName;
 	}

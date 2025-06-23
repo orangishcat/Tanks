@@ -1,7 +1,7 @@
 package tanks.tank;
 
 import tanks.Game;
-import tanks.bullet.DefaultBullets;
+import tanks.bullet.DefaultItems;
 
 /**
  * A tank which shoots explosive bullets
@@ -26,13 +26,13 @@ public class TankOrangeRed extends TankAIControlled
         this.enableDefensiveFiring = true;
         this.resistExplosions = true;
         this.enableMineAvoidance = false;
-        this.explodeOnDestroy = this.mine.explosion;
+        this.explodeOnDestroy = this.getMine().explosion;
 
-        this.setBullet(DefaultBullets.explosive_bullet);
+        this.setBullet(DefaultItems.explosive_bullet);
 
         if (Game.tankTextures)
         {
-            this.baseModel = TankModels.diagonalStripes.base;
+            this.baseSkin = TankModels.diagonalStripes;
             this.emblem = "emblems/bang.png";
             this.emblemR = 159;
             this.emblemG = 67;

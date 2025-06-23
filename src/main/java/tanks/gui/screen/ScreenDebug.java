@@ -16,6 +16,7 @@ public class ScreenDebug extends Screen
     public String invulnerableText = "Invulnerable: ";
     public String fancyLightsText = "Fancy lighting: ";
     public String destroyCheatText = "Destroy cheat: ";
+    public String facesText = "Draw faces: ";
 
     public ScreenDebug()
     {
@@ -58,6 +59,11 @@ public class ScreenDebug extends Screen
             destroyCheat.setText(destroyCheatText, ScreenOptions.onText);
         else
             destroyCheat.setText(destroyCheatText, ScreenOptions.offText);
+
+        if (Game.drawFaces)
+            drawFaces.setText(facesText, ScreenOptions.onText);
+        else
+            drawFaces.setText(facesText, ScreenOptions.offText);
     }
 
     Button back = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 4, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenTitle());
@@ -176,6 +182,20 @@ public class ScreenDebug extends Screen
         }
     });
 
+    Button drawFaces = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 2.5, this.objWidth, this.objHeight, "", new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            Game.drawFaces = !Game.drawFaces;
+            if (Game.drawFaces)
+                drawFaces.setText(facesText, ScreenOptions.onText);
+            else
+                drawFaces.setText(facesText, ScreenOptions.offText);
+        }
+    });
+
+
 
 
     @Override
@@ -190,6 +210,7 @@ public class ScreenDebug extends Screen
         tankIDs.update();
         fancyLighting.update();
         destroyCheat.update();
+        drawFaces.update();
         back.update();
     }
 
@@ -210,6 +231,7 @@ public class ScreenDebug extends Screen
         invulnerable.draw();
         fancyLighting.draw();
         destroyCheat.draw();
+        drawFaces.draw();
         back.draw();
     }
 

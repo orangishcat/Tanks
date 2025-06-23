@@ -4,9 +4,8 @@ import basewindow.Model;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.bullet.Bullet;
-import tanks.effect.AttributeModifier;
-import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
+import tanks.gui.screen.ScreenPartyHost;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.gui.screen.leveleditor.selector.SelectorRotation;
 import tanks.item.Item;
@@ -15,14 +14,14 @@ import tanks.network.event.EventTankAddAttributeModifier;
 import tanks.network.event.EventTankUpdate;
 import tanks.network.event.EventTankUpdateHealth;
 import tanks.network.event.EventTankUpdateVisibility;
+import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
+import tanks.obstacle.ObstacleStackable;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 import static tanks.tank.TankPropertyCategory.*;
 
@@ -37,14 +36,19 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public boolean fromRegistry = false;
 
-	@TankBuildProperty @Property(category = appearanceBody, id = "color_model", name = "Tank body model", miscType = Property.MiscType.colorModel)
-	public Model colorModel = TankModels.tank.color;
-	@TankBuildProperty @Property(category = appearanceTreads, id = "base_model", name = "Tank treads model", miscType = Property.MiscType.baseModel)
-	public Model baseModel = TankModels.tank.base;
-	@TankBuildProperty @Property(category = appearanceTurretBase, id = "turret_base_model", name = "Turret base model", miscType = Property.MiscType.turretBaseModel)
-	public Model turretBaseModel = TankModels.tank.turretBase;
-	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "turret_model", name = "Turret barrel model", miscType = Property.MiscType.turretModel)
-	public Model turretModel = TankModels.tank.turret;
+	public Model colorModel = TankModels.skinnedTankModel.color;
+	public Model baseModel = TankModels.skinnedTankModel.base;
+	public Model turretBaseModel = TankModels.skinnedTankModel.turretBase;
+	public Model turretModel = TankModels.skinnedTankModel.turret;
+
+	@TankBuildProperty @Property(category = appearanceBody, id = "color_skin", name = "Tank body skin", miscType = Property.MiscType.colorModel)
+	public TankModels.TankSkin colorSkin = TankModels.tank;
+	@TankBuildProperty @Property(category = appearanceTreads, id = "base_skin", name = "Tank treads skin", miscType = Property.MiscType.baseModel)
+	public TankModels.TankSkin baseSkin = TankModels.tank;
+	@TankBuildProperty @Property(category = appearanceTurretBase, id = "turret_base_skin", name = "Turret base skin", miscType = Property.MiscType.turretBaseModel)
+	public TankModels.TankSkin turretBaseSkin = TankModels.tank;
+	@TankBuildProperty @Property(category = appearanceTurretBarrel, id = "turret_skin", name = "Turret barrel skin", miscType = Property.MiscType.turretModel)
+	public TankModels.TankSkin turretSkin = TankModels.tank;
 
 	public double angle = 0;
 	public double pitch = 0;
@@ -105,8 +109,11 @@ public abstract class Tank extends Movable implements ISolidObject
 	@TankBuildProperty @Property(category = movementGeneral, id = "friction", name = "Friction", minValue = 0.0, maxValue = 1.0)
 	public double friction = 0.05;
 
-	public double accelerationModifier = 1, frictionModifier = 1, maxSpeedModifier = 1;
-	public double luminanceModifier, glowModifier;
+	public double accelerationModifier = 1;
+	public double frictionModifier = 1;
+	public double maxSpeedModifier = 1;
+	public double luminanceModifier = 1;
+	public double glowModifier = 1;
 
 	@TankBuildProperty @Property(category = appearanceGeneral, id = "size", name = "Tank size", minValue = 0.0, desc = "1 tile = 50 units")
 	public double size;
@@ -231,8 +238,6 @@ public abstract class Tank extends Movable implements ISolidObject
 	public long lastFarthestInSightUpdate = 0;
 	public Tank lastFarthestInSight = null;
 
-	public boolean drawHealray;
-
 	public Tank(String name, double x, double y, double size, double r, double g, double b)
 	{
 		super(x, y);
@@ -304,7 +309,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			if (m.skipNextUpdate || m.destroy)
 				continue;
 
-			if (this != m && m instanceof Tank && ((Tank) m).size > 0)
+			if (this != m && m instanceof Tank && ((Tank)m).size > 0 && !m.destroy)
 			{
 				Tank t = (Tank) m;
 				double distSq = Math.pow(this.posX - m.posX, 2) + Math.pow(this.posY - m.posY, 2);
@@ -519,9 +524,9 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		this.updateVisibility();
 
+		this.drawHealray = em().getAttribute(AttributeModifier.healray) != null;
 		this.age += Panel.frameFrequency;
 		this.invulnerabilityTimer = Math.max(0, this.invulnerabilityTimer - Panel.frameFrequency);
-		this.drawHealray = em().getAttribute(AttributeModifier.healray) != null;
 
 		this.treadAnimation += Math.sqrt(this.lastFinalVX * this.lastFinalVX + this.lastFinalVY * this.lastFinalVY) * Panel.frameFrequency;
 
@@ -535,6 +540,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		if (this.resistFreeze)
             getEffectManager().addImmunities("ice_slip", "ice_accel", "ice_max_speed", "freeze");
+            this.em().addImmunities("ice_slip", "ice_accel", "ice_max_speed", "freeze");
 
 		this.damageFlashAnimation = Math.max(0, this.damageFlashAnimation - 0.05 * Panel.frameFrequency);
 		this.healFlashAnimation = Math.max(0, this.healFlashAnimation - 0.05 * Panel.frameFrequency);
@@ -586,12 +592,13 @@ public abstract class Tank extends Movable implements ISolidObject
 			this.drawTread();
 		}
 
-		EffectManager em = getEffectManager();
-
 		this.accelerationModifier = 1;
 		this.frictionModifier = 1;
 		this.maxSpeedModifier = 1;
 
+		if (health < baseHealth)
+			em.removeAttribute(AttributeModifier.healray);
+		EffectManager em = getEffectManager();
 		if (health < baseHealth)
 			em.removeAttribute(AttributeModifier.healray);
 
@@ -599,8 +606,8 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.frictionModifier = em.getAttributeValue(AttributeModifier.friction, this.frictionModifier);
 		this.maxSpeedModifier = em.getAttributeValue(AttributeModifier.max_speed, this.maxSpeedModifier);
 
-		this.luminanceModifier = em().getAttributeValue(AttributeModifier.glow, this.luminance);
-		this.glowModifier = em().getAttributeValue(AttributeModifier.glow, 1);
+		this.luminanceModifier = em.getAttributeValue(AttributeModifier.glow, this.luminance);
+		this.glowModifier = em.getAttributeValue(AttributeModifier.glow, 1);
 
 		double boost = em.getAttributeValue(AttributeModifier.ember_effect, 0);
 
@@ -674,9 +681,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		}
 
 		if (this.hasCollided)
-		{
-			this.recoilSpeed *= 0.5;
-		}
+            this.recoilSpeed *= 0.5;
 
 		if (this.possessor != null)
 			this.possessor.updatePossessing();
@@ -777,6 +782,11 @@ public abstract class Tank extends Movable implements ISolidObject
 	{
 		double s = (this.size * (Game.tile_size - destroyTimer) / Game.tile_size) * Math.min(this.drawAge / Game.tile_size, 1);
 		double sizeMod = 1;
+
+		this.baseModel.setSkin(this.baseSkin.base);
+		this.colorModel.setSkin(this.colorSkin.color);
+		this.turretBaseModel.setSkin(this.turretBaseSkin.turretBase);
+		this.turretModel.setSkin(this.turretSkin.turret);
 
 		if (forInterface && !in3d)
 			s = Math.min(this.size, Game.tile_size * 1.5);
@@ -1388,17 +1398,17 @@ public abstract class Tank extends Movable implements ISolidObject
 	public static void drawTank(double x, double y, double r1, double g1, double b1, double r2, double g2, double b2, double r3, double g3, double b3, double size)
 	{
 		Drawing.drawing.setColor(r2, g2, b2);
-		Drawing.drawing.drawInterfaceModel(TankModels.tank.base, x, y, size, size, 0);
+		Drawing.drawing.drawInterfaceModel(TankModels.skinnedTankModel.base, x, y, size, size, 0);
 
 		Drawing.drawing.setColor(r1, g1, b1);
-		Drawing.drawing.drawInterfaceModel(TankModels.tank.color, x, y, size, size, 0);
+		Drawing.drawing.drawInterfaceModel(TankModels.skinnedTankModel.color, x, y, size, size, 0);
 
 		Drawing.drawing.setColor(r2, g2, b2);
 
-		Drawing.drawing.drawInterfaceModel(TankModels.tank.turret, x, y, size, size, 0);
+		Drawing.drawing.drawInterfaceModel(TankModels.skinnedTankModel.turret, x, y, size, size, 0);
 
 		Drawing.drawing.setColor(r3, g3, b3);
-		Drawing.drawing.drawInterfaceModel(TankModels.tank.turretBase, x, y, size, size, 0);
+		Drawing.drawing.drawInterfaceModel(TankModels.skinnedTankModel.turretBase, x, y, size, size, 0);
 	}
 
 	@Override

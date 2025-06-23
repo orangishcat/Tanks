@@ -1,7 +1,7 @@
 package tanks.tank;
 
 import tanks.Game;
-import tanks.bullet.DefaultBullets;
+import tanks.bullet.DefaultItems;
 
 /**
  * A short-range tank which shoots fire
@@ -26,17 +26,17 @@ public class TankOrange extends TankAIControlled
 		this.cooldownBase = 0;
 		this.cooldownRandom = 0;
 
-		this.setBullet(DefaultBullets.flamethrower);
+		this.setBullet(DefaultItems.flamethrower);
 		this.bulletItem.item.cooldownBase = 0;
 
 		this.coinValue = 4;
 
 		if (Game.tankTextures)
 		{
-			this.baseModel = TankModels.flames.base;
-			this.colorModel = TankModels.flames.color;
-			this.turretBaseModel = TankModels.flames.turretBase;
-			this.turretModel = TankModels.flames.turret;
+			this.baseSkin = TankModels.flames;
+			this.colorSkin = TankModels.flames;
+			this.turretBaseSkin = TankModels.flames;
+			this.turretSkin = TankModels.flames;
 		}
 
 		this.description = "A short-range tank which shoots fire";

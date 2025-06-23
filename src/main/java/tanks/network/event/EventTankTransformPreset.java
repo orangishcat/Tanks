@@ -31,7 +31,7 @@ public class EventTankTransformPreset extends PersonalEvent
     {
         Tank t = Tank.idMap.get(tank);
 
-        if (this.clientID == null && t instanceof TankRemote && ((TankRemote) t).tank instanceof TankAIControlled && (!revert || !((TankRemote) t).parentTransformations.isEmpty()))
+        if (this.clientID == null && t instanceof TankRemote && ((TankRemote) t).tank instanceof TankAIControlled && (!revert || ((TankRemote) t).parentTransformations.size() > 0))
         {
             TankAIControlled target;
 
@@ -70,8 +70,11 @@ public class EventTankTransformPreset extends PersonalEvent
             t.lightIntensity = target.lightIntensity;
             t.lightSize = target.lightSize;
 
-            ((TankAIControlled) ((TankRemote) t).tank).bullet.shotCount = target.bullet.shotCount;
-            ((TankAIControlled) ((TankRemote) t).tank).bullet.multishotSpread = target.bullet.multishotSpread;
+            if (((TankRemote) t).tank instanceof TankAIControlled)
+            {
+                ((TankAIControlled) ((TankRemote) t).tank).getBullet().shotCount = target.getBullet().shotCount;
+                ((TankAIControlled) ((TankRemote) t).tank).getBullet().multishotSpread = target.getBullet().multishotSpread;
+            }
 
             t.mandatoryKill = target.mandatoryKill;
             t.musicTracks = target.musicTracks;

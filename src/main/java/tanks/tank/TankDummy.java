@@ -13,13 +13,13 @@ public class TankDummy extends TankAIControlled
 		super(name, x, y, Game.tile_size, 75, 40, 0, angle, ShootAI.none);
 		this.enableMovement = false;
 		this.enableMineLaying = false;
-		this.bullet.maxLiveBullets = 0;
+		this.getBullet().maxLiveBullets = 0;
 		this.turretIdleSpeed = 0;
 		this.enableLookingAtTargetEnemy = false;
 
 		if (Game.tankTextures)
 		{
-			this.colorModel = TankModels.fixed.color;
+			this.colorSkin = TankModels.fixed;
 			this.emblem = "emblems/x.png";
 			this.emblemR = 50;
 			this.emblemG = 25;

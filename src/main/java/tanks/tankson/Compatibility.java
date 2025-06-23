@@ -1,19 +1,80 @@
 package tanks.tankson;
 
+import tanks.Game;
+import tanks.bullet.Bullet;
+import tanks.item.ItemBullet;
+import tanks.item.ItemMine;
+import tanks.tank.Mine;
+import tanks.tank.TankAIControlled;
+import tanks.tank.TankModels;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
-public class Compatibility {
-    /** Add a static initializer to initialize compatibility table if necessary */
-    public static final HashMap<String, Function<Object, Object>> compatibility_table = new HashMap<>();
+public class Compatibility
+{
+    /**
+     * Add a static initializer to initialize compatibility table if necessary
+     */
+    public static final HashMap<String, BiFunction<Object, Object, Object>> compatibility_table = new HashMap<>();
+
     public static final HashMap<Class<?>, BiFunction<Field, Object, Object>> general_table = new HashMap<>();
+
     public static final HashMap<String, String> field_table = new HashMap<>();
 
     static
     {
         addGeneralCase(Boolean.class, Compatibility::applyBoolean);
+        compatibility_table.put("bullet", (owner, a) ->
+        {
+            if (a instanceof HashMap)
+            {
+                Object b = Serializer.parseObject((Map<String, Object>) a);
+                if (b instanceof Bullet)
+                {
+                    if (owner instanceof TankAIControlled)
+                    {
+                        if (!((TankAIControlled) owner).enableMovement)
+                            ((Bullet) b).recoil = 0;
+                    }
+
+                    return new ItemBullet.ItemStackBullet(null, new ItemBullet((Bullet) b), 0);
+                }
+            }
+
+            throw new RuntimeException("Failed to convert bullet: " + a.getClass() + " " + a.toString());
+        });
+
+        compatibility_table.put("mine", (owner, a) ->
+        {
+            if (a instanceof HashMap)
+            {
+                Object b = Serializer.parseObject((Map<String, Object>) a);
+                if (b instanceof Mine)
+                    return new ItemMine.ItemStackMine(null, new ItemMine((Mine) b), 0);
+            }
+
+            throw new RuntimeException("Failed to convert mine: " + a.getClass() + " " + a.toString());
+        });
+
+        field_table.put("base_model", "baseSkin");
+        field_table.put("color_model", "colorSkin");
+        field_table.put("turret_base_model", "turretBaseSkin");
+        field_table.put("turret_model", "turretSkin");
+
+        compatibility_table.put("color_model", (owner, a) ->
+               convertModelToSkin((String) a));
+
+        compatibility_table.put("base_model", (owner, a) ->
+                convertModelToSkin((String) a));
+
+        compatibility_table.put("turret_base_model", (owner, a) ->
+                convertModelToSkin((String) a));
+
+        compatibility_table.put("turret_model", (owner, a) ->
+                convertModelToSkin((String) a));
     }
 
     public static <V> void addGeneralCase(Class<V> cls, BiFunction<Field, V, Object> func)
@@ -22,14 +83,16 @@ public class Compatibility {
         general_table.put(cls, (BiFunction<Field, Object, Object>) func);
     }
 
-    public static Object convert(Field f, Object o) {
+    public static Object convert(Field f, Object owner, Object o)
+    {
         if (general_table.containsKey(o.getClass()))
             return general_table.get(o.getClass()).apply(f, o);
 
-        return compatibility_table.get(Serializer.getid(f)).apply(o);
+        return compatibility_table.get(Serializer.getid(f)).apply(owner, o);
     }
 
-    public static String convert(String f) {
+    public static String convert(String f)
+    {
         return field_table.get(f);
     }
 
@@ -43,5 +106,23 @@ public class Compatibility {
         {
             throw new RuntimeException(e);
         }
+    }
+
+    public static TankModels.TankSkin convertModelToSkin(String model)
+    {
+        return Game.registryModelTank.tankSkins.get(model.replace("/models/", "")
+                .replace("/color/", "")
+                .replace("/base/", "")
+                .replace("/turret/", "")
+                .replace("/turretbase/", "")
+                .replace("tankarrow", "tank_arrow")
+                .replace("tankcamoflauge", "tank_camoflauge")
+                .replace("tankmimic", "tank_checkerboard")
+                .replace("tankcross", "tank_cross")
+                .replace("tankdiagonalstripes", "tank_diagonal_stripes")
+                .replace("tankfixed", "tank_fixed")
+                .replace("tankflames", "tank_flames")
+                .replace("tankhorizontalstripes", "tank_horizontal_stripes")
+                .replace("tankverticalstripes", "tank_vertical_stripes"));
     }
 }

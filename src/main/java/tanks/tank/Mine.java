@@ -360,6 +360,11 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
         Drawing.drawing.setColor(r, g, b, a);
     }
 
+    public double getSize()
+    {
+        return size;
+    }
+
     @Override
     public String toString()
     {

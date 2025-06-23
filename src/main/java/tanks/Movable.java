@@ -2,19 +2,22 @@ package tanks;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import tanks.effect.AttributeModifier;
-import tanks.effect.EffectManager;
+import tanks.bullet.Bullet;
 import tanks.gui.screen.ScreenGame;
+import tanks.gui.screen.ScreenPartyHost;
 import tanks.gui.screen.leveleditor.selector.SelectorTeam;
-import tanks.obstacle.Face;
-import tanks.obstacle.ISolidObject;
+import tanks.network.event.EventStatusEffectBegin;
+import tanks.network.event.EventStatusEffectDeteriorate;
+import tanks.network.event.EventStatusEffectEnd;
 import tanks.tank.NameTag;
+import tanks.tank.Tank;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
-public abstract class Movable extends GameObject implements IDrawableForInterface, ISolidObject
+public abstract class Movable extends GameObject implements IDrawableForInterface
 {
 	public ObjectOpenHashSet<Chunk> prevChunks = new ObjectOpenHashSet<>();
 	private EffectManager em;
@@ -129,7 +132,7 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 
 		if (!destroy)
 		{
-			em().update();
+			em.update();
 
 			double vX2 = this.vX;
 			double vY2 = this.vY;
@@ -450,24 +453,24 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
                 if (f.getAnnotation(Property.class) == null || Math.random() < 0.999)
                     continue;
 
-                if (f.getType().equals(double.class))
-                    f.set(this, (double) (f.get(this)) * Math.random() * 1.5 + 0.5);
-                else if (f.getType().equals(int.class))
-                    f.set(this, (int) ((int)(f.get(this)) * Math.random() * 1.5 + 0.5));
-                else if (f.getType().isEnum())
-                {
-                    Enum[] els = ((Enum) f.get(this)).getClass().getEnumConstants();
-                    f.set(this, els[(int) (Math.random() * els.length)]);
-                }
-                else if (Movable.class.isAssignableFrom(f.getType()) && f.get(this) != null)
-                {
-                    ((Movable) (f.get(this))).randomize();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Game.exitToCrash(e);
-        }
-    }
+				if (f.getType().equals(double.class))
+					f.set(this, (double) (f.get(this)) * Math.random() * 1.5 + 0.5);
+				else if (f.getType().equals(int.class))
+					f.set(this, (int) ((int)(f.get(this)) * Math.random() * 1.5 + 0.5));
+				else if (f.getType().isEnum())
+				{
+					Enum[] els = ((Enum) f.get(this)).getClass().getEnumConstants();
+					f.set(this, els[(int) (Math.random() * els.length)]);
+				}
+				else if (Movable.class.isAssignableFrom(f.getType()) && f.get(this) != null)
+				{
+					((Movable) (f.get(this))).randomize();
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Game.exitToCrash(e);
+		}
+	}
 }

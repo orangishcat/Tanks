@@ -13,6 +13,7 @@ import tanks.network.event.EventLoadLevel;
 import tanks.network.event.EventTankRemove;
 import tanks.network.event.INetworkEvent;
 import tanks.obstacle.Obstacle;
+import tanks.obstacle.ObstacleBeatBlock;
 import tanks.registry.RegistryTank;
 import tanks.tank.*;
 
@@ -479,37 +480,6 @@ public class Level
 			}
 		}
 
-		if (sc instanceof ScreenLevelEditor)
-		{
-			ScreenLevelEditor s = (ScreenLevelEditor) sc;
-			if (!enableTeams)
-			{
-				enableTeams = true;
-
-				Team player = new Team(Game.playerTeam.name);
-				Team enemy = new Team(Game.enemyTeam.name);
-
-				for (Movable m : Game.movables)
-				{
-					if (m.team == Game.playerTeam)
-						m.team = player;
-					else if (m.team == Game.enemyTeam)
-						m.team = enemy;
-				}
-
-				this.teamsList.add(enemy);
-				this.teamsList.add(player);
-			}
-
-			s.teams = this.teamsList;
-			if (!s.teams.isEmpty())
-			{
-				s.currentMetadata.put(SelectorTeam.selector_name, s.teams.get(0));
-				s.currentMetadata.put(SelectorTeam.player_selector_name, s.teams.get(Math.min(s.teams.size() - 1, 1)));
-			}
-		}
-
-
 		this.availablePlayerSpawns.clear();
 
 		int playerCount = 1;
@@ -695,6 +665,38 @@ public class Level
 			}
 		}
 
+		if (sc instanceof ScreenLevelEditor)
+		{
+			ScreenLevelEditor s = (ScreenLevelEditor) sc;
+			if (!enableTeams)
+			{
+				enableTeams = true;
+
+				Team player = new Team(Game.playerTeam.name);
+				Team enemy = new Team(Game.enemyTeam.name);
+
+				for (Movable m : Game.movables)
+				{
+					if (m.team == Game.playerTeam)
+						m.team = player;
+					else if (m.team == Game.enemyTeam)
+						m.team = enemy;
+				}
+
+				teamsMap.put("ally", player);
+				teamsMap.put("enemy", enemy);
+				this.teamsList.add(player);
+				this.teamsList.add(enemy);
+			}
+
+			s.teams = this.teamsList;
+			if (s.teams.size() > 0)
+			{
+				s.currentMetadata.put(SelectorTeam.player_selector_name, s.teams.get(0));
+				s.currentMetadata.put(SelectorTeam.selector_name, s.teams.get(Math.min(s.teams.size() - 1, 1)));
+			}
+		}
+
 		addLevelBorders();
 
 		if (!remote && sc == null || (sc instanceof ScreenLevelEditor))
@@ -839,5 +841,10 @@ public class Level
 			else
 				return e.getTank(0, 0, 0);
 		}
+	}
+
+	public boolean isLarge()
+	{
+		return !(this.sizeX * this.sizeY <= 100000 && this.tanks.length < 500);
 	}
 }

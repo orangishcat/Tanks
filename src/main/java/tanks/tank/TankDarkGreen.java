@@ -1,7 +1,7 @@
 package tanks.tank;
 
 import tanks.Game;
-import tanks.bullet.DefaultBullets;
+import tanks.bullet.DefaultItems;
 
 /**
  * A fast tank which rapidly fires many small, low-damage bullets
@@ -18,14 +18,14 @@ public class TankDarkGreen extends TankAIControlled
 		this.targetEnemySightBehavior = TargetEnemySightBehavior.flee;
 		this.bulletAvoidBehvavior = BulletAvoidBehavior.dodge;
 
-		this.setBullet(DefaultBullets.mini_bullet);
+		this.setBullet(DefaultItems.mini_bullet);
 
 		if (Game.tankTextures)
 		{
-			this.baseModel = TankModels.camo.base;
-			this.colorModel = TankModels.camo.color;
-			this.turretBaseModel = TankModels.camo.turretBase;
-			this.turretModel = TankModels.camo.turret;
+			this.baseSkin = TankModels.camo;
+			this.colorSkin = TankModels.camo;
+			this.turretBaseSkin = TankModels.camo;
+			this.turretSkin = TankModels.camo;
 		}
 
 		this.coinValue = 10;

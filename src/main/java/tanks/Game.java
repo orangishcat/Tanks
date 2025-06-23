@@ -146,8 +146,6 @@ public class Game
 	public static boolean traceAllRays = false;
 	public static boolean showTankIDs = false;
 	public static boolean drawAutoZoom = false;
-	public static boolean showHitboxes = false;
-	public static boolean showPathfinding = false;
 	public static final boolean cinematic = false;
 
 	public static long steamLobbyInvite = -1;
@@ -510,10 +508,7 @@ public class Game
 
 	public static void registerTankEmblems()
 	{
-		ArrayList<String> emblems = Game.game.fileManager.getInternalFileContents("/images/emblems/emblems.txt");
-
-		for (String s: emblems)
-            Game.registryModelTank.tankEmblems.add(new RegistryModelTank.TankModelEntry("emblems/" + s + ".png"));
+		Game.registryModelTank.registerSkin(s);
 	}
 
 	public static void registerMinigame(Class<? extends Minigame> minigame, String name, String desc)
@@ -543,7 +538,7 @@ public class Game
 		steamNetworkHandler.load();
 
 		registerEvents();
-		DefaultBullets.initialize();
+		DefaultItems.initialize();
 
 		registerObstacle(ObstacleStackable.class, "normal");
 		registerObstacle(ObstacleIndestructible.class, "hard");
@@ -616,9 +611,6 @@ public class Game
 		registerMetadataSelector(SelectorLuminosity.selector_name, SelectorLuminosity.class);
 		registerMetadataSelector(SelectorColor.selector_name, SelectorColor.class);
 		registerMetadataSelector(SelectorColorAndNoise.selector_name, SelectorColorAndNoise.class);
-
-		TankPlayer.default_bullet = new Bullet();
-		TankPlayer.default_mine = new Mine();
 
 		homedir = System.getProperty("user.home");
 
@@ -768,7 +760,7 @@ public class Game
 	{
 		TankModels.initialize();
 
-		BulletBlock.block = Drawing.drawing.createModel("/models/cube/");
+		BulletBlock.block = Drawing.drawing.getModel("/models/cube/");
 	}
 
 	/**

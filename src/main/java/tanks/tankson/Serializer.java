@@ -3,6 +3,7 @@ package tanks.tankson;
 import tanks.Game;
 import tanks.bullet.Bullet;
 import tanks.item.Item;
+import tanks.registry.RegistryModelTank;
 import tanks.tank.*;
 
 import java.lang.annotation.Annotation;
@@ -61,7 +62,8 @@ public final class Serializer
         return isTanksONable(f.getType());
     }
 
-    public static boolean isTanksONable(Class c) {
+    public static boolean isTanksONable(Class c)
+    {
         while (c != null && !c.isAnnotationPresent(TanksONable.class))
             c = c.getSuperclass();
         return c != null;
@@ -325,7 +327,8 @@ public final class Serializer
                 processed.add("weight");
                 o = new TankAIControlled.SpawnedTankEntry((ITankField) parseObject((Map) m.get("tank")), (Double) m.get("weight"));
                 break;
-            case "tank_ref": {
+            case "tank_ref":
+            {
                 processed.add("tank");
                 o = new TankReference((String) m.get("tank"));
                 break;
@@ -334,6 +337,8 @@ public final class Serializer
                 throw new RuntimeException("Bad object type: " + (String) m.get("obj_type"));
         }
 
+        ArrayList<Field> conversions = new ArrayList<>();
+        ArrayList<Object> conversionTargets = new ArrayList<>();
         for (Field f : o.getClass().getFields())
         {
             if (f.isAnnotationPresent(Property.class) && m.containsKey(getid(f)))
@@ -345,10 +350,14 @@ public final class Serializer
                     if (isTanksONable(f))
                     {
                         Object o3 = m.get(getid(f));
-                        try {
+                        try
+                        {
                             f.set(o, parseObject((Map<String, Object>) o3));
-                        } catch (ClassCastException e) {
-                            f.set(o, Compatibility.convert(f, o3));
+                        }
+                        catch (ClassCastException | IllegalArgumentException e)
+                        {
+                            conversions.add(f);
+                            conversionTargets.add(o3);
                         }
                     }
                     else if (o2 instanceof ArrayList)
@@ -387,20 +396,47 @@ public final class Serializer
             }
         }
 
+
+        for (int i = 0; i < conversions.size(); i++)
+        {
+            Field f = conversions.get(i);
+            Object o3 = conversionTargets.get(i);
+            try
+            {
+                f.set(o, Compatibility.convert(f, o, o3));
+            }
+            catch (Exception e)
+            {
+                System.out.println(getid(f));
+                throw new RuntimeException(e);
+            }
+        }
+
         Set<String> unused = new HashSet<>(m.keySet());
         unused.removeAll(processed);
-        for (String k : unused) {
-            try {
-                o.getClass().getField(Compatibility.convert(k)).set(o, m.get(k));
-            } catch (ClassCastException e) {
-                try {
+        for (String k : unused)
+        {
+            try
+            {
+                Field f = o.getClass().getField(Compatibility.convert(k));
+                f.set(o, Compatibility.compatibility_table.get(k).apply(o, m.get(k)));
+            }
+            catch (ClassCastException e)
+            {
+                try
+                {
                     Field f = o.getClass().getField(Compatibility.convert(k));
-                    f.set(o, Compatibility.convert(f, m.get(k)));
-                } catch (NoSuchFieldException | IllegalAccessException f) {
+                    f.set(o, Compatibility.convert(f, o, m.get(k)));
+                }
+                catch (NoSuchFieldException | IllegalAccessException f)
+                {
                     throw new RuntimeException(f);
                 }
-            } catch (NoSuchFieldException | NullPointerException | IllegalAccessException e) {
+            }
+            catch (NoSuchFieldException | NullPointerException | IllegalAccessException e)
+            {
                 System.out.println("Unconvertable field found!");
+                e.printStackTrace();
             }
         }
 

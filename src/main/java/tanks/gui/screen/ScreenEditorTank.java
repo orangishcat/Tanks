@@ -4,6 +4,7 @@ import basewindow.BaseFile;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.Level;
+import tanks.bullet.BulletArc;
 import tanks.gui.*;
 import tanks.tank.*;
 import tanks.tankson.FieldPointer;
@@ -251,6 +252,10 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             this.preview.colorModel = tank.colorModel;
             this.preview.turretBaseModel = tank.turretBaseModel;
             this.preview.turretModel = tank.turretModel;
+            this.preview.baseSkin = tank.baseSkin;
+            this.preview.colorSkin = tank.colorSkin;
+            this.preview.turretBaseSkin = tank.turretBaseSkin;
+            this.preview.turretSkin = tank.turretSkin;
             this.preview.size = tank.size;
             this.preview.turretSize = tank.turretSize;
             this.preview.turretLength = tank.turretLength;
@@ -272,7 +277,7 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             this.preview.glowSize = tank.glowSize;
             this.preview.lightSize = tank.lightSize;
             this.preview.lightIntensity = tank.lightIntensity;
-            this.preview.setBullet(tank.bullet);
+            this.preview.setBullet(tank.getBullet());
             this.preview.multipleTurrets = tank.multipleTurrets;
 
             if (this.preview.size > Game.tile_size * 2)
@@ -698,15 +703,19 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
                 offmul = 0;
 
             Drawing.drawing.setColor(turretBaseR, turretBaseG, turretBaseB, 255, 0.5);
+            tank.turretBaseModel.setSkin(tank.turretBaseSkin.turretBase);
             Drawing.drawing.drawInterfaceModel2D(tank.turretBaseModel, margin, screen.centerY + 60 - space * 2 + 4 * offmul, 0, s, s, s);
 
             Drawing.drawing.setColor(tank.secondaryColorR, tank.secondaryColorG, tank.secondaryColorB, 255, 0.5);
+            tank.turretModel.setSkin(tank.turretSkin.turret);
             Drawing.drawing.drawInterfaceModel2D(tank.turretModel, margin, screen.centerY + 60 - space * 1, 0, s, s, s);
 
             Drawing.drawing.setColor(tank.colorR, tank.colorG, tank.colorB, 255, 0.5);
+            tank.colorModel.setSkin(tank.colorSkin.color);
             Drawing.drawing.drawInterfaceModel2D(tank.colorModel, margin, screen.centerY + 60 - space * 0 + 7 * offmul, 0, s, s, s);
 
             Drawing.drawing.setColor(tank.secondaryColorR, tank.secondaryColorG, tank.secondaryColorB, 255, 0.5);
+            tank.baseModel.setSkin(tank.baseSkin.base);
             Drawing.drawing.drawInterfaceModel2D(tank.baseModel, margin, screen.centerY + 60 + space * 1 + 7 * offmul, 0, s, s, s);
 
             Drawing.drawing.setColor(80, 80, 80);
@@ -763,6 +772,35 @@ public class ScreenEditorTank extends ScreenEditorTanksONable<TankAIControlled>
             this.delete.draw();
 
         this.save.draw();
+    }
+
+    @Override
+    public void validateChangedProperty(Pointer<?> f, Property p, Object oldValue)
+    {
+        TankAIControlled t = target.get();
+        if (p.id().equals("cooldown_base"))
+        {
+            double bc = t.bulletItem.item.cooldownBase;
+            if ((double) oldValue >= bc && (double) f.cast().get() < bc)
+            {
+                Game.screen = new ScreenInfo(Game.screen, "Note!",
+                        new String[]{"The base tank cooldown you picked is",
+                                "greater than the tank's bullet's cooldown.", "",
+                                "The greater cooldown value will be used."});
+            }
+        }
+        else if (p.id().equals("enable_predictive_firing"))
+        {
+            if ((boolean) f.cast().get())
+            {
+                if (t.shootAIType != TankAIControlled.ShootAI.straight && t.shootAIType != TankAIControlled.ShootAI.alternate)
+                {
+                    Game.screen = new ScreenInfo(Game.screen, "Note!",
+                            new String[]{"Predictive firing is only effective",
+                                    "with straight or alternate aiming behavior."});
+                }
+            }
+        }
     }
 }
 

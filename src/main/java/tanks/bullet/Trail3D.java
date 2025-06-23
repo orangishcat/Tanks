@@ -17,7 +17,7 @@ public class Trail3D extends Trail
     protected double frontAngleOffsetPitch;
     protected double backAngleOffsetPitch;
 
-    public static Model cap = Drawing.drawing.createModel("/models/cap/");
+    public static Model cap = Drawing.drawing.getModel("/models/cap/");
 
     public Trail3D(Movable m, double speed, double backX, double backY, double backZ,
                    double delay, double backWidth, double frontWidth, double length,

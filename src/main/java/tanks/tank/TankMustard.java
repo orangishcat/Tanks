@@ -1,7 +1,7 @@
 package tanks.tank;
 
 import tanks.Game;
-import tanks.bullet.DefaultBullets;
+import tanks.bullet.DefaultItems;
 
 /**
  * A stationary tank which lobs bullets over walls
@@ -20,7 +20,8 @@ public class TankMustard extends TankAIControlled
         this.enableMineLaying = false;
         this.enablePredictiveFiring = true;
 
-        this.setBullet(DefaultBullets.artillery_shell);
+        this.setBullet(DefaultItems.artillery_shell);
+        this.getBullet().recoil = 0;
 
         this.turretAimSpeed = 0.02;
         this.enableLookingAtTargetEnemy = false;
@@ -30,7 +31,7 @@ public class TankMustard extends TankAIControlled
 
         if (Game.tankTextures)
         {
-            this.colorModel = TankModels.fixed.color;
+            this.colorSkin = TankModels.fixed;
         }
 
         this.coinValue = 4;
