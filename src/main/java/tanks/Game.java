@@ -643,9 +643,7 @@ public class Game
 
 		BaseFile extensionRegistryFile = game.fileManager.getFile(homedir + extensionRegistryPath);
 		if (!extensionRegistryFile.exists())
-		{
-			extensionRegistry.initRegistry();
-		}
+            extensionRegistry.initRegistry();
 
 		BaseFile levelsFile = game.fileManager.getFile(homedir + levelDir);
 		if (!levelsFile.exists())

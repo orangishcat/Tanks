@@ -13,18 +13,10 @@ import tanks.tankson.Property;
 public class BulletGas extends Bullet implements IDrawableWithGlow
 {
     public static String bullet_class_name = "gas";
-
     public double startSize;
 
     @Property(id = "end_size", name = "End size", category = BulletPropertyCategory.appearance)
     public double endSize;
-
-    public double startR;
-    public double startG;
-    public double startB;
-    public double endR;
-    public double endG;
-    public double endB;
 
     @Property(id = "color_noise_r", name = "Noise red")
     public double noiseR;
@@ -33,9 +25,8 @@ public class BulletGas extends Bullet implements IDrawableWithGlow
     @Property(id = "color_noise_b", name = "Noise blue")
     public double noiseB;
 
-    public double baseDamage;
-    public double baseBulletKB;
-    public double baseTankKB;
+    public double startR, startG, startB, endR, endG, endB;
+    public double baseDamage, baseBulletKB, baseTankKB;
 
     @Property(id = "opacity", name = "Opacity", category = BulletPropertyCategory.appearance)
     public double opacity = 1;

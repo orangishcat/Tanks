@@ -17,7 +17,10 @@ import tanks.network.event.*;
 import tanks.obstacle.Obstacle;
 import tanks.obstacle.ObstacleStackable;
 import tanks.tank.*;
-import tanks.tankson.*;
+import tanks.tankson.ICopyable;
+import tanks.tankson.ITanksONEditable;
+import tanks.tankson.Property;
+import tanks.tankson.TanksONable;
 
 import java.util.ArrayList;
 
@@ -251,8 +254,6 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 	public double originY;
 
 	public boolean justBounced = false;
-
-	public double[] lightInfo = new double[]{0, 0, 0, 0, 0, 0, 0};
 
 	public final boolean isTemplate;
 
@@ -495,7 +496,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 						((IServerPlayerTank) this.tank).getPlayer().hotbar.coins += t.coinValue;
 
 					if (this.tank instanceof TankPlayerRemote)
-					Game.eventsOut.add(new EventUpdateCoins(((TankPlayerRemote) this.tank).player));
+						Game.eventsOut.add(new EventUpdateCoins(((TankPlayerRemote) this.tank).player));
 				}
 				else if ((!Game.currentLevel.shop.isEmpty() || !Game.currentLevel.startingItems.isEmpty()) && !(t instanceof TankPlayer || t instanceof TankPlayerRemote))
 				{

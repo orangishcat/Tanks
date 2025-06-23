@@ -24,20 +24,10 @@ public class Player
     public String buildName = "player";
     public HashSet<String> ownedBuilds = new HashSet<>();
 
-    public int colorR = 0;
-    public int colorG = 150;
-    public int colorB = 255;
-
-    public int colorR2 = (int) Turret.calculateSecondaryColor(colorR);
-    public int colorG2 = (int) Turret.calculateSecondaryColor(colorG);
-    public int colorB2 = (int) Turret.calculateSecondaryColor(colorB);
-
-    public int colorR3 = (this.colorR + this.colorR2) / 2;
-    public int colorG3 = (this.colorG + this.colorG2) / 2;
-    public int colorB3 = (this.colorB + this.colorB2) / 2;
-
-    public boolean enableSecondaryColor = false;
-    public boolean enableTertiaryColor = false;
+    public int colorR = 0, colorG = 150, colorB = 255;
+    public int colorR2 = (int) Turret.calculateSecondaryColor(colorR), colorG2 = (int) Turret.calculateSecondaryColor(colorG), colorB2 = (int) Turret.calculateSecondaryColor(colorB);
+    public int colorR3 = (this.colorR + this.colorR2) / 2, colorG3 = (this.colorG + this.colorG2) / 2, colorB3 = (this.colorB + this.colorB2) / 2;
+    public boolean enableSecondaryColor = false, enableTertiaryColor = false;
 
     public boolean isBot = false;
 

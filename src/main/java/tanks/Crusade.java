@@ -18,16 +18,12 @@ public class Crusade
 	public static Crusade currentCrusade = null;
 	public static boolean crusadeMode = false;
 
-	public boolean retry = false;
-	public boolean replay = false;
-
-	public boolean win = false;
-	public boolean lose = false;
+	public boolean retry = false, replay = false;
+	public boolean win = false, lose = false;
 
 	public boolean lifeGained = false;
 
-	public int currentLevel = 0;
-	public int saveLevel = 0;
+	public int currentLevel = 0, saveLevel = 0;
 
 	public ArrayList<Double> bestTimes = null;
 
@@ -50,8 +46,8 @@ public class Crusade
 	public ArrayList<CrusadeLevel> levels = new ArrayList<>();
 	public HashSet<Integer> livingTankIDs = new HashSet<>();
 
-	public int bonusLifeFrequency = 3;
 	public int startingLives = 3;
+	public int bonusLifeFrequency = 3;
 	public boolean showNames = false;
 
 	public ArrayList<TankAIControlled> customTanks = new ArrayList<>();

@@ -7,23 +7,13 @@ import java.util.UUID;
 
 public class ConnectedPlayer
 {
-	public String username;
-	public final String rawUsername;
+	public String username, rawUsername;
 	public final UUID clientId;
 
-	public double teamColorR = 255;
-	public double teamColorG = 255;
-	public double teamColorB = 255;
-
-	public double colorR;
-	public double colorG;
-	public double colorB;
-	public double colorR2;
-	public double colorG2;
-	public double colorB2;
-	public double colorR3;
-	public double colorG3;
-	public double colorB3;
+	public double teamColorR = 255, teamColorG = 255, teamColorB = 255;
+	public double colorR, colorG, colorB;
+	public double colorR2, colorG2, colorB2;
+	public double colorR3, colorG3, colorB3;
 
 	public boolean isBot;
 

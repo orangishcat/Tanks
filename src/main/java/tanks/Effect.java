@@ -17,29 +17,17 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
     public EffectType type;
     public double age = 0;
-    public double colR;
-    public double colG;
-    public double colB;
+    public double colR, colG, colB;
 
     public boolean force = false;
     public boolean enableGlow = true;
-    public double glowR;
-    public double glowG;
-    public double glowB;
+    public double glowR, glowG, glowB;
 
     public double maxAge = 100;
-    public double size;
-    public double radius;
-    public double angle;
-    public double distance;
+    public double size, radius, angle, distance;
 
-    public int prevGridX;
-    public int prevGridY;
-
-    public int initialGridX;
-    public int initialGridY;
-
-    public double[] lightInfo = new double[7];
+    public int prevGridX, prevGridY;
+    public int initialGridX, initialGridY;
 
     //Effects that have this set to true are removed faster when the level has ended
     public boolean fastRemoveOnExit = false;
@@ -111,7 +99,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             this.maxAge = 20;
         else if (type == EffectType.circleMarker)
             this.maxAge = 20;
-        else if (type == EffectType.explosion)
+        else if (type == EffectType.eˆxplosion)
         {
             this.maxAge = 20;
             this.colR = 255;

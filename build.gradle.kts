@@ -3,7 +3,7 @@ plugins {
     `maven-publish`
 }
 
-fun get_hash(): String {
+fun getHash(): String {
     return Runtime.getRuntime()
         .exec("git rev-parse --short HEAD")
         .inputStream
@@ -15,9 +15,9 @@ fun get_hash(): String {
 val lwjglVersion = "3.3.3"
 val lwjglNatives = listOf(
     //"natives-freebsd",
-    "natives-linux-arm32", "natives-linux-arm64", 
-	//"natives-linux-ppc64le", "natives-linux-riscv64", 
-	"natives-linux",
+    "natives-linux-arm32", "natives-linux-arm64",
+    //"natives-linux-ppc64le", "natives-linux-riscv64",
+    "natives-linux",
     "natives-macos", "natives-macos-arm64",
     "natives-windows-x86", "natives-windows", "natives-windows-arm64",
 )
@@ -51,7 +51,7 @@ dependencies {
     api(libs.org.l33tlabs.twl.pngdecoder)
     api(libs.org.apache.commons.commons.io)
     implementation("io.netty:netty-all:4.1.68.Final")
-    implementation("it.unimi.dsi:fastutil:8.3.1")
+    implementation("it.unimi.dsi:fastutil-core:8.5.15")
 
     //Steamworks
     api(files("libs/steamworks4j-1.10.0-SNAPSHOT.jar"))
@@ -59,8 +59,8 @@ dependencies {
 }
 
 group = "com.aehmttw"
-version = rootProject.file("src/main/resources/version.txt").readText().toString().trim()
-rootProject.file("src/main/resources/hash.txt").writeText(get_hash())
+version = rootProject.file("src/main/resources/version.txt").readText().trim()
+rootProject.file("src/main/resources/hash.txt").writeText(getHash())
 description = "Tanks"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
