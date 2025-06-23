@@ -99,7 +99,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             this.maxAge = 20;
         else if (type == EffectType.circleMarker)
             this.maxAge = 20;
-        else if (type == EffectType.eˆxplosion)
+        else if (type == EffectType.explosion)
         {
             this.maxAge = 20;
             this.colR = 255;
