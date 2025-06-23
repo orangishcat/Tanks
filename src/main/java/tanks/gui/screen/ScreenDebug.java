@@ -60,7 +60,7 @@ public class ScreenDebug extends Screen
         else
             destroyCheat.setText(destroyCheatText, ScreenOptions.offText);
 
-        if (Game.drawFaces)
+        if (Game.showHitboxes)
             drawFaces.setText(facesText, ScreenOptions.onText);
         else
             drawFaces.setText(facesText, ScreenOptions.offText);
@@ -187,8 +187,8 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.drawFaces = !Game.drawFaces;
-            if (Game.drawFaces)
+            Game.showHitboxes = !Game.showHitboxes;
+            if (Game.showHitboxes)
                 drawFaces.setText(facesText, ScreenOptions.onText);
             else
                 drawFaces.setText(facesText, ScreenOptions.offText);

@@ -194,6 +194,8 @@ public class Game
 	public static boolean enableChatFilter = true;
 	public static boolean nameInMultiplayer = true;
 
+	public static boolean showPathfinding = false;
+	public static boolean showHitboxes = false;
 	public static boolean showSpeedrunTimer = false;
 	public static boolean showBestTime = false;
 
@@ -506,7 +508,7 @@ public class Game
 		Game.registryModelTank.registerFullModel(dir);
 	}
 
-	public static void registerTankEmblems()
+	public static void registerTankSkin(TankModels.TankSkin s)
 	{
 		Game.registryModelTank.registerSkin(s);
 	}

@@ -4,8 +4,9 @@ import basewindow.Model;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import tanks.*;
 import tanks.bullet.Bullet;
+import tanks.effect.AttributeModifier;
+import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
-import tanks.gui.screen.ScreenPartyHost;
 import tanks.gui.screen.ScreenPartyLobby;
 import tanks.gui.screen.leveleditor.selector.SelectorRotation;
 import tanks.item.Item;
@@ -14,14 +15,14 @@ import tanks.network.event.EventTankAddAttributeModifier;
 import tanks.network.event.EventTankUpdate;
 import tanks.network.event.EventTankUpdateHealth;
 import tanks.network.event.EventTankUpdateVisibility;
-import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.obstacle.Obstacle;
-import tanks.obstacle.ObstacleStackable;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Objects;
 
 import static tanks.tank.TankPropertyCategory.*;
 
@@ -237,6 +238,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public long lastFarthestInSightUpdate = 0;
 	public Tank lastFarthestInSight = null;
+	private boolean drawHealray;
 
 	public Tank(String name, double x, double y, double size, double r, double g, double b)
 	{
@@ -596,8 +598,6 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.frictionModifier = 1;
 		this.maxSpeedModifier = 1;
 
-		if (health < baseHealth)
-			em.removeAttribute(AttributeModifier.healray);
 		EffectManager em = getEffectManager();
 		if (health < baseHealth)
 			em.removeAttribute(AttributeModifier.healray);

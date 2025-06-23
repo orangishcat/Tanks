@@ -2,7 +2,11 @@ package tanks.minigames;
 
 import tanks.*;
 import tanks.bullet.Bullet;
-import tanks.gui.screen.*;
+import tanks.effect.StatusEffect;
+import tanks.gui.screen.IDarkScreen;
+import tanks.gui.screen.ScreenArcadeBonuses;
+import tanks.gui.screen.ScreenGame;
+import tanks.gui.screen.ScreenPartyLobby;
 import tanks.hotbar.Hotbar;
 import tanks.item.Item;
 import tanks.item.ItemShield;

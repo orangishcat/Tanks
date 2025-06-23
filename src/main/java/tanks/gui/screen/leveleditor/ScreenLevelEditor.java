@@ -10,7 +10,6 @@ import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.EditorButtons.EditorButton;
 import tanks.gui.screen.leveleditor.selector.MetadataSelector;
 import tanks.item.Item;
-import tanks.network.event.INetworkEvent;
 import tanks.obstacle.Obstacle;
 import tanks.obstacle.ObstacleBeatBlock;
 import tanks.obstacle.ObstacleStackable;
@@ -1468,7 +1467,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			Drawing.drawing.playVibration("click");
 	}
 
-	private void handleErase(boolean[] handled, boolean validLeft, boolean validRight, boolean batch)
+	private void placeErase(boolean[] handled, boolean validLeft, boolean validRight, boolean batch)
 	{
 		boolean skip = false;
 
@@ -2239,6 +2238,16 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				selectedTiles[newX][newY] = true;
 				deque.add(new Point(newX, newY));
 			}
+		}
+	}
+
+	private static class Point
+	{
+		public int x, y;
+		public Point(int x, int y)
+		{
+			this.x = x;
+			this.y = y;
 		}
 	}
 

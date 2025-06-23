@@ -2,22 +2,19 @@ package tanks;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import tanks.bullet.Bullet;
+import tanks.effect.AttributeModifier;
+import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
-import tanks.gui.screen.ScreenPartyHost;
 import tanks.gui.screen.leveleditor.selector.SelectorTeam;
-import tanks.network.event.EventStatusEffectBegin;
-import tanks.network.event.EventStatusEffectDeteriorate;
-import tanks.network.event.EventStatusEffectEnd;
+import tanks.obstacle.Face;
+import tanks.obstacle.ISolidObject;
 import tanks.tank.NameTag;
-import tanks.tank.Tank;
 import tanks.tankson.MetadataProperty;
 import tanks.tankson.Property;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
-public abstract class Movable extends GameObject implements IDrawableForInterface
+public abstract class Movable extends GameObject implements ISolidObject, IDrawableForInterface
 {
 	public ObjectOpenHashSet<Chunk> prevChunks = new ObjectOpenHashSet<>();
 	private EffectManager em;
@@ -132,7 +129,7 @@ public abstract class Movable extends GameObject implements IDrawableForInterfac
 
 		if (!destroy)
 		{
-			em.update();
+			em().update();
 
 			double vX2 = this.vX;
 			double vY2 = this.vY;
