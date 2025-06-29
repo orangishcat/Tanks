@@ -5,7 +5,6 @@ import basewindow.BaseFileManager;
 import basewindow.BaseWindow;
 import basewindow.ShaderGroup;
 import com.codedisaster.steamworks.SteamMatchmaking;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.bullet.*;
 import tanks.extension.Extension;
 import tanks.extension.ExtensionRegistry;
@@ -1077,63 +1076,6 @@ public class Game
 	public static Obstacle getExtraObstacle(double posX, double posY)
 	{
 		return getExtraObstacle((int) (posX / Game.tile_size), (int) (posY / Game.tile_size));
-	}
-
-	/** Field to cache the movable array for reuse */
-	private static final ObjectArrayList<Movable> movableOut = new ObjectArrayList<>();
-	/** Field to cache the obstacle array for reuse */
-	private static final ObjectArrayList<Obstacle> obstacleOut = new ObjectArrayList<>();
-
-	/** Expects all pixel coordinates.
-	 * @return all the movables within the specified range */
-    public static ObjectArrayList<Movable> getMovablesInRange(double x1, double y1, double x2, double y2)
-	{
-		movableOut.clear();
-		for (Movable m : Game.movables)
-		{
-			if (Game.isOrdered(true, x1, m.posX, x2) && Game.isOrdered(true, x2, m.posY, y2))
-				movableOut.add(m);
-		}
-        return movableOut;
-	}
-
-	/** Expects all pixel coordinates.
-	 * @return all the movables within a certain radius of the position */
-	public static ObjectArrayList<Movable> getMovablesInRadius(double posX, double posY, double radius)
-	{
-		movableOut.clear();
-		for (Movable o : Game.movables)
-		{
-			if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
-				movableOut.add(o);
-		}
-		return movableOut;
-	}
-
-	/** Expects all pixel coordinates.
-	 * @return all the obstacles within the specified range */
-	public static ObjectArrayList<Obstacle> getObstaclesInRange(double x1, double y1, double x2, double y2)
-	{
-		obstacleOut.clear();
-		for (Obstacle o : Game.obstacles)
-		{
-			if (Game.isOrdered(true, x1, o.posX, x2) && Game.isOrdered(true, x2, o.posY, y2))
-				obstacleOut.add(o);
-		}
-		return obstacleOut;
-	}
-
-	/** Expects all pixel coordinates.
-	 * @return all the obstacles within a certain radius of the position */
-	public static ObjectArrayList<Obstacle> getObstaclesInRadius(double posX, double posY, double radius)
-	{
-		obstacleOut.clear();
-		for (Obstacle o : Game.obstacles)
-		{
-			if (Movable.sqDistBetw(o.posX, o.posY, posX, posY) < radius * radius)
-				obstacleOut.add(o);
-		}
-		return obstacleOut;
 	}
 
 	public static void removeObstacle(Obstacle o)
