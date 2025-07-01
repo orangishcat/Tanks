@@ -32,13 +32,8 @@ public class Chunk implements Comparable<Chunk>
     public final ObjectOpenHashSet<Obstacle> obstacles = new ObjectOpenHashSet<>();
     public final ObjectOpenHashSet<Movable> movables = new ObjectOpenHashSet<>();
 
-    // Maybe this could be done with one FaceList, but I'm too lazy to figure that out
     /** Stores faces of Movables, which are updated every frame */
     public final FaceList faces = new FaceList();
-    /** Stores faces of Obstacles, which are updated only when the obstacle is added, removed, or changes position */
-    public final FaceList staticFaces = new FaceList();
-
-    public final FaceList[] faceLists = {faces, staticFaces};
     public final Tile[][] tileGrid = new Tile[chunkSize][chunkSize];
 
     public Chunk compareTo;
@@ -72,21 +67,63 @@ public class Chunk implements Comparable<Chunk>
     static int[] x1 = {0, 1, 0, 0}, x2 = {1, 1, 1, 0};
     static int[] y1 = {0, 0, 1, 0}, y2 = {0, 1, 1, 1};
 
+    /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
+     * @return the chunks within the range */
+    public static ObjectArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxChunks)
+    {
+        chunkCache.clear();
+        queue.clear();
+        visited.clear();
+
+        Chunk start = Chunk.getChunk(tileX, tileY);
+
+        if (start != null)
+        {
+            queue.enqueue(start);
+
+            while (!queue.isEmpty())
+            {
+                Chunk c = queue.dequeue();
+                for (int i = 0; i < 4; i++)
+                {
+                    int newX = c.chunkX + Direction.X[i];
+                    int newY = c.chunkY + Direction.Y[i];
+                    Chunk next = Chunk.getChunkCoords(newX, newY);
+                    if (next != null && start.manhattanDist(next) < maxChunks && visited.add(next))
+                    {
+                        chunkCache.add(next);
+                        queue.enqueue(next);
+                    }
+                }
+            }
+        }
+
+        return chunkCache;
+    }
+
     /**
      * Adds a level border on the specified side of the chunk, where rays will collide off of.
      *
-     * @param side Integer from 0-3, indicating top, right, bottom, or left face
+     * @param dir The side of the chunk to add the border on
+     * @param l The level to get the border coordinates from
      */
-    public void addBorderFace(int side, Level l)
+    public void addBorderFace(Direction dir, Level l)
     {
+        int side = dir.index();
         Face f = new Face(null,
-                Math.max(l.startX, Math.min(l.sizeX, (chunkX + x1[side]) * Chunk.chunkSize)) * Game.tile_size,
-                Math.max(l.startY, Math.min(l.sizeY, (chunkY + y1[side]) * Chunk.chunkSize)) * Game.tile_size,
-                Math.max(l.startX, Math.min(l.sizeX, (chunkX + x2[side]) * Chunk.chunkSize)) * Game.tile_size,
-                Math.max(l.startY, Math.min(l.sizeY, (chunkY + y2[side]) * Chunk.chunkSize)) * Game.tile_size,
-                side % 2 == 0, side < 2, true, true);
+                convert(chunkX + x1[side], l),
+                convert(chunkY + y1[side], l),
+                convert(chunkX + x2[side], l),
+                convert(chunkY + y2[side], l),
+                dir, true, true);
         borderFaces[side] = f;
-        staticFaces.getSide(side).add(f);
+        faces.getSide(side).add(f);
+    }
+
+    /** Helper to convert chunk coordinates to game coordinates and clamp it to the level size. */
+    private static double convert(int chunk, Level l)
+    {
+        return Math.max(l.startX, Math.min(l.sizeX, chunk * Chunk.chunkSize)) * Game.tile_size;
     }
 
     public static boolean initialized()
@@ -103,37 +140,6 @@ public class Chunk implements Comparable<Chunk>
 
     static ObjectArrayFIFOQueue<Chunk> queue = new ObjectArrayFIFOQueue<>();
     static ObjectOpenHashSet<Chunk> visited = new ObjectOpenHashSet<>();
-
-    /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
-     * @return the chunks within the range */
-    public static ObjectArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxChunks)
-    {
-        chunkCache.clear();
-        queue.clear();
-        visited.clear();
-
-        Chunk start = Chunk.getChunk(tileX, tileY);
-        if (start != null)
-            queue.enqueue(start);
-
-        while (!queue.isEmpty())
-        {
-            Chunk c = queue.dequeue();
-            for (int i = 0; i < 4; i++)
-            {
-                int newX = c.chunkX + Game.dirX[i];
-                int newY = c.chunkY + Game.dirY[i];
-                Chunk next = Chunk.getChunkCoords(newX, newY);
-                if (next != null && start.manhattanDist(next) < maxChunks && visited.add(next))
-                {
-                    chunkCache.add(next);
-                    queue.enqueue(next);
-                }
-            }
-        }
-
-        return chunkCache;
-    }
 
     public static double chunkToPixel(double chunkPos)
     {
@@ -171,7 +177,7 @@ public class Chunk implements Comparable<Chunk>
         obstacles.add(o);
 
         if (o.tankCollision || o.bulletCollision)
-            staticFaces.addFaces(o);
+            faces.addFaces(o);
     }
 
     public void removeObstacle(Obstacle o)
@@ -180,7 +186,7 @@ public class Chunk implements Comparable<Chunk>
             return;
 
         obstacles.remove(o);
-        staticFaces.removeFaces(o);
+        faces.removeFaces(o);
     }
 
     public static ObjectArrayList<Chunk> getChunksInRange(double x1, double y1, double x2, double y2)
@@ -424,33 +430,11 @@ public class Chunk implements Comparable<Chunk>
             if (s.disableRayCollision())
                 return;
 
-            boolean[] valid = s.getValidHorizontalFaces(false);
-            int i = -1;
-            for (Face f : s.getHorizontalFaces())
+            Face[] faces = s.getFaces();
+            for (int i = 0; i < 4; i++)
             {
-                i++;
-
-                if (valid != null && !valid[i])
-                    continue;
-
-                if (f.positiveCollision)
-                    topFaces.add(f);
-                else
-                    bottomFaces.add(f);
-            }
-
-            valid = s.getValidVerticalFaces(false);
-            i = -1;
-            for (Face f : s.getVerticalFaces())
-            {
-                i++;
-                if (valid != null && !valid[i])
-                    continue;
-
-                if (f.positiveCollision)
-                    leftFaces.add(f);
-                else
-                    rightFaces.add(f);
+                if (faces[i].valid)
+                    getSide(i).add(faces[i]);
             }
         }
 
@@ -459,20 +443,11 @@ public class Chunk implements Comparable<Chunk>
             if (s.disableRayCollision())
                 return;
 
-            for (Face f : s.getHorizontalFaces())
+            Face[] faces = s.getFaces();
+            for (int i = 0; i < 4; i++)
             {
-                if (f.positiveCollision)
-                    topFaces.remove(f);
-                else
-                    bottomFaces.remove(f);
-            }
-
-            for (Face f : s.getVerticalFaces())
-            {
-                if (f.positiveCollision)
-                    leftFaces.remove(f);
-                else
-                    rightFaces.remove(f);
+                if (faces[i].valid)
+                    getSide(i).add(faces[i]);
             }
         }
 
@@ -486,8 +461,10 @@ public class Chunk implements Comparable<Chunk>
                     return leftFaces;
                 case 2:
                     return topFaces;
-                default:
+                case 3:
                     return rightFaces;
+                default:
+                    throw new RuntimeException("Invalid side: " + side);
             }
         }
 
@@ -497,6 +474,13 @@ public class Chunk implements Comparable<Chunk>
             bottomFaces.clear();
             leftFaces.clear();
             rightFaces.clear();
+        }
+
+        public void updateFaces(ISolidObject object)
+        {
+            removeFaces(object);
+            object.updateFaces();
+            addFaces(object);
         }
     }
 

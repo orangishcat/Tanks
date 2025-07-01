@@ -73,7 +73,7 @@ public class TerrainRenderer
 
         for (int dir = 0; dir < 4; dir++)
         {
-            Chunk.Tile neighbor = Chunk.getTile(x + Game.dirX[dir], y + Game.dirY[dir]);
+            Chunk.Tile neighbor = Chunk.getTile(x + Direction.X[dir], y + Direction.Y[dir]);
             if (neighbor != null)
                 extra = Math.max(extra, -neighbor.edgeDepth());
         }

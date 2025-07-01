@@ -2214,8 +2214,8 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			Point p = deque.pop();
 			for (int i = 0; i < 4; i++)
 			{
-				int newX = p.x + Game.dirX[i];
-				int newY = p.y + Game.dirY[i];
+				int newX = p.x + Direction.X[i];
+				int newY = p.y + Direction.Y[i];
 
 				if (newX < 0 || newX >= Game.currentSizeX || newY < 0 || newY >= Game.currentSizeY || selectedTiles[newX][newY] ||
 						Math.abs(newX - x) + Math.abs(newY - y) > 50)

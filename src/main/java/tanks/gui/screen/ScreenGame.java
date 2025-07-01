@@ -132,8 +132,6 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 	public boolean playedIntro = false;
 
-	public ArrayList<Obstacle> obstaclesToUpdate = new ArrayList<>();
-
 	protected static String[] ready_musics =
 			{"piano.ogg", "synth.ogg", "bass-guitar.ogg", "drum.ogg", "beep.ogg",
 					"bass.ogg", "cello.ogg", "chime.ogg", "drum2.ogg", "drum3.ogg",
@@ -2607,66 +2605,47 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		for (Cloud c : Game.clouds)
 			c.draw();
 
-		if (isUpdatingGame() && !Game.game.window.drawingShadow)
-		{
-			for (Chunk c : Chunk.chunkList)
-				c.faces.clear();
-		}
-
-		if (!Game.game.window.drawingShadow)
+		if (Chunk.debug && !Game.game.window.drawingShadow)
 		{
 			for (Movable m : Game.movables)
 			{
-				int count = 0;
-				for (Chunk c : m.getTouchingChunks())
-				{
-					c.addMovable(m);
-					count++;
-				}
-
-				if (Chunk.debug)
-				{
-					Drawing.drawing.setColor(255, 255, 255);
-					Drawing.drawing.drawText(m.posX, m.posY, m.getSize(), count + "");
-				}
-			}
+                Drawing.drawing.setColor(255, 255, 255);
+                Drawing.drawing.drawText(m.posX, m.posY, m.getSize(), m.getTouchingChunks().size() + "");
+            }
 		}
 
 		if (Game.showHitboxes)
 		{
 			for (Chunk c : Chunk.chunkList)
 			{
-				for (Chunk.FaceList faceList : c.faceLists)
-				{
-					for (Face f : faceList.topFaces)
-					{
-						if (shouldHide(f)) continue;
-						drawing.setColor(150, 50, 50);
-						drawing.fillRect(0.5 * (f.endX + f.startX), f.startY, f.endX - f.startX, 5);
-					}
+                for (Face f : c.faces.topFaces)
+                {
+                    if (shouldHide(f)) continue;
+                    drawing.setColor(150, 50, 50);
+                    drawing.fillRect(0.5 * (f.endX + f.startX), f.startY, f.endX - f.startX, 5);
+                }
 
-					for (Face f : faceList.bottomFaces)
-					{
-						if (shouldHide(f)) continue;
-						drawing.setColor(255, 50, 50);
-						drawing.fillRect(0.5 * (f.endX + f.startX), f.startY, f.endX - f.startX, 5);
-					}
+                for (Face f : c.faces.bottomFaces)
+                {
+                    if (shouldHide(f)) continue;
+                    drawing.setColor(255, 50, 50);
+                    drawing.fillRect(0.5 * (f.endX + f.startX), f.startY, f.endX - f.startX, 5);
+                }
 
-					for (Face f : faceList.leftFaces)
-					{
-						if (shouldHide(f)) continue;
-						drawing.setColor(50, 50, 150);
-						drawing.fillRect(f.startX, 0.5 * (f.endY + f.startY), 5, f.endY - f.startY);
-					}
+                for (Face f : c.faces.leftFaces)
+                {
+                    if (shouldHide(f)) continue;
+                    drawing.setColor(50, 50, 150);
+                    drawing.fillRect(f.startX, 0.5 * (f.endY + f.startY), 5, f.endY - f.startY);
+                }
 
-					for (Face f : faceList.rightFaces)
-					{
-						if (shouldHide(f)) continue;
-						drawing.setColor(50, 50, 255);
-						drawing.fillRect(f.startX, 0.5 * (f.endY + f.startY), 5, f.endY - f.startY);
-					}
-				}
-			}
+                for (Face f : c.faces.rightFaces)
+                {
+                    if (shouldHide(f)) continue;
+                    drawing.setColor(50, 50, 255);
+                    drawing.fillRect(f.startX, 0.5 * (f.endY + f.startY), 5, f.endY - f.startY);
+                }
+            }
 		}
 
 		Drawing.drawing.setColor(0, 0, 0, 127);

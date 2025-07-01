@@ -7,7 +7,7 @@ import tanks.*;
 import tanks.rendering.ShaderGroundObstacle;
 import tanks.rendering.ShaderObstacle;
 
-public abstract class Obstacle extends GameObject implements IDrawableForInterface, ISolidObject, IDrawableWithGlow, IBatchRenderableObject
+public abstract class Obstacle extends SolidGameObject implements IDrawableForInterface, ISolidObject, IDrawableWithGlow, IBatchRenderableObject
 {
 	public Effect.EffectType destroyEffect = Effect.EffectType.obstaclePiece;
 	public double destroyEffectAmount = 1;
@@ -70,11 +70,6 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 
 	public String name;
 	public String description;
-
-	public Face[] horizontalFaces;
-	public Face[] verticalFaces;
-
-	protected boolean[] validFaces = new boolean[2];
 
 	public double baseGroundHeight;
 
@@ -256,43 +251,9 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 	}
 
 	@Override
-	public Face[] getHorizontalFaces()
+	public double getSize()
 	{
-		if (this.horizontalFaces == null)
-		{
-			this.horizontalFaces = new Face[2];
-			double s = Game.tile_size / 2;
-			this.horizontalFaces[0] = new Face(this, this.posX - s, this.posY - s, this.posX + s, this.posY - s, true, true, this.tankCollision, this.bulletCollision);
-			this.horizontalFaces[1] = new Face(this, this.posX - s, this.posY + s, this.posX + s, this.posY + s, true, false, this.tankCollision, this.bulletCollision);
-		}
-
-		return this.horizontalFaces;
-	}
-
-	public boolean[] getValidHorizontalFaces(boolean unbreakable)
-	{
-		this.validFaces[0] = this.validFaces[1] = this.tankCollision || this.bulletCollision;
-		return this.validFaces;
-	}
-
-	@Override
-	public Face[] getVerticalFaces()
-	{
-		if (this.verticalFaces == null)
-		{
-			this.verticalFaces = new Face[2];
-			double s = Game.tile_size / 2;
-			this.verticalFaces[0] = new Face(this, this.posX - s, this.posY - s, this.posX - s, this.posY + s, false, true, this.tankCollision, this.bulletCollision);
-			this.verticalFaces[1] = new Face(this, this.posX + s, this.posY - s, this.posX + s, this.posY + s, false, false, this.tankCollision, this.bulletCollision);
-		}
-
-		return this.verticalFaces;
-	}
-
-	public boolean[] getValidVerticalFaces(boolean unbreakable)
-	{
-		this.validFaces[0] = this.validFaces[1] = this.tankCollision || this.bulletCollision;
-		return this.validFaces;
+		return Game.tile_size;
 	}
 
 	/**
@@ -342,6 +303,12 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		return 0;
 	}
 
+	@Override
+	public boolean isFaceValid(Face f)
+	{
+		return tankCollision || bulletCollision;
+	}
+
 	public void onDestroy(Movable source)
 	{
 		Game.removeObstacles.add(this);
@@ -351,8 +318,7 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 	{
 		Chunk c = Chunk.getChunk(posX, posY);
 		if (c == null) return;
-		c.removeObstacle(this);
-		c.addObstacle(this);
+		c.faces.updateFaces(this);
 		afterAdd();
     }
 
@@ -363,8 +329,8 @@ public abstract class Obstacle extends GameObject implements IDrawableForInterfa
 		obsListCache.clear();
 		for (int i = 0; i < 4; i++)
 		{
-			double newX = posX + Game.tile_size * Game.dirX[i];
-			double newY = posY + Game.tile_size * Game.dirY[i];
+			double newX = posX + Game.tile_size * Direction.X[i];
+			double newY = posY + Game.tile_size * Direction.Y[i];
 
 			Obstacle o = Game.getObstacle(newX, newY);
 			if (o != null)

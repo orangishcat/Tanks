@@ -194,10 +194,7 @@ public class Ray
 		return this;
 	}
 
-	/** Result of dynamic collisions */
-	public static Result dynamic = new Result();
-	/** Result of static collisions */
-	public static Result stat = new Result();
+	public static final Result result = new Result();
 
 	public Movable getTarget()
 	{
@@ -231,29 +228,11 @@ public class Ray
 
 		while (this.bounces >= 0 && this.bouncyBounces >= 0)
 		{
-			Result result;
 			Chunk current = Chunk.getChunk(posX, posY);
 			if (current == null)
 				return null;
 
-			int maxChunks = maxChunkCheck;
-			checkFaceList(current, stat, Ray::staticFaces, maxChunks, firstBounce);
-
-			if (stat.collisionFace != null)
-				maxChunks = (int) ((Math.abs(stat.collisionX - posX) + Math.abs(stat.collisionY - posY)) / Game.tile_size / Chunk.chunkSize + 1);
-
-			checkFaceList(current, dynamic, Ray::dynamicFaces, maxChunks, firstBounce);
-
-			if (dynamic.collisionFace != null && stat.collisionFace != null)
-			{
-				result = Movable.sqDistBetw(dynamic.collisionX, dynamic.collisionY, posX, posY) <
-						Movable.sqDistBetw(stat.collisionX, stat.collisionY, posX, posY) ? dynamic : stat;
-			}
-			else
-				result = dynamic.collisionFace != null ? dynamic : stat;
-
-			if (result == null)
-				return null;
+			checkFaceList(current, firstBounce);
 
 			this.age += result.t;
 
@@ -344,7 +323,7 @@ public class Ray
                     this.vX = -this.vX;
                     this.vY = -this.vY;
                 }
-                else if (result.collisionFace.horizontal)
+                else if (result.collisionFace.direction.isHorizontal())
                     this.vY = -this.vY;
                 else
                     this.vX = -this.vX;
@@ -356,21 +335,9 @@ public class Ray
 		return null;
 	}
 
-	/** Lambdas with parameter(s) are anonymous classes, which create temp objects. We don't want that. */
-	public static Chunk.FaceList dynamicFaces(Chunk c)
-	{
-		return c.faces;
-	}
-
-	/** Lambdas with parameter(s) are anonymous classes, which create temp objects. Temp objects bad. */
-	public static Chunk.FaceList staticFaces(Chunk c)
-	{
-		return c.staticFaces;
-	}
-
 	private static boolean isDynamic = false;
 
-	public void checkFaceList(Chunk current, Result result, Function<Chunk, Chunk.FaceList> faceList, int maxChunks, boolean firstBounce)
+	public void checkFaceList(Chunk current, boolean firstBounce)
 	{
 		if (current == null)
 			return;
@@ -378,7 +345,7 @@ public class Ray
 		int totalChunksChecked = 0;
 
 		chunkCheck:
-		for (int chunksChecked = 0; chunksChecked < maxChunks; chunksChecked++)
+		for (int chunksChecked = 0; chunksChecked < maxChunkCheck; chunksChecked++)
 		{
 			double moveXBase = Chunk.chunkSize * Game.tile_size * Math.cos(angle);
 			double moveYBase = Chunk.chunkSize * Game.tile_size * Math.sin(angle);
@@ -431,7 +398,7 @@ public class Ray
 					}
 				}
 
-				checkCollisionIn(result, faceList.apply(chunk), firstBounce);
+				checkCollisionIn(result, chunk.faces, firstBounce);
 
 				if (result.collisionFace != null)
 					break chunkCheck;
@@ -663,27 +630,5 @@ public class Ray
 	public boolean collision(Obstacle o)
 	{
 		return asBullet ? o.bulletCollision : o.tankCollision;
-	}
-
-	/** Used to compare coordinates between faces */
-	public static class DummyFace extends Face
-	{
-		/** The instance of DummyFace to reduce memory allocation */
-		public static DummyFace face = new DummyFace();
-
-		public DummyFace()
-		{
-			super(null, 0, 0, 0, 0, false, false, true, true);
-		}
-
-		public DummyFace set(boolean horizontal, double filter)
-		{
-			this.horizontal = horizontal;
-			if (horizontal)
-				this.startY = filter;
-			else
-				this.startX = filter;
-			return this;
-		}
 	}
 }

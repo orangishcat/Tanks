@@ -1290,8 +1290,8 @@ public class TankAIControlled extends Tank implements ITankField
 
             for (int i = 0; i < 8; i++)
             {
-                int x = t.tileX + Game.dirX[i];
-                int y = t.tileY + Game.dirY[i];
+                int x = t.tileX + Direction.X[i];
+                int y = t.tileY + Direction.Y[i];
 
                 if (x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
                     continue;
@@ -2907,7 +2907,7 @@ public class TankAIControlled extends Tank implements ITankField
 
 			/*for (int i = 0; i < 4; i++)
 			{
-				if (this.isSolid(Game.dirX[i], Game.dirY[i]))
+				if (this.isSolid(Direction.X[i], Direction.Y[i]))
 				{
 					this.unfavorability++;
 					break;

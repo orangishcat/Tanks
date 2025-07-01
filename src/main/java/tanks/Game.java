@@ -55,9 +55,6 @@ public class Game
 
 	public static final double tile_size = 50;
 
-	public static final int[] dirX = {1, -1, 0, 0, 1, 1, -1, -1};
-	public static final int[] dirY = {0, 0, 1, -1, 1, -1, 1, -1};
-
 	public static UUID computerID;
 	public static final UUID clientID = UUID.randomUUID();
 

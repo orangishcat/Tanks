@@ -6,7 +6,6 @@ import tanks.effect.AttributeModifier;
 import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
 import tanks.gui.screen.leveleditor.selector.SelectorTeam;
-import tanks.obstacle.Face;
 import tanks.obstacle.ISolidObject;
 import tanks.tank.NameTag;
 import tanks.tankson.MetadataProperty;
@@ -14,7 +13,7 @@ import tanks.tankson.Property;
 
 import java.lang.reflect.Field;
 
-public abstract class Movable extends GameObject implements ISolidObject, IDrawableForInterface
+public abstract class Movable extends SolidGameObject implements ISolidObject, IDrawableForInterface
 {
 	public ObjectOpenHashSet<Chunk> prevChunks = new ObjectOpenHashSet<>();
 	private EffectManager em;
@@ -42,8 +41,6 @@ public abstract class Movable extends GameObject implements ISolidObject, IDrawa
 	@MetadataProperty(id = "team", name = "Team", selector = SelectorTeam.selector_name, image = "team.png", keybind = "editor.team")
 	public Team team;
 
-	public Face[] horizontalFaces, verticalFaces;
-
 	public Movable(double x, double y)
 	{
 		this.posX = x;
@@ -51,6 +48,8 @@ public abstract class Movable extends GameObject implements ISolidObject, IDrawa
 
 		this.lastPosX = x;
 		this.lastPosY = y;
+
+		updateFaces();
 	}
 
 	public void preUpdate()
@@ -91,7 +90,7 @@ public abstract class Movable extends GameObject implements ISolidObject, IDrawa
 
         for (Chunk c : cache)
         {
-			c.faces.addFaces(this);
+			c.faces.updateFaces(this);
 			if (prevChunks.add(c))
 				onEnterChunk(c);
         }
@@ -336,46 +335,6 @@ public abstract class Movable extends GameObject implements ISolidObject, IDrawa
 		Drawing.drawing.setFontSize(20);
 		if (this.team != null)
 			Drawing.drawing.drawText(this.posX, this.posY + 35, this.team.name);
-	}
-
-	@Override
-	public Face[] getHorizontalFaces()
-	{
-		double s = this.getSize() / 2;
-
-		if (this.horizontalFaces == null)
-		{
-			this.horizontalFaces = new Face[2];
-			this.horizontalFaces[0] = new Face(this, this.posX - s, this.posY - s, this.posX + s, this.posY - s, true, true, true, true);
-			this.horizontalFaces[1] = new Face(this, this.posX - s, this.posY + s, this.posX + s, this.posY + s, true, false, true, true);
-		}
-		else
-		{
-			this.horizontalFaces[0].update(this.posX - s, this.posY - s, this.posX + s, this.posY - s);
-			this.horizontalFaces[1].update(this.posX - s, this.posY + s, this.posX + s, this.posY + s);
-		}
-
-		return this.horizontalFaces;
-	}
-
-	@Override
-	public Face[] getVerticalFaces()
-	{
-		double s = this.getSize() / 2;
-
-		if (this.verticalFaces == null)
-		{
-			this.verticalFaces = new Face[2];
-			this.verticalFaces[0] = new Face(this, this.posX - s, this.posY - s, this.posX - s, this.posY + s, false, true, true, true);
-			this.verticalFaces[1] = new Face(this, this.posX + s, this.posY - s, this.posX + s, this.posY + s, false, false, true, true);
-		}
-		else
-		{
-			this.verticalFaces[0].update(this.posX - s, this.posY - s, this.posX - s, this.posY + s);
-			this.verticalFaces[1].update(this.posX + s, this.posY - s, this.posX + s, this.posY + s);
-		}
-
-		return this.verticalFaces;
 	}
 
 	public static double[] getLocationInDirection(double angle, double distance)

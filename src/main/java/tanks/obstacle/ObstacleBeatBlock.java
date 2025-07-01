@@ -85,8 +85,6 @@ public class ObstacleBeatBlock extends ObstacleStackable
             this.firstUpdate = false;
             this.refreshHitboxes = true;
 
-            this.verticalFaces = null;
-            this.horizontalFaces = null;
             this.allowBounce = false;
             this.shouldClip = true;
 
