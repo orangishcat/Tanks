@@ -2145,9 +2145,10 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		for (Movable m : Game.removeMovables)
 		{
-			m.getTouchingChunks().forEach(chunk -> chunk.removeMovable(m));
+            for (Chunk chunk : m.getTouchingChunks())
+                chunk.removeMovable(m);
 
-			if (m instanceof IAvoidObject)
+            if (m instanceof IAvoidObject)
 				IAvoidObject.avoidances.remove(m);
 		}
 
@@ -2571,8 +2572,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.1 * frac, 0));
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, 0, -Math.PI * 0.5 * frac, 0, 0, 0, -1));
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.0575 * frac, 0.9 * frac));
-
             }
+
             if (fcZoom > 0)
                 Game.game.window.transformations.add(new ScaleAboutPoint(Game.game.window, 1, 1, fcZoom + 1, 0, 0, 0));
 
@@ -2614,7 +2615,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
             }
 		}
 
-		if (Game.showHitboxes)
+		if (Game.drawFaces)
 		{
 			for (Chunk c : Chunk.chunkList)
 			{
@@ -3179,7 +3180,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 	public static boolean shouldHide(Face f)
 	{
-		return (f.owner instanceof Tank && (((Tank) f.owner).canHide || ((Tank) f.owner).hidden)) || (f.owner instanceof TankAIControlled && ((TankAIControlled) f.owner).invisible);
+		return (f.owner instanceof Tank && (((Tank) f.owner).canHide && ((Tank) f.owner).hidden)) || (f.owner instanceof TankAIControlled && ((TankAIControlled) f.owner).invisible);
 	}
 
 	public static Tank focusedTank()

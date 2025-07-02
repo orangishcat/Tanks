@@ -345,8 +345,6 @@ public class Level
 			Game.movables.remove(Game.playerTank);
 		}
 
-		this.reloadTiles();
-
 		if (!((obstaclesPos.length == 1 && obstaclesPos[0].isEmpty()) || obstaclesPos.length == 0))
 		{
 			for (String obstaclesPo : obstaclesPos)
@@ -398,6 +396,8 @@ public class Level
 				}
 			}
 		}
+
+		this.reloadTiles();
 
 		ArrayList<Tank> tanksToRemove = new ArrayList<>();
 
@@ -759,8 +759,13 @@ public class Level
 
 			Chunk c = Chunk.getChunk(o.posX, o.posY);
 			if (c != null)
-				c.addObstacle(o);
+				c.addObstacle(o, false);
         }
+
+		for (Movable m : Game.movables)
+			m.refreshFaces = true;
+		for (Obstacle o : Game.obstacles)
+			o.refreshHitboxes();
 
 		ScreenLevelEditor s = null;
 		

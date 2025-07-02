@@ -1,7 +1,7 @@
 package tanks;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import tanks.effect.AttributeModifier;
 import tanks.effect.EffectManager;
 import tanks.gui.screen.ScreenGame;
@@ -15,7 +15,7 @@ import java.lang.reflect.Field;
 
 public abstract class Movable extends SolidGameObject implements ISolidObject, IDrawableForInterface
 {
-	public ObjectOpenHashSet<Chunk> prevChunks = new ObjectOpenHashSet<>();
+	public ObjectArraySet<Chunk> prevChunks = new ObjectArraySet<>();
 	private EffectManager em;
 
 	public double lastPosX, lastPosY, lastPosZ = 0;
@@ -23,6 +23,9 @@ public abstract class Movable extends SolidGameObject implements ISolidObject, I
 	public double lastFinalVX, lastFinalVY, lastFinalVZ;
 	public double lastVX, lastVY, lastVZ;
 	public double lastOriginalVX, lastOriginalVY, lastOriginalVZ;
+
+	public double age = 0;
+	public boolean refreshFaces = true;
 
 	public boolean destroy = false;
 	public boolean dealsDamage = true;
@@ -48,12 +51,12 @@ public abstract class Movable extends SolidGameObject implements ISolidObject, I
 
 		this.lastPosX = x;
 		this.lastPosY = y;
-
-		updateFaces();
 	}
 
 	public void preUpdate()
 	{
+		updateChunks();
+
 		double frameFrequency = affectedByFrameFrequency ? Panel.frameFrequency : 1;
 		this.lastVX = (this.posX - this.lastPosX) / frameFrequency;
 		this.lastVY = (this.posY - this.lastPosY) / frameFrequency;
@@ -66,54 +69,50 @@ public abstract class Movable extends SolidGameObject implements ISolidObject, I
 		this.lastPosX = this.posX;
 		this.lastPosY = this.posY;
 		this.lastPosZ = this.posZ;
+
+		refreshFaces = false;
 	}
 
-	public static Chunk leave;
+	public static ObjectArrayList<Chunk> leaveChunks = new ObjectArrayList<>();
 
 	public void updateChunks()
 	{
-		ObjectArrayList<Chunk> cache = getTouchingChunks();
-		for (Chunk c : prevChunks)
+        if (!refreshFaces && posX == lastPosX && posY == lastPosY)
+			return;
+
+        ObjectArrayList<Chunk> cache = getTouchingChunks();
+
+        for (Chunk c : cache)
+        {
+            if (prevChunks.add(c))
+                onEnterChunk(c);
+            c.faces.removeFaces(this);
+        }
+
+		leaveChunks.clear();
+        for (Chunk c : prevChunks)
 		{
 			if (!cache.contains(c))
 			{
 				onLeaveChunk(c);
-				leave = c;
-				break;
+				leaveChunks.add(c);
 			}
 		}
-		if (leave != null)
-		{
-			prevChunks.remove(leave);
-			leave = null;
-		}
+		prevChunks.removeAll(leaveChunks);
 
-        for (Chunk c : cache)
-        {
-			c.faces.updateFaces(this);
-			if (prevChunks.add(c))
-				onEnterChunk(c);
-        }
+		updateFaces();
+		for (Chunk c : cache)
+            c.faces.addFaces(this);
     }
 
 	public void onEnterChunk(Chunk c)
 	{
-		c.addMovable(this);
+
 	}
 
 	public void onLeaveChunk(Chunk c)
 	{
 		c.removeMovable(this);
-	}
-
-	public void addFaces()
-	{
-		getTouchingChunks().forEach(chunk -> chunk.faces.addFaces(this));
-	}
-
-	public void removeFaces()
-	{
-		getTouchingChunks().forEach(chunk -> chunk.faces.removeFaces(this));
 	}
 
 	public ObjectArrayList<Chunk> getTouchingChunks()
@@ -150,8 +149,6 @@ public abstract class Movable extends SolidGameObject implements ISolidObject, I
 				this.posZ += this.lastFinalVZ * frameFrequency;
 			}
 		}
-
-		updateChunks();
 	}
 
 	public void initEffectManager(EffectManager em)

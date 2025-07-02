@@ -192,7 +192,8 @@ public class Game
 	public static boolean nameInMultiplayer = true;
 
 	public static boolean showPathfinding = false;
-	public static boolean showHitboxes = false;
+	public static boolean drawFaces = false;
+	public static boolean immutableFaces = false;
 	public static boolean showSpeedrunTimer = false;
 	public static boolean showBestTime = false;
 
@@ -814,7 +815,7 @@ public class Game
 		addObstacle(o, true);
 	}
 
-	public static void addObstacle(Obstacle o, boolean redraw)
+	public static void addObstacle(Obstacle o, boolean refresh)
 	{
 		o.removed = false;
 		Game.obstacles.add(o);
@@ -828,12 +829,11 @@ public class Game
 
 		Chunk c = Chunk.getChunk(o.posX, o.posY);
 		if (c != null)
-			c.addObstacle(o);
+			c.addObstacle(o, refresh);
 
-		if (redraw)
+		if (refresh)
 		{
 			redraw(o);
-
 			Game.redrawObstacles.add(o);
 		}
 
@@ -1202,18 +1202,6 @@ public class Game
 	{
 		Chunk.Tile t = Chunk.getTile(posX, posY);
 		return t != null && t.solid();
-	}
-
-	public static boolean isUnbreakable(int tileX, int tileY)
-	{
-		Chunk.Tile t = Chunk.getTile(tileX, tileY);
-		return t != null && t.unbreakable();
-	}
-
-	public static boolean isUnbreakable(double posX, double posY)
-	{
-		Chunk.Tile t = Chunk.getTile(posX, posY);
-		return t != null && t.unbreakable();
 	}
 
 	public static double getTileHeight(double posX, double posY)

@@ -3,8 +3,12 @@ package tanks.gui.screen;
 import tanks.Drawing;
 import tanks.Game;
 import tanks.gui.Button;
+import tanks.gui.ButtonList;
 import tanks.replay.ReplayIO;
 import tanks.tank.TankPlayer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ScreenDebug extends Screen
 {
@@ -17,11 +21,23 @@ public class ScreenDebug extends Screen
     public String fancyLightsText = "Fancy lighting: ";
     public String destroyCheatText = "Destroy cheat: ";
     public String facesText = "Draw faces: ";
+    public String immutableFacesText = "Immutable faces: ";
+
+    public ButtonList debugButtons;
+    Button test = new Button(0, 0, this.objWidth, this.objHeight, "Test stuff", () -> Game.screen = new ScreenTestDebug());
+
+    Button back = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 4, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenTitle());
 
     public ScreenDebug()
     {
         this.music = "menu_options.ogg";
         this.musicID = "menu";
+
+        debugButtons = new ButtonList(new ArrayList<>(Arrays.asList(
+                test, traceAllRays, firstPerson, followingCam, destroyCheat, invulnerable,
+                fancyLighting, tankIDs, showPathfinding, drawFaces, immutableFaces
+        )), 0, 0, -30);
+        debugButtons.setRowsAndColumns(4, 3);
 
         if (Game.traceAllRays)
             traceAllRays.setText(traceText, ScreenOptions.onText);
@@ -60,17 +76,37 @@ public class ScreenDebug extends Screen
         else
             destroyCheat.setText(destroyCheatText, ScreenOptions.offText);
 
-        if (Game.showHitboxes)
+        if (Game.drawFaces)
             drawFaces.setText(facesText, ScreenOptions.onText);
         else
             drawFaces.setText(facesText, ScreenOptions.offText);
+
+        if (Game.immutableFaces)
+            immutableFaces.setText(immutableFacesText, ScreenOptions.onText);
+        else
+            immutableFaces.setText(immutableFacesText, ScreenOptions.offText);
     }
 
-    Button back = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 4, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenTitle());
+    @Override
+    public void update()
+    {
+        debugButtons.update();
+        back.update();
+    }
 
-    Button test = new Button(Drawing.drawing.interfaceSizeX / 2 - this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Test stuff", () -> Game.screen = new ScreenTestDebug());
+    @Override
+    public void draw()
+    {
+        this.drawDefaultBackground();
+        Drawing.drawing.setInterfaceFontSize(this.titleSize);
+        Drawing.drawing.setColor(0, 0, 0);
+        Drawing.drawing.displayInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 210, "Debug menu");
 
-    Button traceAllRays = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 1.5, this.objWidth, this.objHeight, "", new Runnable()
+        debugButtons.draw();
+        back.draw();
+    }
+
+    Button traceAllRays = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -84,7 +120,9 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button firstPerson = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+
+
+    Button firstPerson = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -98,7 +136,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button followingCam = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button followingCam = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -112,7 +150,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button showPathfinding = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 2.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button showPathfinding = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -126,7 +164,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button tankIDs = new Button(Drawing.drawing.interfaceSizeX / 2 + this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 1.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button tankIDs = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -140,7 +178,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button invulnerable = new Button(Drawing.drawing.interfaceSizeX / 2 - this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button invulnerable = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -154,7 +192,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button fancyLighting = new Button(Drawing.drawing.interfaceSizeX / 2 - this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 1.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button fancyLighting = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -168,7 +206,7 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button destroyCheat = new Button(Drawing.drawing.interfaceSizeX / 2 - this.objXSpace / 2, Drawing.drawing.interfaceSizeY / 2 - this.objYSpace * 0.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button destroyCheat = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
@@ -182,58 +220,32 @@ public class ScreenDebug extends Screen
         }
     });
 
-    Button drawFaces = new Button(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 + this.objYSpace * 2.5, this.objWidth, this.objHeight, "", new Runnable()
+    Button drawFaces = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
         {
-            Game.showHitboxes = !Game.showHitboxes;
-            if (Game.showHitboxes)
+            Game.drawFaces = !Game.drawFaces;
+            if (Game.drawFaces)
                 drawFaces.setText(facesText, ScreenOptions.onText);
             else
                 drawFaces.setText(facesText, ScreenOptions.offText);
         }
     });
 
-
-
-
-    @Override
-    public void update()
+    Button immutableFaces = new Button(0, 0, this.objWidth, this.objHeight, "", new Runnable()
     {
-        test.update();
-        traceAllRays.update();
-        followingCam.update();
-        firstPerson.update();
-        showPathfinding.update();
-        invulnerable.update();
-        tankIDs.update();
-        fancyLighting.update();
-        destroyCheat.update();
-        drawFaces.update();
-        back.update();
-    }
+        @Override
+        public void run()
+        {
+            Game.immutableFaces = !Game.immutableFaces;
+            if (Game.immutableFaces)
+                immutableFaces.setText(immutableFacesText, ScreenOptions.onText);
+            else
+                immutableFaces.setText(immutableFacesText, ScreenOptions.offText);
+        }
+    });
 
-    @Override
-    public void draw()
-    {
-        this.drawDefaultBackground();
-        Drawing.drawing.setInterfaceFontSize(this.titleSize);
-        Drawing.drawing.setColor(0, 0, 0);
-        Drawing.drawing.displayInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 210, "Debug menu");
-
-        firstPerson.draw();
-        followingCam.draw();
-        test.draw();
-        traceAllRays.draw();
-        showPathfinding.draw();
-        tankIDs.draw();
-        invulnerable.draw();
-        fancyLighting.draw();
-        destroyCheat.draw();
-        drawFaces.draw();
-        back.draw();
-    }
 
     @Override
     public void onFilesDropped(String... filePaths)

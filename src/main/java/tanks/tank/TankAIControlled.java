@@ -1307,7 +1307,10 @@ public class TankAIControlled extends Tank implements ITankField
                     // diagonal check
                     int signX = x < t.tileX ? 1 : -1;
                     int signY = y < t.tileY ? 1 : -1;
-                    Tile diag1 = g[x][y + signY], diag2 = g[x + signX][y];
+                    if (y + signY < 0 || y + signY >= Game.currentSizeY || x + signX < 0 || x + signX >= Game.currentSizeX)
+                        continue;
+
+					Tile diag1 = g[x][y + signY], diag2 = g[x + signX][y];
                     if (diag1.type != Tile.Type.empty || diag2.type != Tile.Type.empty)
                         continue;
 

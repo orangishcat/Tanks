@@ -9,14 +9,9 @@ import tanks.network.event.EventBulletReboundIndicator;
 public class BulletReboundIndicator extends Movable
 {
     public double size;
-    public double colorR;
-    public double colorG;
-    public double colorB;
-    public double colorR2;
-    public double colorG2;
-    public double colorB2;
+    public double colorR, colorG, colorB;
+    public double colorR2, colorG2, colorB2;
     public double maxAge;
-    public double age;
 
     public BulletReboundIndicator(Bullet b)
     {

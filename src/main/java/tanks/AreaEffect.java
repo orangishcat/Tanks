@@ -5,7 +5,6 @@ import tanks.effect.AttributeModifier;
 public abstract class AreaEffect extends Movable
 {	
 	public boolean constantlyImbue = true;
-	public double age = 0;
 	public double maxAge = 1000;
 	
 	public AreaEffect(double x, double y)
@@ -20,9 +19,7 @@ public abstract class AreaEffect extends Movable
 		this.age += Panel.frameFrequency * em().getAttributeValue(AttributeModifier.clock_speed, 1);
 		
 		if (constantlyImbue)
-		{
-			this.imbueEffects();
-		}
+            this.imbueEffects();
 		
 		if (this.age > this.maxAge)
 			Game.removeMovables.add(this);

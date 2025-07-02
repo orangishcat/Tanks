@@ -61,9 +61,9 @@ public class DebugKeybinds
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_B))
         {
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_B);
-            Game.showHitboxes = !Game.showHitboxes;
+            Game.drawFaces = !Game.drawFaces;
             notifs.add(new ScreenElement.Notification("Collision boxes: \u00a7255200000255"
-                    + (Game.showHitboxes ? "shown" : "hidden"), 200));
+                    + (Game.drawFaces ? "shown" : "hidden"), 200));
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_V))
@@ -228,8 +228,7 @@ public class DebugKeybinds
                                     + " E: " + (t1.extraObstacle != null ? t1.extraObstacle.name : "none"));
                     Game.game.window.fontRenderer.drawString(mx + 10, my + 50, Drawing.drawing.fontSize, Drawing.drawing.fontSize,
                             "H: " + (int) t1.height() + " GH+D: " + (int) (t1.groundHeight() + t1.depth) + " E: " + (int) TerrainRenderer.getExtra(posX, posY, t1.obstacle));
-                    Game.game.window.fontRenderer.drawString(mx + 10, my + 70, Drawing.drawing.fontSize, Drawing.drawing.fontSize,
-                            "S: " + t1.solid() + " U: " + t1.unbreakable());
+                    Game.game.window.fontRenderer.drawString(mx + 10, my + 70, Drawing.drawing.fontSize, Drawing.drawing.fontSize, "S: " + t1.solid());
                 }
             }
             else if (Game.game.window.pressedKeys.contains(InputCodes.KEY_2))

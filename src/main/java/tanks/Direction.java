@@ -2,18 +2,18 @@ package tanks;
 
 public enum Direction
 {
-    up, right, down, left;
+    up, right, down, left, upLeft, upRight, downLeft, downRight;
 
-    public static final int[] X = {1, -1, 0, 0}, Y = {0, 0, 1, -1};
+    public static final int[] X = {0, 1, 0, -1, 0, 1, -1, 0, 1, -1}, Y = {-1, 0, 1, 0, 1, 0, 0, -1, 1, -1};
 
     private static final Direction[] values = Direction.values();
 
-    public boolean isHorizontal()
+    public boolean nonZeroX()
     {
         return this == right || this == left;
     }
 
-    public boolean isVertical()
+    public boolean nonZeroY()
     {
         return this == up || this == down;
     }
@@ -21,6 +21,16 @@ public enum Direction
     public int index()
     {
         return this.ordinal();
+    }
+
+    public int x()
+    {
+        return X[this.ordinal()];
+    }
+
+    public int y()
+    {
+        return Y[this.ordinal()];
     }
 
     /**

@@ -290,9 +290,12 @@ public class Ray
 
             if (Chunk.debug && trace)
             {
-                Game.effects.add(Effect.createNewEffect(posX, posY, 50, Effect.EffectType.piece).setColor(0, 150, 0));
-                Game.effects.add(Effect.createNewEffect(result.collisionFace.startX, result.collisionFace.startY, 50, Effect.EffectType.piece).setColor(255, 0, 0));
-                Game.effects.add(Effect.createNewEffect(result.collisionFace.endX, result.collisionFace.endY, 50, Effect.EffectType.piece).setColor(255, 0, 0));
+                Game.effects.add(Effect.createNewEffect(posX, posY, 50, Effect.EffectType.piece)
+						.setColor(0, 150, 0).setGlowEnabled(false));
+                Game.effects.add(Effect.createNewEffect(result.collisionFace.startX, result.collisionFace.startY, 50, Effect.EffectType.piece)
+						.setColor(255, 128, 0).setGlowEnabled(false));
+                Game.effects.add(Effect.createNewEffect(result.collisionFace.endX, result.collisionFace.endY, 50, Effect.EffectType.piece)
+						.setColor(255, 128, 0).setGlowEnabled(false));
             }
 
             ISolidObject obj = result.collisionFace.owner;
@@ -323,7 +326,7 @@ public class Ray
                     this.vX = -this.vX;
                     this.vY = -this.vY;
                 }
-                else if (result.collisionFace.direction.isHorizontal())
+                else if (!result.collisionFace.direction.nonZeroX())
                     this.vY = -this.vY;
                 else
                     this.vX = -this.vX;
@@ -334,8 +337,6 @@ public class Ray
 
 		return null;
 	}
-
-	private static boolean isDynamic = false;
 
 	public void checkFaceList(Chunk current, boolean firstBounce)
 	{
@@ -380,7 +381,7 @@ public class Ray
 
 				totalChunksChecked++;
 
-				if (Chunk.debug && trace && (isDynamic = !isDynamic))
+				if (Chunk.debug && trace)
 				{
 					// displays the order of chunks checked and locations that the ray checked
 					Game.effects.add(Effect.createNewEffect(

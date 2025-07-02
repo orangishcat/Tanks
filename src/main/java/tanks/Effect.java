@@ -16,7 +16,6 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
     public enum State {live, removed, recycle}
 
     public EffectType type;
-    public double age = 0;
     public double colR, colG, colB;
 
     public boolean force = false;
@@ -663,6 +662,12 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
         this.glowR = r;
         this.glowG = g;
         this.glowB = b;
+        return this;
+    }
+
+    public Effect setGlowEnabled(boolean enabled)
+    {
+        this.enableGlow = enabled;
         return this;
     }
 

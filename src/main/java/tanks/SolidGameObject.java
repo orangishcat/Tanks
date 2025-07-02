@@ -12,34 +12,39 @@ public abstract class SolidGameObject extends GameObject implements ISolidObject
     @Override
     public Face[] getFaces()
     {
+        if (this.faces == null)
+            this.updateFaces();
         return this.faces;
     }
 
     public boolean isFaceValid(Face f)
     {
-        return true;
+        return !Double.isNaN(posX) && !Double.isNaN(posY);
     }
 
-    @Override
     public void updateFaces()
     {
-        double s = this.getSize() / 2;
-
         if (this.faces == null)
-        {
             this.faces = new Face[4];
+
+        if (this.faces[0] == null || !Game.immutableFaces)
+        {
             for (int i = 0; i < 4; i++)
                 this.faces[i] = new Face(this, Direction.fromIndex(i), true, true);
         }
 
+        double s = this.getSize();
+
         for (int i = 0; i < 4; i++)
         {
             Face f = this.faces[i];
-            f.startX = this.posX - s * Direction.X[i];
-            f.endX = this.posX + s * Direction.X[i];
-            f.startY = this.posY - s * Direction.Y[i];
-            f.endY = this.posY + s * Direction.Y[i];
-            f.valid = this.isFaceValid(f);
+            f.update(
+                    this.posX + s * (Chunk.x1[i] - 0.5),
+                    this.posY + s * (Chunk.y1[i] - 0.5),
+                    this.posX + s * (Chunk.x2[i] - 0.5),
+                    this.posY + s * (Chunk.y2[i] - 0.5),
+                    this.isFaceValid(f)
+            );
         }
     }
 }

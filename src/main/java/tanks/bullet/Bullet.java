@@ -43,7 +43,6 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 	public boolean playPopSound = true;
 	public boolean playBounceSound = true;
-	public double age = 0;
 
 	@Property(id = "size", minValue = 0.0, name = "Size", category = BulletPropertyCategory.appearance, desc = "1 tile = 50 units")
 	public double size = bullet_size;

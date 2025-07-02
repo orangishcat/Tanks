@@ -192,39 +192,31 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 
 	}
 
-	public boolean hasNeighbor(int ox, int oy, boolean unbreakable)
+	public boolean hasNeighbor(int ox, int oy)
 	{
 		int x = (int) (this.posX / Game.tile_size) + ox;
 		int y = (int) (this.posY / Game.tile_size) + oy;
-
-		if (x >= 0 && x < Game.currentSizeX && y >= 0 && y < Game.currentSizeY)
-		{
-			if (unbreakable)
-				return Game.isUnbreakable(x, y);
-            return Game.isSolid(x, y);
-        }
-
-		return false;
+		return Game.isSolid(x, y);
 	}
 
 	public boolean hasLeftNeighbor()
 	{
-		return hasNeighbor(-1, 0, false);
+		return hasNeighbor(-1, 0);
 	}
 
 	public boolean hasRightNeighbor()
 	{
-		return hasNeighbor(1, 0, false);
+		return hasNeighbor(1, 0);
 	}
 
 	public boolean hasUpperNeighbor()
 	{
-		return hasNeighbor(0, -1, false);
+		return hasNeighbor(0, -1);
 	}
 
 	public boolean hasLowerNeighbor()
 	{
-		return hasNeighbor(0, 1, false);
+		return hasNeighbor(0, 1);
 	}
 
 	/**
@@ -306,7 +298,7 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 	@Override
 	public boolean isFaceValid(Face f)
 	{
-		return tankCollision || bulletCollision;
+		return super.isFaceValid(f) && !hasNeighbor(f.direction.x(), f.direction.y()) && bulletCollision;
 	}
 
 	public void onDestroy(Movable source)
@@ -318,8 +310,9 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 	{
 		Chunk c = Chunk.getChunk(posX, posY);
 		if (c == null) return;
-		c.faces.updateFaces(this);
-		afterAdd();
+		c.faces.removeFaces(this);
+		updateFaces();
+		c.faces.addFaces(this);
     }
 
 	private static final ObjectArrayList<Obstacle> obsListCache = new ObjectArrayList<>();

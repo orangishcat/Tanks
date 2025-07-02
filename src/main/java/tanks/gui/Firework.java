@@ -17,7 +17,6 @@ public class Firework extends Movable
 	public enum FireworkType {rocket, particle, particle_group, trail, flash}
 	public FireworkType type;
 
-	public double age = 0;
 	public double maxAge = (int) (Math.random() * 80 + 80);
 
 	public boolean exploded = false;

@@ -64,9 +64,6 @@ public class Chunk implements Comparable<Chunk>
         this.chunkY = 0;
     }
 
-    static int[] x1 = {0, 1, 0, 0}, x2 = {1, 1, 1, 0};
-    static int[] y1 = {0, 0, 1, 0}, y2 = {0, 1, 1, 1};
-
     /** Iterates in a diamond shape (like BFS) outwards until the manhattan distance traveled is >= maxChunks.
      * @return the chunks within the range */
     public static ObjectArrayList<Chunk> iterateOutwards(int tileX, int tileY, int maxChunks)
@@ -101,6 +98,9 @@ public class Chunk implements Comparable<Chunk>
         return chunkCache;
     }
 
+
+    public static int[] x1 = {0, 1, 0, 0}, x2 = {1, 1, 1, 0}, y1 = {0, 0, 1, 0}, y2 = {0, 1, 1, 1};
+
     /**
      * Adds a level border on the specified side of the chunk, where rays will collide off of.
      *
@@ -111,19 +111,19 @@ public class Chunk implements Comparable<Chunk>
     {
         int side = dir.index();
         Face f = new Face(null,
-                convert(chunkX + x1[side], l),
-                convert(chunkY + y1[side], l),
-                convert(chunkX + x2[side], l),
-                convert(chunkY + y2[side], l),
+                convert(chunkX + x1[side], l, true),
+                convert(chunkY + y1[side], l, false),
+                convert(chunkX + x2[side], l, true),
+                convert(chunkY + y2[side], l, false),
                 dir, true, true);
         borderFaces[side] = f;
         faces.getSide(side).add(f);
     }
 
     /** Helper to convert chunk coordinates to game coordinates and clamp it to the level size. */
-    private static double convert(int chunk, Level l)
+    private static double convert(int chunk, Level l, boolean isX)
     {
-        return Math.max(l.startX, Math.min(l.sizeX, chunk * Chunk.chunkSize)) * Game.tile_size;
+        return Math.max(isX ? l.startX : l.startY, Math.min(isX ? l.sizeX : l.sizeY, chunk * Chunk.chunkSize)) * Game.tile_size;
     }
 
     public static boolean initialized()
@@ -171,12 +171,16 @@ public class Chunk implements Comparable<Chunk>
 
     public void addObstacle(Obstacle o)
     {
+        addObstacle(o, true);
+    }
+
+    public void addObstacle(Obstacle o, boolean refresh)
+    {
         if (o == null)
             return;
 
         obstacles.add(o);
-
-        if (o.tankCollision || o.bulletCollision)
+        if (refresh)
             faces.addFaces(o);
     }
 
@@ -392,11 +396,11 @@ public class Chunk implements Comparable<Chunk>
         if (!debug)
             return;
 
-        Drawing.drawing.setColor(255, 0, 0, 128);
+        Drawing.drawing.setColor(255, 255, 0, 128);
 
         for (Chunk c : chunkList)
             Drawing.drawing.drawRect(addCoords(c.chunkX, chunkSize / 2.) * Game.tile_size, addCoords(c.chunkY, chunkSize / 2.) * Game.tile_size,
-                    chunkSize * Game.tile_size, chunkSize * Game.tile_size, 2);
+                    chunkSize * Game.tile_size, chunkSize * Game.tile_size, 1);
     }
 
     @Override
@@ -446,8 +450,8 @@ public class Chunk implements Comparable<Chunk>
             Face[] faces = s.getFaces();
             for (int i = 0; i < 4; i++)
             {
-                if (faces[i].valid)
-                    getSide(i).add(faces[i]);
+                if (faces[i].lastValid)
+                    getSide(i).remove(faces[i]);
             }
         }
 
@@ -456,13 +460,13 @@ public class Chunk implements Comparable<Chunk>
             switch (side)
             {
                 case 0:
-                    return bottomFaces;
-                case 1:
-                    return leftFaces;
-                case 2:
                     return topFaces;
-                case 3:
+                case 1:
                     return rightFaces;
+                case 2:
+                    return bottomFaces;
+                case 3:
+                    return leftFaces;
                 default:
                     throw new RuntimeException("Invalid side: " + side);
             }
@@ -474,13 +478,6 @@ public class Chunk implements Comparable<Chunk>
             bottomFaces.clear();
             leftFaces.clear();
             rightFaces.clear();
-        }
-
-        public void updateFaces(ISolidObject object)
-        {
-            removeFaces(object);
-            object.updateFaces();
-            addFaces(object);
         }
     }
 
@@ -510,11 +507,6 @@ public class Chunk implements Comparable<Chunk>
         public boolean solid()
         {
             return obstacle != null && obstacle.bulletCollision;
-        }
-
-        public boolean unbreakable()
-        {
-            return obstacle != null && !obstacle.shouldShootThrough;
         }
     }
 

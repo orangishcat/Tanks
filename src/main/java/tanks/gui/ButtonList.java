@@ -134,6 +134,13 @@ public class ButtonList
 
     }
 
+    public void setRowsAndColumns(int rows, int columns)
+    {
+        this.rows = rows;
+        this.columns = columns;
+        this.sortButtons();
+    }
+
     public void sortButtons()
     {
         this.next.posX = Drawing.drawing.interfaceSizeX / 2 + this.objXSpace / 2 + xOffset;

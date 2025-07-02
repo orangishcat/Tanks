@@ -17,7 +17,6 @@ public class Laser extends Movable implements IDrawableWithGlow
     public double frontY;
     public double frontZ;
 
-    public double age = 0;
     public double maxAge = 20;
 
     public boolean expired = false;
