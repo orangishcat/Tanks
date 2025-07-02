@@ -107,7 +107,7 @@ public abstract class Movable extends SolidGameObject implements ISolidObject, I
 
 	public void onEnterChunk(Chunk c)
 	{
-
+		c.addMovable(this, false);
 	}
 
 	public void onLeaveChunk(Chunk c)

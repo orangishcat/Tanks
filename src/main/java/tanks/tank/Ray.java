@@ -326,7 +326,7 @@ public class Ray
                     this.vX = -this.vX;
                     this.vY = -this.vY;
                 }
-                else if (!result.collisionFace.direction.nonZeroX())
+                else if (!result.collisionFace.direction.isNonZeroX())
                     this.vY = -this.vY;
                 else
                     this.vX = -this.vX;

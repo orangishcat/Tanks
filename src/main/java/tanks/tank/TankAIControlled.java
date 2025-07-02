@@ -1668,17 +1668,30 @@ public class TankAIControlled extends Tank implements ITankField
 		if ((this.enableLookingAtTargetEnemy || this.straightShoot || this.sightTransformTank != null) && this.frameTimerTriggered)
 			this.lookAtTargetEnemy();
 
-		if (this.shootAIType.equals(ShootAI.homing))
-			this.straightShoot = this.seesTargetEnemy;
-
-		if (this.shootAIType.equals(ShootAI.none))
-			this.angle = this.orientation;
-		else if (this.shootAIType.equals(ShootAI.wander) || this.shootAIType.equals(ShootAI.sprinkler))
-			this.updateTurretWander();
-		else if (this.shootAIType.equals(ShootAI.straight))
+		if (b instanceof BulletArc)
+		{
+			this.setAimAngleArc();
 			this.updateTurretStraight();
+		}
+		else if (b instanceof BulletAirStrike)
+		{
+			this.setAimAngleAirStrike();
+			this.updateTurretStraight();
+		}
 		else
-			this.updateTurretReflect();
+		{
+			if (this.shootAIType.equals(ShootAI.homing))
+				this.straightShoot = this.seesTargetEnemy;
+
+			if (this.shootAIType.equals(ShootAI.none))
+				this.angle = this.orientation;
+			else if (this.shootAIType.equals(ShootAI.wander) || this.shootAIType.equals(ShootAI.sprinkler))
+				this.updateTurretWander();
+			else if (this.shootAIType.equals(ShootAI.straight) || this.straightShoot)
+				this.updateTurretStraight();
+			else
+				this.updateTurretReflect();
+		}
 
 		if (!(b instanceof BulletArc || b instanceof BulletAirStrike))
 			this.pitch -= Movable.angleBetween(this.pitch, 0) / 10 * Panel.frameFrequency;

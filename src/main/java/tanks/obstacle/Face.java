@@ -33,7 +33,7 @@ public class Face implements Comparable<Face>
         int cx = Double.compare(this.startX, f.startX);
         int cy = Double.compare(this.startY, f.startY);
 
-        if (this.direction.nonZeroX())
+        if (this.direction.isNonZeroX())
             return cx != 0 ? cx : cy;
         return cy != 0 ? cy : cx;
     }
@@ -55,7 +55,7 @@ public class Face implements Comparable<Face>
         if (!valid || (startX == endX && startY == endY))
             return;
 
-        if (this.direction.nonZeroY())
+        if (this.direction.isNonZeroY())
         {
             if (this.startX == this.endX)
                 throw new RuntimeException("Face has zero width: " + this);
@@ -74,7 +74,7 @@ public class Face implements Comparable<Face>
     public String toString()
     {
         String ownerName = this.owner instanceof Obstacle ? ((Obstacle) this.owner).name : this.owner instanceof Tank ? ((Tank) this.owner).name : this.owner != null ? this.owner.getClass().getSimpleName() : "null";
-        if (this.direction.nonZeroY())
+        if (this.direction.isNonZeroY())
             return String.format("%.1f-%.1f %.1f  %s", this.startX, this.endX, this.startY, ownerName);
         else
             return String.format("%.1f %.1f-%.1f  %s", this.startX, this.startY, this.endY, ownerName);

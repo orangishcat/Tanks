@@ -696,8 +696,6 @@ public class Level
 			}
 		}
 
-		addLevelBorders();
-
 		if (!remote && sc == null || (sc instanceof ScreenLevelEditor))
 			Game.eventsOut.add(new EventEnterLevel());
 	}

@@ -117,7 +117,7 @@ public class Chunk implements Comparable<Chunk>
                 convert(chunkY + y2[side], l, false),
                 dir, true, true);
         borderFaces[side] = f;
-        faces.getSide(side).add(f);
+        faces.getSide(dir.opposite().index()).add(f);
     }
 
     /** Helper to convert chunk coordinates to game coordinates and clamp it to the level size. */
@@ -153,11 +153,17 @@ public class Chunk implements Comparable<Chunk>
 
     public void addMovable(Movable m)
     {
+        addMovable(m, true);
+    }
+
+    public void addMovable(Movable m, boolean refresh)
+    {
         if (m == null)
             return;
 
         movables.add(m);
-        faces.addFaces(m);
+        if (refresh)
+            faces.addFaces(m);
     }
 
     public void removeMovable(Movable m)

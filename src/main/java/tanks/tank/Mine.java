@@ -214,7 +214,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
         boolean enemyNear = false;
         boolean allyNear = false;
-        for (Movable m: Game.getMovablesInRadius(posX, posY, explosion.radius))
+        for (Movable m: Game.getMovablesInRadius(posX, posY, explosion.radius + Game.tile_size / 2))
         {
             if (m instanceof Tank && !m.destroy && ((Tank) m).canTarget())
             {

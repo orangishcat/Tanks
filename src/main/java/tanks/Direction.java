@@ -8,14 +8,25 @@ public enum Direction
 
     private static final Direction[] values = Direction.values();
 
-    public boolean nonZeroX()
+    public boolean isNonZeroX()
     {
-        return this == right || this == left;
+        return x() != 0;
     }
 
-    public boolean nonZeroY()
+    public boolean isNonZeroY()
     {
-        return this == up || this == down;
+        return y() != 0;
+    }
+
+    public boolean isDiagonal()
+    {
+        return x() != 0 && y() != 0;
+    }
+
+    public Direction opposite()
+    {
+        int offset = ordinal() >= 4 ? 4 : 0;
+        return values[(this.ordinal() - offset + 2) % 4 + offset];
     }
 
     public int index()
