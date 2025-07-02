@@ -542,7 +542,6 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		if (this.resistFreeze)
             getEffectManager().addImmunities("ice_slip", "ice_accel", "ice_max_speed", "freeze");
-            this.em().addImmunities("ice_slip", "ice_accel", "ice_max_speed", "freeze");
 
 		this.damageFlashAnimation = Math.max(0, this.damageFlashAnimation - 0.05 * Panel.frameFrequency);
 		this.healFlashAnimation = Math.max(0, this.healFlashAnimation - 0.05 * Panel.frameFrequency);
@@ -1245,7 +1244,7 @@ public abstract class Tank extends Movable implements ISolidObject
 				Game.currentSizeY * Game.tile_size - Drawing.drawing.interfaceSizeY * 0.4);
 
         return Math.max(Math.abs(m.posX - boundedX) / Drawing.drawing.interfaceSizeX,
-				Math.abs(m.posY - boundedY) / Drawing.drawing.interfaceSizeY) * 1.5 + 0.2;
+				Math.abs(m.posY - boundedY) / Drawing.drawing.interfaceSizeY) * 1.5 + 0.4;
 	}
 
 	private double autoZoomCache = -1;
@@ -1255,7 +1254,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		if (autoZoomCache >= 0 && Panel.panel.ageFrames % 20 != 0)
 			return autoZoomCache;
 
-		double dist = Math.min(4, Math.max(1, getAutoZoomRaw()));
+		double dist = Math.min(4, Math.max(1.2, getAutoZoomRaw()));
 		double targetScale = Drawing.drawing.interfaceScale / dist;
 		return autoZoomCache = Math.max(Math.min((targetScale - Drawing.drawing.unzoomedScale) / Math.max(0.001, Drawing.drawing.interfaceScale - Drawing.drawing.unzoomedScale), 1), 0);
 	}

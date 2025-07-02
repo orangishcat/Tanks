@@ -2339,11 +2339,12 @@ public class TankAIControlled extends Tank implements ITankField
 				double angle = dir * Math.PI * 2;
 				double dist = Ray.newRay(this.posX, this.posY, angle, 0, this, Game.tile_size)
 						.setAsBullet(false).setBouncyBounces(0).getDist();
-				if (dist >= maxEmptySpace && (dist < nearest.getRadius() || Movable.absoluteAngleBetween(angle, avoidAngle) > Math.PI / 3))
+				if (dist >= maxEmptySpace && (dist < nearest.getRadius() + size / 2 || Movable.absoluteAngleBetween(angle, avoidAngle) > Math.PI / 3))
 				{
 					maxEmptySpace = dist;
 					bestFleeAngle = angle;
 				}
+				fleeDistances[(int) (dir * count)] = dist;
 			}
 		}
 

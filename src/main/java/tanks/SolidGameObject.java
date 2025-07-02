@@ -30,7 +30,7 @@ public abstract class SolidGameObject extends GameObject implements ISolidObject
         if (this.faces[0] == null || !Game.immutableFaces)
         {
             for (int i = 0; i < 4; i++)
-                this.faces[i] = new Face(this, Direction.fromIndex(i), true, true);
+                this.faces[i] = new Face(this, Direction.fromIndex(i), tankCollision(), bulletCollision());
         }
 
         double s = this.getSize();
@@ -43,8 +43,20 @@ public abstract class SolidGameObject extends GameObject implements ISolidObject
                     this.posY + s * (Chunk.y1[i] - 0.5),
                     this.posX + s * (Chunk.x2[i] - 0.5),
                     this.posY + s * (Chunk.y2[i] - 0.5),
-                    this.isFaceValid(f)
+                    this.isFaceValid(f),
+                    tankCollision(),
+                    bulletCollision()
             );
         }
+    }
+
+    public boolean tankCollision()
+    {
+        return true;
+    }
+
+    public boolean bulletCollision()
+    {
+        return true;
     }
 }

@@ -512,7 +512,7 @@ public class Chunk implements Comparable<Chunk>
 
         public boolean solid()
         {
-            return obstacle != null && obstacle.bulletCollision;
+            return obstacle != null && obstacle.tankCollision;
         }
     }
 

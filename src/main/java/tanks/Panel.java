@@ -23,6 +23,7 @@ import tanks.tank.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class Panel
 {
@@ -468,9 +469,9 @@ public class Panel
 
 		if (!(Game.screen instanceof ScreenInfo))
 		{
-			if (!(Game.screen instanceof ScreenGame) || Panel.zoomTarget < 0 ||
+			if (!(Game.screen instanceof ScreenGame) || (Panel.zoomTarget < 0 && !Drawing.drawing.movingCamera) ||
 					((Game.playerTank == null || Game.playerTank.destroy) && (((ScreenGame) Game.screen).spectatingTank == null)) || !((ScreenGame) Game.screen).playing)
-				this.zoomTimer -= 0.03 * Panel.frameFrequency;
+				this.zoomTimer -= 0.02 * Panel.frameFrequency;
 		}
 
 		if (((Game.playerTank != null && !Game.playerTank.destroy) || (Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).spectatingTank != null)) && !ScreenGame.finished
@@ -664,9 +665,9 @@ public class Panel
 		if (ScreenPartyLobby.isClient)
             Client.handler.reply();
 
-		if (forceRefreshMusic || (prevScreen != null && prevScreen != Game.screen && Game.screen != null && !Game.stringsEqual(prevScreen.music, Game.screen.music) && !(Game.screen instanceof IOnlineScreen)))
+		if (forceRefreshMusic || (prevScreen != null && prevScreen != Game.screen && Game.screen != null && !Objects.equals(prevScreen.music, Game.screen.music) && !(Game.screen instanceof IOnlineScreen)))
 		{
-			if (Game.stringsEqual(prevScreen.musicID, Game.screen.musicID))
+			if (Objects.equals(prevScreen.musicID, Game.screen.musicID))
 				this.playScreenMusic(500);
 			else
 				this.playScreenMusic(0);

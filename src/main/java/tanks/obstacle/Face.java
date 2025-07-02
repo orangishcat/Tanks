@@ -25,7 +25,7 @@ public class Face implements Comparable<Face>
     public Face(ISolidObject o, double x1, double y1, double x2, double y2, Direction direction, boolean tank, boolean bullet)
     {
         this(o, direction, tank, bullet);
-        update(x1, y1, x2, y2, true);
+        update(x1, y1, x2, y2, true, tank, bullet);
     }
 
     public int compareTo(Face f)
@@ -38,7 +38,7 @@ public class Face implements Comparable<Face>
         return cy != 0 ? cy : cx;
     }
 
-    public void update(double x1, double y1, double x2, double y2, boolean valid)
+    public void update(double x1, double y1, double x2, double y2, boolean valid, boolean tank, boolean bullet)
     {
         this.startX = x1;
         this.startY = y1;
@@ -46,6 +46,8 @@ public class Face implements Comparable<Face>
         this.endY = y2;
         this.lastValid = this.valid;
         this.valid = valid;
+        this.solidTank = tank;
+        this.solidBullet = bullet;
 
         validate();
     }

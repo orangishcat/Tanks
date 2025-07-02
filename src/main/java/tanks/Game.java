@@ -1276,17 +1276,6 @@ public class Game
 		return r;
 	}
 
-	public static boolean stringsEqual(String a, String b)
-	{
-		if (a == null && b == null)
-			return true;
-
-		if (a == null || b == null)
-			return false;
-
-		return a.equals(b);
-	}
-
 	public static void loadTankMusic()
 	{
 		if (!Game.game.window.soundsEnabled)
