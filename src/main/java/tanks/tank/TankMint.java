@@ -29,12 +29,10 @@ public class TankMint extends TankAIControlled
 		this.mineAvoidSensitivity = 1;
 
 		this.avoidanceSeekOpenSpaces = true;
-		this.bulletAvoidBehvavior = BulletAvoidBehavior.dodge;
+		this.bulletAvoidBehvavior = BulletAvoidBehavior.intersect;
 
 		if (Game.tankTextures)
-		{
-			this.baseSkin = TankModels.diagonalStripes;
-		}
+            this.baseSkin = TankModels.diagonalStripes;
 
 		this.coinValue = 2;
 

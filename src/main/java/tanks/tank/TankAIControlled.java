@@ -1565,7 +1565,9 @@ public class TankAIControlled extends Tank implements ITankField
 			this.avoidDirection = direction + Math.PI * 0.5 * (1 - (1 - frac) * mult / 2) * Math.signum(diff);
 		}
 		else if (this.bulletAvoidBehvavior == BulletAvoidBehavior.back_off)
-			this.avoidDirection = nearest.getAngleInDirection(this.posX, this.posY);
+		{
+			this.avoidDirection = nearest.getAngleInDirection(this.posX, this.posY) + Math.PI * 0.15 * (age % 500 < 250 ? 1 : -1);
+		}
 		else if (this.bulletAvoidBehvavior == BulletAvoidBehavior.back_off_dodge)
 		{
 			double a = nearest.getAngleInDirection(this.posX, this.posY);
@@ -1575,14 +1577,14 @@ public class TankAIControlled extends Tank implements ITankField
 			if (d < Game.tile_size * 2)
 				this.avoidDirection = direction + Math.PI * 0.5 * (1 - (1 - frac) * -1 / 2) * Math.signum(diff);
 			else
-				this.avoidDirection = a;
+				this.avoidDirection = a + Math.PI * 0.15 * (age % 500 < 250 ? 1 : -1);
 		}
 		else if (this.bulletAvoidBehvavior == BulletAvoidBehavior.intersect)
 		{
 			double targetX = nearestTarget.targetX;
 			double targetY = nearestTarget.targetY;
 
-			this.avoidDirection = this.getAngleInDirection(targetX, targetY) + Math.PI;
+			this.avoidDirection = this.getAngleInDirection(targetX, targetY) + Math.PI * 0.75;
 			diff = Movable.angleBetween(this.avoidDirection, direction);
 
 			if (Math.abs(diff) < Math.PI / 4)

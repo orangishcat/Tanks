@@ -1413,7 +1413,7 @@ public abstract class Tank extends Movable implements ISolidObject
 	@Override
 	public double getSize()
 	{
-		return size;
+		return size * hitboxSize;
 	}
 
 	protected static class ClippedTile
