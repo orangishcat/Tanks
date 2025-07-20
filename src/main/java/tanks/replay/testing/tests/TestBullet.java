@@ -3,6 +3,7 @@ package tanks.replay.testing.tests;
 import tanks.Game;
 import tanks.Movable;
 import tanks.bullet.Bullet;
+import tanks.bullet.BulletEffect;
 import tanks.replay.testing.Test;
 import tanks.replay.testing.TestType;
 
@@ -17,7 +18,7 @@ public class TestBullet extends Test
         expectOnce(() ->
         {
             for (Movable m : Game.movables)
-                if (m instanceof Bullet && ((Bullet) m).effect == Bullet.BulletEffect.dark_fire)
+                if (m instanceof Bullet && ((Bullet) m).effect == BulletEffect.dark_fire)
                     return true;
             return false;
         }).setName("Dark fire bullet check");
