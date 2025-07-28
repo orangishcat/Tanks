@@ -32,10 +32,10 @@ public class ItemDrop extends Movable
         this.item = item;
         this.drawLevel = 2;
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             this.drawLevel = 8;
 
-        if (Game.enable3d && Game.enable3dBg && Game.fancyTerrain)
+        if (Game.options.graphics.enable3d && Game.options.graphics.enable3dBg && Game.options.graphics.fancyTerrain)
         {
             this.height = Math.max(this.height, Game.sampleTerrainGroundHeight(this.posX - size / 2, this.posY - size / 2));
             this.height = Math.max(this.height, Game.sampleTerrainGroundHeight(this.posX + size / 2, this.posY - size / 2));
@@ -109,7 +109,7 @@ public class ItemDrop extends Movable
         else
             size = s;
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             for (int i = 0; i <= 8; i++)
             {
@@ -126,7 +126,7 @@ public class ItemDrop extends Movable
             Drawing.drawing.drawImage(this.item.item.icon, px, py, s / 2, s / 2);
         }
 
-        if (Game.showTankIDs)
+        if (Game.options.debug.showTankIDs)
         {
             Drawing.drawing.setColor(0, 0, 0);
             Drawing.drawing.setFontSize(30);

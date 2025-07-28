@@ -200,7 +200,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter
 				}
 			}
 
-			long time = System.currentTimeMillis() * Game.networkRate / 1000;
+			long time = System.currentTimeMillis() * Game.options.misc.networkRate / 1000;
 			if (time != lastStackedEventSend)
 			{
 				lastStackedEventSend = time;

@@ -29,7 +29,7 @@ public class ScreenIntro extends Screen
         zoomTranslation.window = Game.game.window;
         zoomTranslation.applyAsShadow = true;
 
-        if (Game.fancyTerrain && Game.enable3d)
+        if (Game.options.graphics.fancyTerrain && Game.options.graphics.enable3d)
             introAnimationTime = 1000;
 
         if (Game.usernameInvalid(Game.player.username))
@@ -81,7 +81,7 @@ public class ScreenIntro extends Screen
         if (!tutorialFile.exists())
             Drawing.drawing.playSound("battle_intro.ogg", 1.0f, true);
         else
-            Drawing.drawing.playMusic("menu_intro.ogg", Game.musicVolume, false, "intro", 0, false);
+            Drawing.drawing.playMusic("menu_intro.ogg", Game.options.sound.musicVolume, false, "intro", 0, false);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ScreenIntro extends Screen
 
         double frac = Math.min(1, ((lastTime - startTime - introTime) / introAnimationTime));
 
-        if (Game.enable3d && Game.fancyTerrain)
+        if (Game.options.graphics.enable3d && Game.options.graphics.fancyTerrain)
         {
             zoomTranslation.z = -0.08 * (1 - frac);
             Game.game.window.transformations.add(zoomTranslation);
@@ -113,7 +113,7 @@ public class ScreenIntro extends Screen
         Drawing.drawing.setColor(Level.currentColor.red, Level.currentColor.green, Level.currentColor.blue);
         Drawing.drawing.fillInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2, Game.game.window.absoluteWidth * 1.2 / Drawing.drawing.interfaceScale, Game.game.window.absoluteHeight * 1.2 / Drawing.drawing.interfaceScale);
 
-        if (lastTime - startTime >= introTime && Game.fancyTerrain)
+        if (lastTime - startTime >= introTime && Game.options.graphics.fancyTerrain)
         {
             Obstacle.draw_size = frac * Game.tile_size;
             Game.screen.drawDefaultBackground(frac);

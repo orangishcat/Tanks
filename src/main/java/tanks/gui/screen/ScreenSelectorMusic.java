@@ -81,7 +81,7 @@ public class ScreenSelectorMusic extends Screen implements IConditionalOverlaySc
                 if (!selector.selectedOptions[j])
                     Drawing.drawing.removeSyncedMusic(selector.options[j], 500);
                 else
-                    Drawing.drawing.addSyncedMusic(selector.options[j], Game.musicVolume, true, 500);
+                    Drawing.drawing.addSyncedMusic(selector.options[j], Game.options.sound.musicVolume, true, 500);
             }
             );
 
@@ -110,7 +110,7 @@ public class ScreenSelectorMusic extends Screen implements IConditionalOverlaySc
             for (int i = 0; i < selector.options.length; i++)
             {
                 if (selector.selectedOptions[i])
-                    Drawing.drawing.addSyncedMusic(selector.options[i], Game.musicVolume, true, 500);
+                    Drawing.drawing.addSyncedMusic(selector.options[i], Game.options.sound.musicVolume, true, 500);
             }
             firstUpdate = false;
         }

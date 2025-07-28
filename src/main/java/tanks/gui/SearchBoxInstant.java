@@ -38,7 +38,7 @@ public class SearchBoxInstant extends SearchBox
 		Game.game.window.showKeyboard = false;
 		Panel.selectedTextBox = null;
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			this.submitEffect();
 		}

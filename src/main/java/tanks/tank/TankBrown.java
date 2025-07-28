@@ -24,7 +24,7 @@ public class TankBrown extends TankAIControlled
 		this.enableLookingAtTargetEnemy = false;
 		this.aimAccuracyOffset = 0;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 		}

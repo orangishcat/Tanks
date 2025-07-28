@@ -1121,7 +1121,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 				}
 			}
 
-			if (Game.bulletTrails && Math.random() < frameFrequency * Game.effectMultiplier && Game.effectsEnabled && !this.homingSilent)
+			if (Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off && Math.random() < frameFrequency * Game.options.graphics.effect.particlePercentage && Game.options.graphics.effect.particleEffects && !this.homingSilent)
 			{
 				Effect e = Effect.createNewEffect(this.posX, this.posY, this.posZ, Effect.EffectType.piece);
 				double var = 50;
@@ -1137,7 +1137,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 				double v = this.homingSharpness > 0 ? 1 : -1;
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					e.set3dPolarMotion(Math.PI + this.getAngleInDirection(this.homingTarget.posX, this.homingTarget.posY) + (Math.random() - 0.5) * 0.01, Math.PI * 0.1 * (Math.random() - 0.5), this.size / 50.0 * (12 + Math.random() * 4) * v);
 				else
 					e.setPolarMotion(Math.PI + this.getAngleInDirection(this.homingTarget.posX, this.homingTarget.posY) + (Math.random() - 0.5) * 0.01, this.size / 50.0 * (12 + Math.random() * 4) * v);
@@ -1164,9 +1164,9 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		{
 			Game.eventsOut.add(new EventBulletStunEffect((Tank) movable, this.hitStun / 100.0));
 
-			if (Game.effectsEnabled)
+			if (Game.options.graphics.effect.particleEffects)
 			{
-				for (int i = 0; i < 25 * Game.effectMultiplier; i++)
+				for (int i = 0; i < 25 * Game.options.graphics.effect.particlePercentage; i++)
 				{
 					Effect e = Effect.createNewEffect(movable.posX, movable.posY, this.posZ, Effect.EffectType.stun);
 					e.linkedMovable = movable;
@@ -1348,7 +1348,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 					this.onDestroy();
 			}
 
-			if (this.destroyTimer <= 0 && Game.effectsEnabled)
+			if (this.destroyTimer <= 0 && Game.options.graphics.effect.particleEffects)
 			{
 				this.addDestroyEffect();
 			}
@@ -1364,11 +1364,11 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			if (this.autoZ)
 				this.posZ = this.iPosZ * frac + (Game.tile_size / 4) * (1 - frac);
 
-			this.ageFrac += frameFrequency * Game.effectMultiplier;
+			this.ageFrac += frameFrequency * Game.options.graphics.effect.particlePercentage;
 
-			if (Game.bulletTrails)
+			if (Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off)
 			{
-				while (this.ageFrac >= 1 && Game.effectsEnabled && this.effect.enableParticles)
+				while (this.ageFrac >= 1 && Game.options.graphics.effect.particleEffects && this.effect.enableParticles)
 				{
 					this.ageFrac -= 1;
 
@@ -1391,7 +1391,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 					e.glowG = e.colG * (1 - this.effect.particleGlow);
 					e.glowB = e.colB * (1 - this.effect.particleGlow);
 
-					if (Game.enable3d)
+					if (Game.options.graphics.enable3d)
 						e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0 * this.effect.particleSpeed);
 					else
 						e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0 * this.effect.particleSpeed);
@@ -1450,7 +1450,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 		this.addedTrail = true;
 
-		if (!Game.bulletTrails || this.effect.trailEffects.isEmpty())
+		if (Game.options.graphics.bulletTrails == GameOptions.BulletTrails.off || this.effect.trailEffects.isEmpty())
 			return;
 
 		double speed = this.speed;
@@ -1474,7 +1474,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		{
 			Trail t = this.effect.trailEffects.get(i);
 
-			if (!this.trail3d || !Game.enable3d)
+			if (!this.trail3d || !Game.options.graphics.enable3d)
 				this.addTrailObj(i, new Trail(this, this.speed, x, y, this.size * speed / 3.125 * t.delay, this.size / 2 * t.backWidth, this.size / 2 * t.frontWidth, this.size * speed / 3.125 * t.maxLength, this.lastTrailAngle,
 					t.frontColor.red, t.frontColor.green, t.frontColor.blue, t.frontColor.alpha, t.backColor.red, t.backColor.green, t.backColor.blue, t.backColor.alpha, t.glow, t.luminosity, t.frontCircle, t.backCircle), redirect);
 			else
@@ -1546,31 +1546,31 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		double luminance = this.em().getAttributeValue(AttributeModifier.glow, this.effect.luminance);
 		double glow = this.em().getAttributeValue(AttributeModifier.glow, this.effect.glowIntensity);
 
-		if (this.freezing && Game.bulletTrails)
+		if (this.freezing && Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off)
 		{
 			for (int i = 0; i < 30 - 10 * Math.sin(this.age / 12.0); i++)
 			{
 				Drawing.drawing.setColor(255, 255, 255, 20, 1);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.fillGlow(this.posX, this.posY, this.posZ, i * 4, i * 4);
 				else
 					Drawing.drawing.fillGlow(this.posX, this.posY, i * 4, i * 4);
 			}
 		}
 
-		if (this.boosting && Game.glowEnabled)
+		if (this.boosting && Game.options.graphics.glowEnabled)
 		{
 			double frac = 1 - Math.min(1, this.destroyTimer / 60);
 			Drawing.drawing.setColor(255, 180, 0, 180 * frac, 1);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillGlow(this.posX, this.posY, this.posZ, this.size * 8, this.size * 8);
 			else
 				Drawing.drawing.fillGlow(this.posX, this.posY, this.size * 8, this.size * 8);
 		}
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			if (!this.effect.overrideGlowColor)
 				Drawing.drawing.setColor(this.outlineColor.red * glow, this.outlineColor.green * glow, this.outlineColor.blue * glow, 255, 1);
@@ -1584,7 +1584,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			{
 				sizeMul *= 1 - destroyTimer / 60.0;
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.fillGlow(this.posX, this.posY, this.posZ, this.size * sizeMul, this.size * sizeMul, true, true, shade);
 				else
 					Drawing.drawing.fillGlow(this.posX, this.posY, this.size * sizeMul, this.size * sizeMul, shade);
@@ -1614,7 +1614,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 				Drawing.drawing.setColor(this.outlineColor.red, this.outlineColor.green, this.outlineColor.blue, opacity * opacity * opacity * 255.0 * opacityMod, luminance);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.fillOval(posX, posY, posZ, s * size + sizeModifier, s * size + sizeModifier);
 				else
 					Drawing.drawing.fillOval(posX, posY, s * size + sizeModifier, s * size + sizeModifier);
@@ -1625,7 +1625,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			{
 				Drawing.drawing.setColor(255, 0, 255, opacity * opacity * opacity * 255.0 * opacityMultiplier, luminance);
 				double bumper = (1 + Math.sin(this.age / 100.0 * Math.PI * 4)) * 0.25 + 1.2;
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.fillOval(posX, posY, posZ, bumper * size + sizeModifier, bumper * size + sizeModifier);
 				else
 					Drawing.drawing.fillOval(posX, posY, bumper * size + sizeModifier, bumper * size + sizeModifier);
@@ -1633,9 +1633,9 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 			Drawing.drawing.setColor(this.outlineColor.red, this.outlineColor.green, this.outlineColor.blue, opacity * opacity * opacity * 255.0 * opacityMultiplier, luminance);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 			{
-				if (Game.xrayBullets && this.respectXRay)
+				if (Game.options.graphics.xrayBullets && this.respectXRay)
 					Drawing.drawing.fillOval(posX, posY, posZ - 0.5, size + sizeModifier, size + sizeModifier, false, true);
 				Drawing.drawing.fillOval(posX, posY, posZ, size + sizeModifier, size + sizeModifier);
 			}
@@ -1644,7 +1644,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 			Drawing.drawing.setColor(this.baseColor.red, this.baseColor.green, this.baseColor.blue, opacity * opacity * opacity * 255.0 * opacityMultiplier, luminance);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillOval(posX, posY, posZ, (size + sizeModifier) * 0.6, (size + sizeModifier) * 0.6, 1);
 			else
 				Drawing.drawing.fillOval(posX, posY, (size + sizeModifier) * 0.6, (size + sizeModifier) * 0.6);
@@ -1670,7 +1670,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			Drawing.drawing.setColor(this.baseColor.red, this.baseColor.green, this.baseColor.blue, frac * 255 * d, 1);
 			Drawing.drawing.drawImage(frac * Math.PI / 2 + this.getAngleInDirection(this.homingTarget.posX, this.homingTarget.posY), "cursor.png", this.homingTarget.posX, this.homingTarget.posY, s, s);
 
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 			{
 				Drawing.drawing.setColor(this.outlineColor.red, this.outlineColor.green, this.outlineColor.blue, frac * 255 * d, 1);
 				Drawing.drawing.fillGlow(this.posX, this.posY, this.size * 16, this.size * 16);
@@ -1725,9 +1725,9 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 				}
 			}
 
-			if (Game.effectsEnabled)
+			if (Game.options.graphics.effect.particleEffects)
 			{
-				for (int i = 0; i < 25 * Game.effectMultiplier; i++)
+				for (int i = 0; i < 25 * Game.options.graphics.effect.particlePercentage; i++)
 				{
 					Effect e = Effect.createNewEffect(this.posX, this.posY, Game.tile_size / 2, Effect.EffectType.piece);
 					double var = 50;
@@ -1736,7 +1736,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 					e.colG = Math.min(255, Math.max(0, this.outlineColor.green + Math.random() * var - var / 2));
 					e.colB = Math.min(255, Math.max(0, this.outlineColor.blue + Math.random() * var - var / 2));
 
-					if (Game.enable3d)
+					if (Game.options.graphics.enable3d)
 						e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() + 0.5);
 					else
 						e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() + 0.5);
@@ -1751,7 +1751,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 	public void addDestroyEffect()
 	{
-		for (int i = 0; i < this.size * 4 * Game.effectMultiplier; i++)
+		for (int i = 0; i < this.size * 4 * Game.options.graphics.effect.particlePercentage; i++)
 		{
 			Effect e = Effect.createNewEffect(this.posX, this.posY, this.posZ, Effect.EffectType.piece);
 			double var = 50;
@@ -1763,7 +1763,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			e.glowG = e.colG - this.outlineColor.green;
 			e.glowB = e.colB - this.outlineColor.blue;
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0 * 4);
 			else
 				e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0 * 4);

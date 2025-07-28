@@ -152,8 +152,8 @@ public class TrackRenderer
     public static double getMaxTrackAge()
     {
         double maxAge = 2.5;
-        if (Game.effectsEnabled)
-            maxAge += Game.effectMultiplier * 47.5;
+        if (Game.options.graphics.effect.particleEffects)
+            maxAge += Game.options.graphics.effect.particlePercentage * 47.5;
 
         return maxAge * 100;
     }

@@ -34,7 +34,7 @@ public class TankLightPinkAngry extends TankAIControlled
         this.bulletAvoidBehvavior = BulletAvoidBehavior.aggressive_dodge;
         this.targetEnemySightBehavior = TargetEnemySightBehavior.sidewind;
 
-        if (Game.tankTextures)
+        if (Game.options.graphics.tankTextures)
         {
             this.emblem = "emblems/angry.png";
             this.emblemColor.red = 200;

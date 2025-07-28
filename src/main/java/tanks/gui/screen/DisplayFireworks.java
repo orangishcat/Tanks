@@ -33,7 +33,7 @@ public class DisplayFireworks
     {
         this.fireworkMultiplier = multiplier;
         this.addOwnFireworks = addOwnFireworks;
-        if (Panel.win && Game.effectsEnabled && addOwnFireworks)
+        if (Panel.win && Game.options.graphics.effect.particleEffects && addOwnFireworks)
         {
             for (int i = 0; i < initial_fireworks * fireworkMultiplier; i++)
             {
@@ -52,7 +52,7 @@ public class DisplayFireworks
     {
         ArrayList<Firework> fireworks = getFireworkArray();
 
-        if (addOwnFireworks && ((!debug && Math.random() < firework_frequency * fireworkMultiplier * Panel.frameFrequency * Game.effectMultiplier) || (debug && Game.game.input.shoot.isValid())))
+        if (addOwnFireworks && ((!debug && Math.random() < firework_frequency * fireworkMultiplier * Panel.frameFrequency * Game.options.graphics.effect.particlePercentage) || (debug && Game.game.input.shoot.isValid())))
         {
             if (debug)
                 Game.game.input.shoot.invalidate();
@@ -90,7 +90,7 @@ public class DisplayFireworks
 
         Game.game.window.shaderDefault.set();
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             for (int i = 0; i < getFireworkArray().size(); i++)
             {

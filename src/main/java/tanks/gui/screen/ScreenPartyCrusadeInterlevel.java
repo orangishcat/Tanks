@@ -177,7 +177,7 @@ public class ScreenPartyCrusadeInterlevel extends Screen implements IDarkScreen
     @Override
     public void update()
     {
-        if (Panel.win && Game.effectsEnabled)
+        if (Panel.win && Game.options.graphics.effect.particleEffects)
             Panel.darkness = Math.min(Panel.darkness + Panel.frameFrequency * 1.5, 191);
 
         if (ScreenPartyLobby.isClient)
@@ -215,10 +215,10 @@ public class ScreenPartyCrusadeInterlevel extends Screen implements IDarkScreen
     {
         this.drawDefaultBackground();
 
-        if (Panel.win && Game.effectsEnabled && !Game.game.window.drawingShadow)
+        if (Panel.win && Game.options.graphics.effect.particleEffects && !Game.game.window.drawingShadow)
             Panel.darkness = Math.min(Panel.darkness + Panel.frameFrequency * 1.5, 191);
 
-        if (Panel.win && Game.effectsEnabled && !Game.game.window.drawingShadow)
+        if (Panel.win && Game.options.graphics.effect.particleEffects && !Game.game.window.drawingShadow)
             this.fireworksDisplay.draw();
 
         if (ScreenPartyLobby.isClient)
@@ -248,10 +248,10 @@ public class ScreenPartyCrusadeInterlevel extends Screen implements IDarkScreen
             }
         }
 
-        if (Game.showSpeedrunTimer)
+        if (Game.options.speedrun.showSpeedrunTimer)
             SpeedrunTimer.draw();
 
-        if ((Panel.win && Game.effectsEnabled) || Level.isDark())
+        if ((Panel.win && Game.options.graphics.effect.particleEffects) || Level.isDark())
             Drawing.drawing.setColor(255, 255, 255);
         else
             Drawing.drawing.setColor(0, 0, 0);

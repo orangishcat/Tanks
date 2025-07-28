@@ -171,7 +171,7 @@ public class TerrainRenderer
 
         if (shader instanceof IGroundHeightShader)
         {
-            if (!Game.enable3dBg && Game.screen instanceof ScreenIntro)
+            if (!Game.options.graphics.enable3dBg && Game.screen instanceof ScreenIntro)
                 s.setAttribute(((IGroundHeightShader) shader).getGroundHeight(), (float) (Math.random() * 10.0));
             else
                 s.setAttribute(((IGroundHeightShader) shader).getGroundHeight(), (float) currentDepth);
@@ -328,7 +328,7 @@ public class TerrainRenderer
 
         if (shader instanceof IGroundHeightShader)
         {
-            if (!Game.enable3dBg && Game.screen instanceof ScreenIntro)
+            if (!Game.options.graphics.enable3dBg && Game.screen instanceof ScreenIntro)
                 s.setAttribute(((IGroundHeightShader) shader).getGroundHeight(), (float) (Math.random() * 10.0));
             else
                 s.setAttribute(((IGroundHeightShader) shader).getGroundHeight(), (float) currentDepth);
@@ -500,7 +500,7 @@ public class TerrainRenderer
             double z = 0;
             double sc = 1;
 
-            boolean in = Game.followingCam || asPreview || Drawing.drawing.isIncluded(x + s.posX * section_size, y + s.posY * section_size, x + (s.posX + 1) * section_size, y + (s.posY + 1) * section_size);
+            boolean in = Game.options.debug.followingCam || asPreview || Drawing.drawing.isIncluded(x + s.posX * section_size, y + s.posY * section_size, x + (s.posX + 1) * section_size, y + (s.posY + 1) * section_size);
 
             s.renderer.endModification();
 
@@ -588,7 +588,7 @@ public class TerrainRenderer
         {
             this.introShader.set();
             this.introShader.setSize((float) (Obstacle.draw_size / Game.tile_size));
-            this.introShader.d3.set(Game.enable3d);
+            this.introShader.d3.set(Game.options.graphics.enable3d);
 
             for (int x = xStart; x <= xEnd; x++)
             {
@@ -681,7 +681,7 @@ public class TerrainRenderer
 
         Drawing.drawing.setColor(r, g, b);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             Obstacle top = t.obstacle();
             if (top != null && top.replaceTiles && !top.removed)
@@ -691,7 +691,7 @@ public class TerrainRenderer
             else
             {
                 byte o = BaseShapeRenderer.hide_behind_face;
-                if (!Game.fancyTerrain || !Game.enable3dBg)
+                if (!Game.options.graphics.fancyTerrain || !Game.options.graphics.enable3dBg)
                 {
                     if (Game.sampleEdgeGroundDepth(x - 1, y) >= 0) o |= BaseShapeRenderer.hide_left_face;
                     if (Game.sampleEdgeGroundDepth(x + 1, y) >= 0) o |= BaseShapeRenderer.hide_right_face;
@@ -718,7 +718,7 @@ public class TerrainRenderer
 
         if (!this.staged)
         {
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 this.addBox(t,
                     x * Game.tile_size,
                     y * Game.tile_size,

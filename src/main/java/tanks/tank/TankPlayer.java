@@ -142,7 +142,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 	@Override
 	public void update()
 	{
-		if (Game.invulnerable)
+		if (Game.options.debug.invulnerable)
 		{
 			this.resistExplosions = true;
 			this.resistBullets = true;
@@ -245,7 +245,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 
 			if (a >= 0 && intensity >= 0.2)
 			{
-				if (Game.followingCam)
+				if (Game.options.debug.followingCam)
 					a += this.angle + Math.PI / 2;
 
 				this.addPolarMotion(a, acceleration * this.maxSpeed * Panel.frameFrequency);
@@ -360,7 +360,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 						double px = Drawing.drawing.getInterfacePointerX(tp[0]);
 						double py = Drawing.drawing.getInterfacePointerY(tp[1]);
 
-						if (!Game.followingCam)
+						if (!Game.options.debug.followingCam)
 						{
 							this.mouseX = Drawing.drawing.toGameCoordsX(px);
 							this.mouseY = Drawing.drawing.toGameCoordsY(py);
@@ -408,7 +408,7 @@ public class TankPlayer extends TankPlayable implements ILocalPlayerTank, IServe
 				this.prevDistSq = distSq;
 			}
 		}
-		else if (!Game.followingCam)
+		else if (!Game.options.debug.followingCam)
 		{
 			this.mouseX = Drawing.drawing.getMouseX();
 			this.mouseY = Drawing.drawing.getMouseY();

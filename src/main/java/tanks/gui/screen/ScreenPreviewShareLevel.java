@@ -53,7 +53,7 @@ public class ScreenPreviewShareLevel extends Screen implements ILevelPreviewScre
             {
                 Game.steamNetworkHandler.workshop.upload("Level", name, level.levelString, description.inputText);
                 hideUI = true;
-                infoBar = Drawing.drawing.enableStats;
+                infoBar = Game.options.window.infoBar;
                 mouseTarget = Panel.showMouseTarget;
                 mouseTargetHeight = Panel.showMouseTargetHeight;
                 Panel.showMouseTarget = false;

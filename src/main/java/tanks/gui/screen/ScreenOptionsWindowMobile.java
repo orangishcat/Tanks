@@ -13,9 +13,9 @@ public class ScreenOptionsWindowMobile extends Screen
         @Override
         public void run()
         {
-            Drawing.drawing.showStats(!Drawing.drawing.enableStats);
+            Drawing.drawing.showStats(!Game.options.window.infoBar);
 
-            if (Drawing.drawing.enableStats)
+            if (Game.options.window.infoBar)
                 showStats.setText(infoBarText, ScreenOptions.onText);
             else
                 showStats.setText(infoBarText, ScreenOptions.offText);
@@ -36,7 +36,7 @@ public class ScreenOptionsWindowMobile extends Screen
         this.music = "menu_options.ogg";
         this.musicID = "menu";
 
-        if (Drawing.drawing.enableStats)
+        if (Game.options.window.infoBar)
             showStats.setText(infoBarText, ScreenOptions.onText);
         else
             showStats.setText(infoBarText, ScreenOptions.offText);

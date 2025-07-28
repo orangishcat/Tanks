@@ -15,7 +15,7 @@ public class SpeedrunTimer
         if (!(Game.screen instanceof ScreenGame) || ScreenGame.finishedQuick)
             alpha += 64 + 64 * Math.sin(System.currentTimeMillis() / 1000.0 * Math.PI * 4);
 
-        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
             Drawing.drawing.setColor(255, 255, 255, alpha);
         else
             Drawing.drawing.setColor(0, 0, 0, alpha);
@@ -27,7 +27,7 @@ public class SpeedrunTimer
         String crusadeDiff = "";
 
         boolean showDiff = false;
-        if (Crusade.crusadeMode && ScreenGame.finishedQuick && Crusade.currentCrusade.bestTimes != null && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient && Game.showBestTime)
+        if (Crusade.crusadeMode && ScreenGame.finishedQuick && Crusade.currentCrusade.bestTimes != null && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient && Game.options.speedrun.showBestTime)
         {
             showDiff = true;
             double time = 0;
@@ -60,7 +60,7 @@ public class SpeedrunTimer
                 Drawing.drawing.setInterfaceFontSize(50);
                 Drawing.drawing.drawInterfaceText(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2 - 30, "Level: " + levelDiff);
 
-                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
                     Drawing.drawing.setColor(255, 255, 255, alpha);
                 else
                     Drawing.drawing.setColor(0, 0, 0, alpha);
@@ -73,7 +73,7 @@ public class SpeedrunTimer
             else
             {
                 String end = "\u00A7000000000255)";
-                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+                if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
                     end = "\u00A7255255255255)";
 
                 levelDiff = " (" + levelDiff + end;
@@ -81,10 +81,10 @@ public class SpeedrunTimer
             }
         }
 
-        if (!Game.showSpeedrunTimer)
+        if (!Game.options.speedrun.showSpeedrunTimer)
             return;
 
-        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
             Drawing.drawing.setColor(255, 255, 255, alpha);
         else
             Drawing.drawing.setColor(0, 0, 0, alpha);
@@ -94,7 +94,7 @@ public class SpeedrunTimer
 
         if (Crusade.crusadeMode)
         {
-            if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+            if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
                 Drawing.drawing.setColor(255, 255, 255, alpha);
             else
                 Drawing.drawing.setColor(0, 0, 0, alpha);

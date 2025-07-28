@@ -296,7 +296,7 @@ public class ItemBar
 
 	public void setItemLocal(int index)
 	{
-		if (this.player.hotbar != null && !Hotbar.circular)
+		if (this.player.hotbar != null && !Game.options.misc.circularHotbar)
 		{
 			this.player.hotbar.hidden = false;
 
@@ -608,7 +608,7 @@ public class ItemBar
 
 				Drawing.drawing.setColor(255, 255, 255, Math.min(1, 2 - (this.timeSinceSwitch) / 100.0) * 255 * a);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.playerTank.size, Game.tile_size, Game.tile_size);
 				else
 					Drawing.drawing.drawImage(icon, Game.playerTank.posX, Game.playerTank.posY, Game.tile_size, Game.tile_size);

@@ -34,7 +34,7 @@ public class DisplayLevel
 
         for (Obstacle o: Game.obstacles)
         {
-            if (!Game.enable3d || !o.batchDraw)
+            if (!Game.options.graphics.enable3d || !o.batchDraw)
                 drawables[o.drawLevel].add(o);
         }
 
@@ -43,7 +43,7 @@ public class DisplayLevel
 
         for (int i = 0; i < this.drawables.length; i++)
         {
-            if (i == 5 && Game.enable3d)
+            if (i == 5 && Game.options.graphics.enable3d)
             {
                 Drawing drawing = Drawing.drawing;
                 Drawing.drawing.setColor(174, 92, 16);
@@ -61,7 +61,7 @@ public class DisplayLevel
                     ((Movable) d).drawTeam();
             }
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
             {
                 for (IDrawable d : this.drawables[i])
                 {

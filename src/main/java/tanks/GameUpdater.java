@@ -10,7 +10,7 @@ public class GameUpdater implements IUpdater
 	{
 		try
 		{
-			if (Game.enableExtensions)
+			if (Game.options.misc.extension.enableExtensions)
 			{
 				for (int i = 0; i < Game.extensionRegistry.extensions.size(); i++)
 				{
@@ -22,7 +22,7 @@ public class GameUpdater implements IUpdater
 
 			Panel.panel.update();
 
-			if (Game.enableExtensions)
+			if (Game.options.misc.extension.enableExtensions)
 			{
 				for (int i = 0; i < Game.extensionRegistry.extensions.size(); i++)
 				{

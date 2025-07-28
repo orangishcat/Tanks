@@ -21,32 +21,32 @@ public class ScreenDebug extends Screen
         this.music = "menu_options.ogg";
         this.musicID = "menu";
 
-        if (Game.traceAllRays)
+        if (Game.options.debug.traceAllRays)
             traceAllRays.setText(traceText, ScreenOptions.onText);
         else
             traceAllRays.setText(traceText, ScreenOptions.offText);
 
-        if (Game.firstPerson)
+        if (Game.options.debug.firstPerson)
             firstPerson.setText(firstPersonText, ScreenOptions.onText);
         else
             firstPerson.setText(firstPersonText, ScreenOptions.offText);
 
-        if (Game.followingCam)
+        if (Game.options.debug.followingCam)
             followingCam.setText(followingCamText, ScreenOptions.onText);
         else
             followingCam.setText(followingCamText, ScreenOptions.offText);
 
-        if (Game.showTankIDs)
+        if (Game.options.debug.showTankIDs)
             tankIDs.setText(tankIDsText, ScreenOptions.onText);
         else
             tankIDs.setText(tankIDsText, ScreenOptions.offText);
 
-        if (Game.invulnerable)
+        if (Game.options.debug.invulnerable)
             invulnerable.setText(invulnerableText, ScreenOptions.onText);
         else
             invulnerable.setText(invulnerableText, ScreenOptions.offText);
 
-        if (Game.fancyLights)
+        if (Game.options.debug.fancyLights)
             fancyLighting.setText(fancyLightsText, ScreenOptions.onText);
         else
             fancyLighting.setText(fancyLightsText, ScreenOptions.offText);
@@ -56,7 +56,7 @@ public class ScreenDebug extends Screen
         else
             destroyCheat.setText(destroyCheatText, ScreenOptions.offText);
 
-        if (Game.drawFaces)
+        if (Game.options.debug.drawFaces)
             drawFaces.setText(facesText, ScreenOptions.onText);
         else
             drawFaces.setText(facesText, ScreenOptions.offText);
@@ -71,9 +71,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.traceAllRays = !Game.traceAllRays;
+            Game.options.debug.traceAllRays = !Game.options.debug.traceAllRays;
 
-            if (Game.traceAllRays)
+            if (Game.options.debug.traceAllRays)
                 traceAllRays.setText(traceText, ScreenOptions.onText);
             else
                 traceAllRays.setText(traceText, ScreenOptions.offText);
@@ -85,9 +85,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.firstPerson = !Game.firstPerson;
+            Game.options.debug.firstPerson = !Game.options.debug.firstPerson;
 
-            if (Game.firstPerson)
+            if (Game.options.debug.firstPerson)
                 firstPerson.setText(firstPersonText, ScreenOptions.onText);
             else
                 firstPerson.setText(firstPersonText, ScreenOptions.offText);
@@ -99,9 +99,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.followingCam = !Game.followingCam;
+            Game.options.debug.followingCam = !Game.options.debug.followingCam;
 
-            if (Game.followingCam)
+            if (Game.options.debug.followingCam)
                 followingCam.setText(followingCamText, ScreenOptions.onText);
             else
                 followingCam.setText(followingCamText, ScreenOptions.offText);
@@ -113,9 +113,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.showTankIDs = !Game.showTankIDs;
+            Game.options.debug.showTankIDs = !Game.options.debug.showTankIDs;
 
-            if (Game.showTankIDs)
+            if (Game.options.debug.showTankIDs)
                 tankIDs.setText(tankIDsText, ScreenOptions.onText);
             else
                 tankIDs.setText(tankIDsText, ScreenOptions.offText);
@@ -127,9 +127,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.invulnerable = !Game.invulnerable;
+            Game.options.debug.invulnerable = !Game.options.debug.invulnerable;
 
-            if (Game.invulnerable)
+            if (Game.options.debug.invulnerable)
                 invulnerable.setText(invulnerableText, ScreenOptions.onText);
             else
                 invulnerable.setText(invulnerableText, ScreenOptions.offText);
@@ -141,9 +141,9 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.fancyLights = !Game.fancyLights;
+            Game.options.debug.fancyLights = !Game.options.debug.fancyLights;
 
-            if (Game.fancyLights)
+            if (Game.options.debug.fancyLights)
                 fancyLighting.setText(fancyLightsText, ScreenOptions.onText);
             else
                 fancyLighting.setText(fancyLightsText, ScreenOptions.offText);
@@ -169,8 +169,8 @@ public class ScreenDebug extends Screen
         @Override
         public void run()
         {
-            Game.drawFaces = !Game.drawFaces;
-            if (Game.drawFaces)
+            Game.options.debug.drawFaces = !Game.options.debug.drawFaces;
+            if (Game.options.debug.drawFaces)
                 drawFaces.setText(facesText, ScreenOptions.onText);
             else
                 drawFaces.setText(facesText, ScreenOptions.offText);

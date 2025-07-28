@@ -137,7 +137,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
         if (Drawing.drawing.interfaceScaleZoom > 1)
             page_size = 9;
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
         {
             if (screen == null)
                 this.background = new DisplayCrusadeLevels(crusade);
@@ -151,7 +151,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
             p = setupOnlyRecords(screen);
 
         this.player = p;
-        this.forceInBounds = Game.previewCrusades;
+        this.forceInBounds = Game.options.misc.previewCrusades;
 
         Obstacle.draw_size = Game.tile_size;
 
@@ -192,7 +192,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
             this.age = 12;
         }
 
-        if (!Game.fullStats)
+        if (!Game.options.misc.fullStats)
         {
             this.view = View.misc;
             this.wizardFinished = true;
@@ -357,7 +357,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
                     f.stopReading();
                 }
 
-                if (crusade.timePassed <= bestTime && !Game.invulnerable && !TankPlayer.enableDestroyCheat && !onlyRecord)
+                if (crusade.timePassed <= bestTime && !Game.options.debug.invulnerable && !TankPlayer.enableDestroyCheat && !onlyRecord)
                 {
                     if (!f.exists())
                         f.create();
@@ -863,7 +863,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
     @Override
     public void draw()
     {
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
         {
             this.background.draw();
 
@@ -1250,7 +1250,7 @@ public class ScreenCrusadeStats extends Screen implements IDarkScreen, IHiddenCh
 
         if (!onlyRecord)
         {
-            if (wizardFinished || !Game.fullStats)
+            if (wizardFinished || !Game.options.misc.fullStats)
             {
                 viewTanks.draw();
                 viewLevels.draw();

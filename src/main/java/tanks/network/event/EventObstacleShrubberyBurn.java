@@ -50,7 +50,7 @@ public class EventObstacleShrubberyBurn extends PersonalEvent
                 Game.removeObstacles.add(o);
 
                 Effect e;
-                if (Game.enable3d)
+                if (Game.options.graphics.enable3d)
                     e = (Effect.createNewEffect(this.posX, this.posY,
                             Obstacle.draw_size * (0.25 + 0.75 * ((ObstacleShrubbery) o).heightMultiplier * (1 - (255 - ((ObstacleShrubbery) o).height) / 128)),
                             Effect.EffectType.bushBurn));

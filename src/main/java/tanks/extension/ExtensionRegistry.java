@@ -22,7 +22,7 @@ public class ExtensionRegistry
 
 		String path = Game.homedir + Game.extensionRegistryPath;
 
-		if (Game.enableExtensions)
+		if (Game.options.misc.extension.enableExtensions)
 		{
 			try
 			{
@@ -56,7 +56,7 @@ public class ExtensionRegistry
 
 			try
 			{
-				if (Game.autoLoadExtensions)
+				if (Game.options.misc.extension.autoLoadExtensions)
 				{
 					ArrayList<String> files = Game.game.fileManager.getFile(Game.homedir + Game.extensionDir).getSubfiles();
 

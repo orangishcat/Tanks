@@ -17,7 +17,7 @@ public class ScreenExit extends Screen
 
     public ScreenExit()
     {
-        if (Game.fancyTerrain && Game.enable3d)
+        if (Game.options.graphics.fancyTerrain && Game.options.graphics.enable3d)
             outroAnimationTime = 1000;
     }
 
@@ -44,7 +44,7 @@ public class ScreenExit extends Screen
         Game.game.window.clipMultiplier = 2;
         Game.game.window.clipDistMultiplier = 1;
 
-        if (!Game.game.window.drawingShadow || !Game.shadowsEnabled)
+        if (!Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
             lastTime = System.currentTimeMillis();
 
         if (lastTime - startTime < outroTime + outroAnimationTime)

@@ -31,9 +31,9 @@ public class DebugKeybinds
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_B))
         {
             Game.game.window.pressedKeys.remove((Integer) InputCodes.KEY_B);
-            Game.drawFaces = !Game.drawFaces;
+            Game.options.debug.drawFaces = !Game.options.debug.drawFaces;
             notifs.add(new ScreenElement.Notification("Collision boxes: \u00a7255200000255"
-                    + (Game.drawFaces ? "shown" : "hidden"), 200));
+                    + (Game.options.debug.drawFaces ? "shown" : "hidden"), 200));
         }
 
         if (Game.game.window.pressedKeys.contains(InputCodes.KEY_V))

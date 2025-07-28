@@ -52,7 +52,7 @@ public class ObstacleStackable extends Obstacle
         double colorMul = Math.random() * 0.5 + 0.5;
         double[] col = new double[3];
 
-        if (Game.fancyTerrain)
+        if (Game.options.graphics.fancyTerrain)
         {
             col[0] = (colorMul * (176 - Math.random() * 70));
             col[1] = (colorMul * (111 - Math.random() * 34));
@@ -74,7 +74,7 @@ public class ObstacleStackable extends Obstacle
 
         drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA, this.glow);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             for (int i = 0; i < Math.min(stackHeight, default_max_height); i++)
             {
@@ -87,7 +87,7 @@ public class ObstacleStackable extends Obstacle
                 {
                     byte o = (byte) (option | this.getOptionsByte(((i + 1) + stackHeight % 1.0) * Game.tile_size));
 
-                    if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+                    if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
                         options[i] = o;
 
                     drawing.fillBox(this, this.posX, this.posY, i * Game.tile_size + this.startHeight * Game.tile_size, draw_size, draw_size, draw_size, o);
@@ -96,7 +96,7 @@ public class ObstacleStackable extends Obstacle
                 {
                     byte o = (byte) (option | this.getOptionsByte((i + stackHeight % 1.0) * Game.tile_size));
 
-                    if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+                    if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
                         options[i] = o;
 
                     drawing.fillBox(this, this.posX, this.posY, (i - 1 + stackHeight % 1.0) * Game.tile_size + this.startHeight * Game.tile_size, draw_size, draw_size, draw_size, o);
@@ -110,7 +110,7 @@ public class ObstacleStackable extends Obstacle
     @Override
     public void draw3dOutline(double r, double g, double b, double a)
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             drawOutline(r, g, b, a);
             return;
@@ -182,12 +182,12 @@ public class ObstacleStackable extends Obstacle
     @Override
     public void playDestroyAnimation(double posX, double posY, double radius)
     {
-        if (Game.effectsEnabled)
+        if (Game.options.graphics.effect.particleEffects)
         {
             Effect.EffectType effect = this.destroyEffect;
             double freq = Math.min((Math.sqrt(Math.pow(posX - this.posX, 2) + Math.pow(posY - this.posY, 2)) + Game.tile_size * 2.5) / radius, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 if (effect == Effect.EffectType.obstaclePiece)
                     effect = Effect.EffectType.obstaclePiece3d;
@@ -208,7 +208,7 @@ public class ObstacleStackable extends Obstacle
                 {
                     for (int k = 0; k < Game.tile_size - 6; k += 4)
                     {
-                        if (Math.random() > this.destroyEffectAmount * freq * freq * Game.effectMultiplier)
+                        if (Math.random() > this.destroyEffectAmount * freq * freq * Game.options.graphics.effect.particlePercentage)
                             continue;
 
                         Effect e = Effect.createNewEffect(this.posX + j + 5 - Game.tile_size / 2, this.posY + k + 5 - Game.tile_size / 2, effect);
@@ -238,7 +238,7 @@ public class ObstacleStackable extends Obstacle
             {
                 for (double l = 0; l < height; l += s)
                 {
-                    if (Math.random() > freq * Game.effectMultiplier)
+                    if (Math.random() > freq * Game.options.graphics.effect.particlePercentage)
                         continue;
 
                     Effect e = Effect.createNewEffect(x + j + s / 2 - Game.tile_size / 2, y + k + s / 2 - Game.tile_size / 2, l + z, effect);

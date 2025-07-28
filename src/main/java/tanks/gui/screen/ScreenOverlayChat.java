@@ -193,7 +193,7 @@ public class ScreenOverlayChat
 
     public static boolean isDark()
     {
-        return (((Panel.win && Game.effectsEnabled) || Panel.darkness > 0) && Game.screen instanceof IDarkScreen) || (Level.isDark());
+        return (((Panel.win && Game.options.graphics.effect.particleEffects) || Panel.darkness > 0) && Game.screen instanceof IDarkScreen) || (Level.isDark());
     }
 
     public static void addChat(String chat)

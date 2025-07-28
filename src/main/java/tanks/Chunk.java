@@ -282,10 +282,10 @@ public class Chunk implements Comparable<Chunk>
 
     public static Tile setTileColor(Level l, Random r, Tile t)
     {
-        t.colR = l.color.red + (Game.fancyTerrain ? r.nextDouble() * l.colorVar.red : 0);
-        t.colG = l.color.green + (Game.fancyTerrain ? r.nextDouble() * l.colorVar.green : 0);
-        t.colB = l.color.blue + (Game.fancyTerrain ? r.nextDouble() * l.colorVar.blue : 0);
-        t.depth = Game.fancyTerrain && Game.enable3dBg ? r.nextDouble() * 10 : 0;
+        t.colR = l.color.red + (Game.options.graphics.fancyTerrain ? r.nextDouble() * l.colorVar.red : 0);
+        t.colG = l.color.green + (Game.options.graphics.fancyTerrain ? r.nextDouble() * l.colorVar.green : 0);
+        t.colB = l.color.blue + (Game.options.graphics.fancyTerrain ? r.nextDouble() * l.colorVar.blue : 0);
+        t.depth = Game.options.graphics.fancyTerrain && Game.options.graphics.enable3dBg ? r.nextDouble() * 10 : 0;
         return t;
     }
 
@@ -433,7 +433,7 @@ public class Chunk implements Comparable<Chunk>
     {
         Game.tiles = new Tile[l.sizeX][l.sizeY];
 
-        int var = Game.fancyTerrain ? 1 : 0;
+        int var = Game.options.graphics.fancyTerrain ? 1 : 0;
 
         Random tilesRandom = new Random(l.tilesRandomSeed);
         for (int i = 0; i < l.sizeX; i++)
@@ -444,7 +444,7 @@ public class Chunk implements Comparable<Chunk>
                 t.colR = l.color.red + var * tilesRandom.nextDouble() * l.colorVar.red;
                 t.colG = l.color.green + var * tilesRandom.nextDouble() * l.colorVar.green;
                 t.colB = l.color.blue + var * tilesRandom.nextDouble() * l.colorVar.blue;
-                t.depth = Game.enable3dBg ? tilesRandom.nextDouble() * TILE_DEPTH_VARIATION * var : 0;
+                t.depth = Game.options.graphics.enable3dBg ? tilesRandom.nextDouble() * TILE_DEPTH_VARIATION * var : 0;
                 Game.tiles[i][j] = t;
             }
         }

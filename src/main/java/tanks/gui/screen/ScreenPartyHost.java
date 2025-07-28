@@ -139,7 +139,7 @@ public class ScreenPartyHost extends Screen
 
     Button quit = new Button(this.centerX, this.centerY + 270, this.objWidth, this.objHeight, "End party", () -> Game.screen = new ScreenConfirmEndParty());
 
-    Button toggleIP = new Button(-1000, -1000, this.objHeight, this.objHeight, "", () -> Game.showIP = !Game.showIP, "Toggle showing IP address");
+    Button toggleIP = new Button(-1000, -1000, this.objHeight, this.objHeight, "", () -> Game.options.multiplayer.server.showIP = !Game.options.multiplayer.server.showIP, "Toggle showing IP address");
 
     public ScreenPartyHost()
     {
@@ -195,7 +195,7 @@ public class ScreenPartyHost extends Screen
         {
             try
             {
-                server = new Server(Game.port);
+                server = new Server(Game.options.multiplayer.server.port);
                 server.run();
             }
             catch (Exception e)
@@ -212,7 +212,7 @@ public class ScreenPartyHost extends Screen
             ip = Translation.translate("Getting your IP Address...");
             try
             {
-                ip = Translation.translate("Your Local IP Address: %s (Port: %d)", Inet4Address.getLocalHost().getHostAddress(), Game.port);
+                ip = Translation.translate("Your Local IP Address: %s (Port: %d)", Inet4Address.getLocalHost().getHostAddress(), Game.options.multiplayer.server.port);
             }
             catch (UnknownHostException e)
             {
@@ -359,14 +359,14 @@ public class ScreenPartyHost extends Screen
 
         String title = this.ip;
 
-        if (!Game.showIP)
+        if (!Game.options.multiplayer.server.showIP)
             title = Translation.translate("Party host");
 
         Drawing.drawing.drawInterfaceText(this.centerX, this.centerY - ipY, title);
         this.toggleIP.posX = this.centerX + Game.game.window.fontRenderer.getStringSizeX(Drawing.drawing.fontSize, title) / Drawing.drawing.interfaceScale / 2 + 30;
         this.toggleIP.posY = this.centerY - ipY;
 
-        if (Game.showIP)
+        if (Game.options.multiplayer.server.showIP)
             this.toggleIP.setText("-");
         else
             this.toggleIP.setText("+");
@@ -385,7 +385,7 @@ public class ScreenPartyHost extends Screen
             if (this.usernamePage <= 0)
             {
                 String n = Game.player.username;
-                if (Game.enableChatFilter)
+                if (Game.options.multiplayer.chatFilter)
                     n = Game.chatFilter.filterChat(n);
 
                 n = "\u00A7000127255255" + n;

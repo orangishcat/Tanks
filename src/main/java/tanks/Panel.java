@@ -148,7 +148,7 @@ public class Panel
 
 		Game.resetTiles();
 
-		if (Game.game.fullscreen)
+		if (Game.options.window.fullscreen)
 			Game.game.window.setFullscreen(true);
 
 		Game.game.window.setIcon("/images/icon64.png");
@@ -282,16 +282,16 @@ public class Panel
 
 //			this.startTime = System.currentTimeMillis() + splash_duration;
 //			Drawing.drawing.playSound("splash_jingle.ogg");
-//			Drawing.drawing.playMusic("menu_intro.ogg", Game.musicVolume, false, "intro", 0, false);
+//			Drawing.drawing.playMusic("menu_intro.ogg", Game.options.sound.musicVolume, false, "intro", 0, false);
 		}
 
 		if (!started)
 			this.startTime = System.currentTimeMillis();
 
-		int maxFps = Game.maxFPS;
-		if (Game.deterministicMode && Game.deterministic30Fps)
+		int maxFps = Game.options.graphics.maxFps;
+		if (Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
 			maxFps = 30;
-		else if (Game.deterministicMode)
+		else if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
 			maxFps = 60;
 
 		if (maxFps > 0)
@@ -305,12 +305,12 @@ public class Panel
 
 		lastFrameNano = System.nanoTime();
 
-		Game.game.window.constrainMouse = Game.constrainMouse && ((Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).paused && ((ScreenGame) Game.screen).playing && Game.playerTank != null && !Game.playerTank.destroy) || Game.screen instanceof ScreenLevelEditor);
+		Game.game.window.constrainMouse = Game.options.window.constrainMouse && ((Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).paused && ((ScreenGame) Game.screen).playing && Game.playerTank != null && !Game.playerTank.destroy) || Game.screen instanceof ScreenLevelEditor);
 
-		if (!Game.shadowsEnabled)
+		if (!Game.options.graphics.shadow.shadowsEnabled)
 			Game.game.window.setShadowQuality(0);
 		else
-			Game.game.window.setShadowQuality(Game.shadowQuality / 10.0 * 1.25);
+			Game.game.window.setShadowQuality(Game.options.graphics.shadow.shadowQuality / 10.0 * 1.25);
 
 		Screen prevScreen = Game.screen;
 
@@ -329,9 +329,9 @@ public class Panel
 		Drawing.drawing.interfaceScale = Drawing.drawing.interfaceScaleZoom * Math.min(Panel.windowWidth / 28, (Panel.windowHeight - Drawing.drawing.statsHeight) / 18) / 50.0;
 		Game.game.window.absoluteDepth = Drawing.drawing.interfaceScale * Game.absoluteDepthBase;
 
-		if (Game.deterministicMode && Game.deterministic30Fps)
+		if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off && Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
 			Panel.frameFrequency = 100.0 / 30;
-		else if (Game.deterministicMode)
+		else if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
 			Panel.frameFrequency = 100.0 / 60;
 		else
 			Panel.frameFrequency = Math.min(Game.game.window.frameFrequency, 20);
@@ -478,7 +478,7 @@ public class Panel
 		}
 
 		if (((Game.playerTank != null && !Game.playerTank.destroy) || (Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).spectatingTank != null)) && !ScreenGame.finished
-				&& (Drawing.drawing.unzoomedScale < Drawing.drawing.interfaceScale || Game.followingCam)
+				&& (Drawing.drawing.unzoomedScale < Drawing.drawing.interfaceScale || Game.options.debug.followingCam)
 				&& Game.screen instanceof ScreenGame && (((ScreenGame) (Game.screen)).playing || ((ScreenPartyHost.isServer || ScreenPartyLobby.isClient) && Game.startTime < Game.currentLevel.startTime)))
 		{
 			Drawing.drawing.enableMovingCamera = Drawing.drawing.unzoomedScale < Drawing.drawing.interfaceScale;
@@ -679,12 +679,12 @@ public class Panel
 		if (Game.screen.music == null)
 			Drawing.drawing.stopMusic();
 		else if (Panel.panel.startMusicPlayed)
-			Drawing.drawing.playMusic(Game.screen.music, Game.musicVolume, true, Game.screen.musicID, fadeTime);
+			Drawing.drawing.playMusic(Game.screen.music, Game.options.sound.musicVolume, true, Game.screen.musicID, fadeTime);
 	}
 
 	public void draw()
 	{
-		if ((Game.game.window.drawingShadow || !Game.shadowsEnabled) && (Game.screen instanceof ScreenGame && !(((ScreenGame) Game.screen).paused && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)))
+		if ((Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled) && (Game.screen instanceof ScreenGame && !(((ScreenGame) Game.screen).paused && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)))
 			this.age += Panel.frameFrequency;
 
 		while (Panel.panel.pastPlayerTime.size() > 1 && Panel.panel.pastPlayerTime.get(1) < Panel.panel.age - Drawing.drawing.getTrackOffset())
@@ -735,7 +735,7 @@ public class Panel
 
 			if (!(Game.screen instanceof ScreenExit))
 			{
-				if (Game.screen instanceof ScreenGame && Game.currentLevel != null && Game.followingCam)
+				if (Game.screen instanceof ScreenGame && Game.currentLevel != null && Game.options.debug.followingCam)
 					Drawing.drawing.setColor(133 * (Level.currentLightIntensity * 0.7), 193 * (Level.currentLightIntensity * 0.7), 233 * (Level.currentLightIntensity * 0.7));
 				else
 					Drawing.drawing.setColor(174, 92, 16);
@@ -749,7 +749,7 @@ public class Panel
 
 			Game.screen.setupLights();
 
-			if (Game.fancyLights)
+			if (Game.options.debug.fancyLights)
 				Game.game.window.createLights(this.lights, Drawing.drawing.scale);
 
 			if (!Game.game.window.drawingShadow)
@@ -787,7 +787,7 @@ public class Panel
 
 				if (System.currentTimeMillis() - continuationStartTime > 500 && !continuationMusic)
 				{
-					Drawing.drawing.playMusic("waiting_music.ogg", Game.musicVolume, true, Game.screen.musicID, 500);
+					Drawing.drawing.playMusic("waiting_music.ogg", Game.options.sound.musicVolume, true, Game.screen.musicID, 500);
 					continuationMusic = true;
 					forceRefreshMusic = true;
 				}
@@ -894,7 +894,7 @@ public class Panel
 		{
 			if (Level.isDark())
 			{
-				if (Game.glowEnabled)
+				if (Game.options.graphics.glowEnabled)
 				{
 					Drawing.drawing.setColor(0, 0, 0, 128);
 					Drawing.drawing.fillInterfaceGlow(mx, my, 64, 64, true);
@@ -904,7 +904,7 @@ public class Panel
 			}
 			else
 			{
-				if (Game.glowEnabled)
+				if (Game.options.graphics.glowEnabled)
 				{
 					double v = 1;
 					if (Game.screen instanceof ScreenIntro)
@@ -933,7 +933,7 @@ public class Panel
 			Drawing.drawing.drawInterfaceImage("cursor.png", mx, my, 48, 48);
 		}
 
-		if (Game.enable3d && ((Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).paused && !((ScreenGame) Game.screen).shopScreen && Game.playerTank != null) || Game.screen instanceof ScreenLevelEditor) && Panel.showMouseTargetHeight)
+		if (Game.options.graphics.enable3d && ((Game.screen instanceof ScreenGame && !((ScreenGame) Game.screen).paused && !((ScreenGame) Game.screen).shopScreen && Game.playerTank != null) || Game.screen instanceof ScreenLevelEditor) && Panel.showMouseTargetHeight)
 		{
 			double c = 127 * Obstacle.draw_size / Game.tile_size;
             double a = 255;
@@ -1058,7 +1058,7 @@ public class Panel
 
 	public void drawBar(double offset)
 	{
-		if (!Drawing.drawing.enableStats)
+		if (!Game.options.window.infoBar)
 			return;
 
 		Drawing.drawing.setColor(87, 46, 8);

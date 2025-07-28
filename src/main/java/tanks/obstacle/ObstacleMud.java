@@ -50,7 +50,7 @@ public class ObstacleMud extends Obstacle
     @Override
     public void onObjectEntryLocal(Movable m)
     {
-        if (Game.effectsEnabled && m instanceof Tank && !ScreenGame.finished && Math.random() * Panel.frameFrequency <= 0.1 * Game.effectMultiplier)
+        if (Game.options.graphics.effect.particleEffects && m instanceof Tank && !ScreenGame.finished && Math.random() * Panel.frameFrequency <= 0.1 * Game.options.graphics.effect.particlePercentage)
         {
             Tank t = (Tank) m;
             double a = m.getPolarDirection();
@@ -125,7 +125,7 @@ public class ObstacleMud extends Obstacle
     @Override
     public void draw()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB);
             Drawing.drawing.fillRect(this, this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);

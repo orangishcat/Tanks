@@ -54,11 +54,11 @@ public class ObstacleLava extends Obstacle implements IAvoidObject
 
     public void addEffect()
     {
-        if (Game.effectsEnabled && !ScreenGame.finished)
+        if (Game.options.graphics.effect.particleEffects && !ScreenGame.finished)
         {
-            if (Math.random() < Game.effectMultiplier * 0.01)
+            if (Math.random() < Game.options.graphics.effect.particlePercentage * 0.01)
             {
-                if (Game.enable3d)
+                if (Game.options.graphics.enable3d)
                 {
                     Effect e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, 0, Effect.EffectType.piece);
                     e.colR = 255;
@@ -102,7 +102,7 @@ public class ObstacleLava extends Obstacle implements IAvoidObject
     @Override
     public void draw()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB);
             Drawing.drawing.fillRect(this, this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);

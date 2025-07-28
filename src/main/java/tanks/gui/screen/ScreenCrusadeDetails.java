@@ -119,7 +119,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
         showRecordButton.textColB = 255;
         showRecordButton.fontSize = 22;
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
             this.forceInBounds = true;
 
         if (c.levels.isEmpty())
@@ -157,7 +157,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
         if (!c.started)
             textOffset += 50;
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
             this.background = new DisplayCrusadeLevels(this.crusade);
 
         if (crusade.description != null)
@@ -237,7 +237,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
     @Override
     public void draw()
     {
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
         {
             this.background.draw();
 
@@ -254,7 +254,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
 
         Drawing.drawing.setColor(0, 0, 0, 255);
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
         {
             Drawing.drawing.setColor(0, 0, 0, 127);
             Drawing.drawing.drawPopup(this.centerX, this.centerY, Drawing.drawing.baseInterfaceSizeX * 0.7, this.objYSpace * sizeY);
@@ -272,7 +272,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
         {
             Drawing.drawing.setInterfaceFontSize(this.textSize * 0.75);
 
-            if (Game.previewCrusades)
+            if (Game.options.misc.previewCrusades)
             {
                 Drawing.drawing.displayInterfaceText(this.centerX + Drawing.drawing.baseInterfaceSizeX * 0.35 - 50, this.centerY + this.objYSpace * (sizeY / 2. - 0.5), true, "Best completion time: %s", SpeedrunTimer.getTime(this.bestTime));
                 showRecordButton.posY = this.centerY + this.objYSpace * (sizeY / 2.0 - 0.5);
@@ -287,7 +287,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
             this.showRecordButton.draw();
         }
 
-        if (!Game.previewCrusades)
+        if (!Game.options.misc.previewCrusades)
             Drawing.drawing.setColor(0, 0, 0, 255);
 
         Drawing.drawing.setInterfaceFontSize(this.textSize);
@@ -320,7 +320,7 @@ public class ScreenCrusadeDetails extends Screen implements ICrusadePreviewScree
         {
             double pos = this.centerY - this.objYSpace * 2.5;
 
-            if (Game.previewCrusades)
+            if (Game.options.misc.previewCrusades)
                 Drawing.drawing.setColor(255, 255, 255);
             else
                 Drawing.drawing.setColor(0, 0, 0);

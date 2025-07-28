@@ -42,7 +42,7 @@ public class ObstacleColorFlashing extends Obstacle
     @Override
     public void draw()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA);
             Drawing.drawing.fillRect(this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);

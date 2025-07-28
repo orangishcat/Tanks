@@ -10,7 +10,7 @@ public class GameDrawer implements IDrawer
 	{
 		try
 		{
-			if (Game.enableExtensions)
+			if (Game.options.misc.extension.enableExtensions)
 			{
 				for (int i = 0; i < Game.extensionRegistry.extensions.size(); i++)
 				{
@@ -22,7 +22,7 @@ public class GameDrawer implements IDrawer
 
 			Panel.panel.draw();
 
-			if (Game.enableExtensions)
+			if (Game.options.misc.extension.enableExtensions)
 			{
 				for (int i = 0; i < Game.extensionRegistry.extensions.size(); i++)
 				{

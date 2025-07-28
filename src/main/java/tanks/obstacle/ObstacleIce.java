@@ -14,7 +14,7 @@ public class ObstacleIce extends Obstacle
     {
         super(name, posX, posY);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             this.drawLevel = 6;
         else
             this.drawLevel = 1;
@@ -58,7 +58,7 @@ public class ObstacleIce extends Obstacle
     {
         double h = this.baseGroundHeight;
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA * (h - Obstacle.draw_size / Game.tile_size * 15) / (h - 15));
             Drawing.drawing.fillRect(this, this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);

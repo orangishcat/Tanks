@@ -204,7 +204,7 @@ public class TankNPC extends TankDummy
                 ((ScreenGame) Game.screen).npcShopScreen = true;
                 ((ScreenGame) Game.screen).npcShopList = npcShopList;
 
-                if (Game.followingCam)
+                if (Game.options.debug.followingCam)
                     Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
 
                 return;

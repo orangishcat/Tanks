@@ -91,7 +91,7 @@ public class Arcade extends Minigame
         this.disableFriendlyFire = true;
         this.removeMusicWhenDead = true;
 
-        if (Game.deterministicMode)
+        if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
             this.random = new Random(0);
         else
             this.random = new Random();
@@ -482,7 +482,7 @@ public class Arcade extends Minigame
         for (String s: this.playingMusics)
         {
             if (!this.prevMusics.contains(s))
-                Drawing.drawing.addSyncedMusic(s, Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic(s, Game.options.sound.musicVolume, true, 500);
         }
 
         for (String s: this.prevMusics)
@@ -636,7 +636,7 @@ public class Arcade extends Minigame
             }
         }
 
-        if (Hotbar.circular)
+        if (Game.options.misc.circularHotbar)
             this.drawChainTimerCircle();
         else
             this.drawChainTimer();
@@ -785,7 +785,7 @@ public class Arcade extends Minigame
 
         double alpha = (127 + 128 * frac) * frac2;
 
-        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+        if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
             Drawing.drawing.setColor(255, 255, 255, alpha);
         else
             Drawing.drawing.setColor(0, 0, 0, alpha);

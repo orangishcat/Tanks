@@ -56,7 +56,7 @@ public class ObstacleBoostPanel extends Obstacle
 
         this.brightness = Math.min(this.brightness + Panel.frameFrequency * 8, 100);
 
-        if (Math.random() < Panel.frameFrequency * Game.effectMultiplier * 0.25)
+        if (Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage * 0.25)
             this.addEffect(m.posX, m.posY, 0);
     }
 
@@ -96,9 +96,9 @@ public class ObstacleBoostPanel extends Obstacle
                 Drawing.drawing.playSound("boost.ogg", 1, (float) ((radius - distsq) / radius));
         }
 
-        if (Game.effectsEnabled && !ScreenGame.finished && !(m instanceof Bullet && !((Bullet) m).playPopSound))
+        if (Game.options.graphics.effect.particleEffects && !ScreenGame.finished && !(m instanceof Bullet && !((Bullet) m).playPopSound))
         {
-            for (int i = 0; i < 25 * Game.effectMultiplier; i++)
+            for (int i = 0; i < 25 * Game.options.graphics.effect.particlePercentage; i++)
                 this.addEffect(m.posX, m.posY, 0.5);
         }
     }
@@ -108,10 +108,10 @@ public class ObstacleBoostPanel extends Obstacle
     {
         double offset = 0;
 
-        if (Game.fancyTerrain)
+        if (Game.options.graphics.fancyTerrain)
             offset = Math.sin((this.posX + this.posY + System.currentTimeMillis() / 50.0) / 10) * 40 + 40;
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR - offset / 2, Math.min(this.colorG - offset + this.brightness, 255), this.colorB + this.brightness, 255, 1.0);
             Drawing.drawing.fillRect(this, this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);
@@ -142,7 +142,7 @@ public class ObstacleBoostPanel extends Obstacle
         e.colG = Math.min(255, Math.max(0, this.colorG + Math.random() * var - var / 2));
         e.colB = Math.min(255, Math.max(0, this.colorB + Math.random() * var - var / 2));
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() + extra);
         else
             e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() + extra);
@@ -163,7 +163,7 @@ public class ObstacleBoostPanel extends Obstacle
     @Override
     public Effect getCompanionEffect()
     {
-        if (Game.glowEnabled && brightness > 0)
+        if (Game.options.graphics.glowEnabled && brightness > 0)
         {
             glow.posX = this.posX;
             glow.posY = this.posY;

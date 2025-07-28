@@ -158,9 +158,9 @@ public class EventTankTransformCustom extends PersonalEvent
             }
             else if (effect == poof)
             {
-                if (Game.effectsEnabled)
+                if (Game.options.graphics.effect.particleEffects)
                 {
-                    for (int i = 0; i < 50 * Game.effectMultiplier; i++)
+                    for (int i = 0; i < 50 * Game.options.graphics.effect.particlePercentage; i++)
                     {
                         Effect e = Effect.createNewEffect(t.posX, t.posY, t.size / 4, Effect.EffectType.piece);
                         double var = 50;
@@ -168,7 +168,7 @@ public class EventTankTransformCustom extends PersonalEvent
                         e.colG = Math.min(255, Math.max(0, t.color.green + Math.random() * var - var / 2));
                         e.colB = Math.min(255, Math.max(0, t.color.blue + Math.random() * var - var / 2));
 
-                        if (Game.enable3d)
+                        if (Game.options.graphics.enable3d)
                             e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, 1 + Math.random() * t.size / 50.0);
                         else
                             e.setPolarMotion(Math.random() * 2 * Math.PI, 1 + Math.random() * t.size / 50.0);

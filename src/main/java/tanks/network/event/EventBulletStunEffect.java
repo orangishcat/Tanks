@@ -24,13 +24,13 @@ public class EventBulletStunEffect extends PersonalEvent
     @Override
     public void execute()
     {
-        if (Game.effectsEnabled && this.clientID == null)
+        if (Game.options.graphics.effect.particleEffects && this.clientID == null)
         {
             Tank t = Tank.idMap.get(tank);
             if (t == null)
                 return;
 
-            for (int i = 0; i < 25 * Game.effectMultiplier; i++)
+            for (int i = 0; i < 25 * Game.options.graphics.effect.particlePercentage; i++)
             {
                 Effect e = Effect.createNewEffect(t.posX, t.posY, Game.tile_size / 4, Effect.EffectType.stun);
                 e.linkedMovable = t;

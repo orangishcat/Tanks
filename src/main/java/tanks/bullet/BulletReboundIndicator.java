@@ -48,7 +48,7 @@ public class BulletReboundIndicator extends Movable
         if (this.age > this.maxAge)
             Game.removeMovables.add(this);
 
-        if (Game.effectsEnabled && Panel.frameFrequency * Game.effectMultiplier >= Math.random())
+        if (Game.options.graphics.effect.particleEffects && Panel.frameFrequency * Game.options.graphics.effect.particlePercentage >= Math.random())
         {
             Effect e = Effect.createNewEffect(this.posX, this.posY, this.posZ, Effect.EffectType.piece);
             double var = 50;
@@ -60,7 +60,7 @@ public class BulletReboundIndicator extends Movable
             e.glowG = e.colG - this.color2.green;
             e.glowB = e.colB - this.color2.blue;
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0 * 4);
             else
                 e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0 * 4);

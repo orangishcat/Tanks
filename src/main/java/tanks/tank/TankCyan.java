@@ -29,7 +29,7 @@ public class TankCyan extends TankAIControlled
 
 		this.coinValue = 4;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/snowflake.png";
 			this.emblemColor.set(160, 255, 255);

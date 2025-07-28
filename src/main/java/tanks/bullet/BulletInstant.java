@@ -53,13 +53,13 @@ public class BulletInstant extends Bullet
 
 	public void addDestroyEffect()
 	{
-		if (Game.effectsEnabled)
+		if (Game.options.graphics.effect.particleEffects)
 		{
 			double mul = 4;
 			if (this.item.item.cooldownBase <= 0)
 				mul = 0.25;
 
-			for (int i = 0; i < this.size * mul * Game.effectMultiplier; i++)
+			for (int i = 0; i < this.size * mul * Game.options.graphics.effect.particlePercentage; i++)
 			{
 				Effect e = Effect.createNewEffect(this.posX, this.posY, this.posZ, Effect.EffectType.piece);
 				double var = 50;
@@ -68,7 +68,7 @@ public class BulletInstant extends Bullet
 				e.colG = Math.min(255, Math.max(0, this.baseColor.green + Math.random() * var - var / 2));
 				e.colB = Math.min(255, Math.max(0, this.baseColor.blue + Math.random() * var - var / 2));
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0 * 4);
 				else
 					e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0 * 4);
@@ -171,7 +171,7 @@ public class BulletInstant extends Bullet
 		boolean glows = false;
 		double size = 0.25;
 
-		if (Game.fancyBulletTrails)
+		if (Game.options.graphics.bulletTrails == GameOptions.BulletTrails.fancy)
 		{
 			for (int j = 0; j < 2; j++)
 			{

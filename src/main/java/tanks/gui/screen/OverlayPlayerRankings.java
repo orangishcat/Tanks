@@ -80,7 +80,7 @@ public class OverlayPlayerRankings
                     Drawing.drawing.setColor(cp.teamColor, opacity);
 
                     String name;
-                    if (Game.enableChatFilter)
+                    if (Game.options.multiplayer.chatFilter)
                         name = Game.chatFilter.filterChat(cp.username);
                     else
                         name = cp.username;

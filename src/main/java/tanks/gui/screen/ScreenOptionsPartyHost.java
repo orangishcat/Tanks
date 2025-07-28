@@ -53,9 +53,9 @@ public class ScreenOptionsPartyHost extends Screen
         @Override
         public void run()
         {
-            Game.disablePartyFriendlyFire = !Game.disablePartyFriendlyFire;
+            Game.options.multiplayer.partyHost.disablePartyFriendlyFire = !Game.options.multiplayer.partyHost.disablePartyFriendlyFire;
 
-            if (Game.disablePartyFriendlyFire)
+            if (Game.options.multiplayer.partyHost.disablePartyFriendlyFire)
                 disableFriendlyFire.setText(disableFriendlyFireText, disabledText);
             else
                 disableFriendlyFire.setText(disableFriendlyFireText, defaultText);
@@ -90,7 +90,7 @@ public class ScreenOptionsPartyHost extends Screen
         else
             anticheat.setText(anticheatText, weakText);
 
-        if (Game.disablePartyFriendlyFire)
+        if (Game.options.multiplayer.partyHost.disablePartyFriendlyFire)
             disableFriendlyFire.setText(disableFriendlyFireText, disabledText);
         else
             disableFriendlyFire.setText(disableFriendlyFireText, defaultText);
@@ -98,10 +98,10 @@ public class ScreenOptionsPartyHost extends Screen
         timer = new TextBox(this.centerX, this.centerY + this.objYSpace * 0, this.objWidth, this.objHeight, "Countdown time", () ->
         {
             if (timer.inputText.length() == 0)
-                timer.inputText = Game.partyStartTime / 100.0 + "";
+                timer.inputText = Game.options.multiplayer.partyHost.partyStartTime / 100.0 + "";
             else
-                Game.partyStartTime = Double.parseDouble(timer.inputText) * 100;
-        }, Game.partyStartTime / 100.0 + "", "The wait time in seconds after---all players are ready before---the battle begins.");
+                Game.options.multiplayer.partyHost.partyStartTime = Double.parseDouble(timer.inputText) * 100;
+        }, Game.options.multiplayer.partyHost.partyStartTime / 100.0 + "", "The wait time in seconds after---all players are ready before---the battle begins.");
 
         timer.maxValue = 60;
         timer.maxChars = 4;
@@ -113,13 +113,13 @@ public class ScreenOptionsPartyHost extends Screen
         bots = new TextBox(this.centerX, this.centerY - this.objYSpace * 1.5, this.objWidth, this.objHeight, "Bot players", () ->
         {
             if (bots.inputText.length() == 0)
-                bots.inputText = Game.botPlayerCount + "";
+                bots.inputText = Game.options.multiplayer.partyHost.botPlayerCount + "";
             else
-                Game.botPlayerCount = Integer.parseInt(bots.inputText);
+                Game.options.multiplayer.partyHost.botPlayerCount = Integer.parseInt(bots.inputText);
 
             if (ScreenPartyHost.isServer)
-                ScreenPartyHost.setBotCount(Game.botPlayerCount);
-        }, Game.botPlayerCount + "", "How many extra bot players---to add to parties");
+                ScreenPartyHost.setBotCount(Game.options.multiplayer.partyHost.botPlayerCount);
+        }, Game.options.multiplayer.partyHost.botPlayerCount + "", "How many extra bot players---to add to parties");
 
         bots.maxValue = 1000;
         bots.maxChars = 3;

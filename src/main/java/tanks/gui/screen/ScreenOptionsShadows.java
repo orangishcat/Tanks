@@ -14,9 +14,9 @@ public class ScreenOptionsShadows extends Screen
         @Override
         public void run()
         {
-            Game.shadowsEnabled = !Game.shadowsEnabled;
+            Game.options.graphics.shadow.shadowsEnabled = !Game.options.graphics.shadow.shadowsEnabled;
 
-            if (Game.shadowsEnabled)
+            if (Game.options.graphics.shadow.shadowsEnabled)
                 shadows.setText(shadowsText + ScreenOptions.onText);
             else
                 shadows.setText(shadowsText + ScreenOptions.offText);
@@ -33,10 +33,10 @@ public class ScreenOptionsShadows extends Screen
             if (shadowQuality.inputText.length() <= 0)
                 shadowQuality.inputText = shadowQuality.previousInputText;
 
-            Game.shadowQuality = Integer.parseInt(shadowQuality.inputText);
+            Game.options.graphics.shadow.shadowQuality = Integer.parseInt(shadowQuality.inputText);
         }
     }
-            , Game.shadowQuality, 1, 20, 1);
+            , Game.options.graphics.shadow.shadowQuality, 1, 20, 1);
 
     Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenOptionsGraphics()
     );
@@ -57,7 +57,7 @@ public class ScreenOptionsShadows extends Screen
         shadowQuality.g1 = 210;
         shadowQuality.b1 = 210;
 
-        if (Game.shadowsEnabled)
+        if (Game.options.graphics.shadow.shadowsEnabled)
             shadows.setText(shadowsText, ScreenOptions.onText);
         else
             shadows.setText(shadowsText, ScreenOptions.offText);

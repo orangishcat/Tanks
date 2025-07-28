@@ -32,11 +32,11 @@ public class ScreenJoinOnlineServer extends Screen
         @Override
         public void run()
         {
-            Game.lastOnlineServer = ip.inputText;
+            Game.options.multiplayer.server.lastOnlineServer = ip.inputText;
             ScreenOptions.saveOptions(Game.homedir);
         }
     },
-            Game.lastOnlineServer);
+            Game.options.multiplayer.server.lastOnlineServer);
 
     Button join = new Button(this.centerX, this.centerY + this.objYSpace / 2, this.objWidth, this.objHeight, "Join", new Runnable()
     {
@@ -56,8 +56,8 @@ public class ScreenJoinOnlineServer extends Screen
 
                     try
                     {
-                        String ipaddress = Game.lastOnlineServer;
-                        int port = Game.port;
+                        String ipaddress = Game.options.multiplayer.server.lastOnlineServer;
+                        int port = Game.options.multiplayer.server.port;
 
                         if (ipaddress.contains(":"))
                         {
@@ -66,7 +66,7 @@ public class ScreenJoinOnlineServer extends Screen
                         }
 
                         if (ipaddress.equals(""))
-                            Client.connect("localhost", Game.port, true, connectionID);
+                            Client.connect("localhost", Game.options.multiplayer.server.port, true, connectionID);
                         else
                             Client.connect(ipaddress, port, true, connectionID);
                     }

@@ -51,7 +51,7 @@ public class TextBoxSlider extends TextBox
 
         drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, sizeY * 3 / 4, 0.6, 0, 0, 0, 100, false);
 
         drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -79,7 +79,7 @@ public class TextBoxSlider extends TextBox
         double frac = Math.max(Math.min((this.value - this.min) / (this.max - this.min), 1), 0);
         double x = start1 * (1 - frac) + end1 * frac;
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             if (selected)
                 Button.drawGlow(mid2, this.posY + 3.5, end2 - start2 - this.sizeY * (-m), this.sizeY * m, 0.55, 0, 0, 0, 160, false);
@@ -122,10 +122,10 @@ public class TextBoxSlider extends TextBox
 
         if (this.min < this.max)
         {
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 Button.drawGlow(x, this.posY + 2.5, this.sizeY * m, this.sizeY * m, 0.6, 0, 0, 0, 100, false);
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 drawing.setColor((this.bgColorR + this.colorR) / 2, (this.bgColorG + this.colorG) / 2, (this.bgColorB + this.colorB) / 2);
             else
                 drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -133,7 +133,7 @@ public class TextBoxSlider extends TextBox
             drawing.fillInterfaceOval(x, this.posY, this.sizeY * m * m, this.sizeY * m * m);
             //drawing.setColor(this.colorR, this.colorG, this.colorB);
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 Button.drawGlow(x, this.posY + 1.5, this.sizeY * m * m, this.sizeY * m * m, 0.6, 0, 0, 0, 100, false);
 
             drawing.setColor(this.r1 * (1 - frac) + this.r2 * frac, this.g1 * (1 - frac) + this.g2 * frac, this.b1 * (1 - frac) + this.b2 * frac);

@@ -276,7 +276,7 @@ public class ScreenInterlevel extends Screen implements IDarkScreen
 
 	public ScreenInterlevel()
 	{
-		if (Game.followingCam)
+		if (Game.options.debug.followingCam)
 			Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
 
 		Game.player.hotbar.percentHidden = 100;
@@ -339,7 +339,7 @@ public class ScreenInterlevel extends Screen implements IDarkScreen
 		save.posY = ((Game.game.window.absoluteHeight - Drawing.drawing.statsHeight) / Drawing.drawing.interfaceScale - Drawing.drawing.interfaceSizeY) / 2
 				+ Drawing.drawing.interfaceSizeY - 50 * Drawing.drawing.interfaceScaleZoom;
 
-		if (Panel.win && Game.effectsEnabled && !Game.game.window.drawingShadow)
+		if (Panel.win && Game.options.graphics.effect.particleEffects && !Game.game.window.drawingShadow)
 			this.fireworksDisplay.draw();
 
 		boolean skip = false;
@@ -409,10 +409,10 @@ public class ScreenInterlevel extends Screen implements IDarkScreen
 			}
 		}
 
-		if (Game.showSpeedrunTimer)
+		if (Game.options.speedrun.showSpeedrunTimer)
 			SpeedrunTimer.draw();
 
-		if ((Panel.win && Game.effectsEnabled) || Level.isDark())
+		if ((Panel.win && Game.options.graphics.effect.particleEffects) || Level.isDark())
 			Drawing.drawing.setColor(255, 255, 255);
 		else
 			Drawing.drawing.setColor(0, 0, 0);
@@ -455,7 +455,7 @@ public class ScreenInterlevel extends Screen implements IDarkScreen
 			}
 		}
 
-		if (Panel.win && Game.effectsEnabled && !Game.game.window.drawingShadow)
+		if (Panel.win && Game.options.graphics.effect.particleEffects && !Game.game.window.drawingShadow)
 			Panel.darkness = Math.min(Panel.darkness + Panel.frameFrequency * 1.5, 191);
 	}
 }

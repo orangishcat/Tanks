@@ -20,9 +20,9 @@ public class ScreenOptionsMisc extends Screen
         @Override
         public void run()
         {
-            Game.autostart = !Game.autostart;
+            Game.options.misc.autoStart = !Game.options.misc.autoStart;
 
-            if (Game.autostart)
+            if (Game.options.misc.autoStart)
                 autostart.setText(autostartText, ScreenOptions.onText);
             else
                 autostart.setText(autostartText, ScreenOptions.offText);
@@ -35,9 +35,9 @@ public class ScreenOptionsMisc extends Screen
         @Override
         public void run()
         {
-            Game.fullStats = !Game.fullStats;
+            Game.options.misc.fullStats = !Game.options.misc.fullStats;
 
-            if (Game.fullStats)
+            if (Game.options.misc.fullStats)
                 fullStats.setText(fullStatsText, ScreenOptions.onText);
             else
                 fullStats.setText(fullStatsText, ScreenOptions.offText);
@@ -50,9 +50,9 @@ public class ScreenOptionsMisc extends Screen
         @Override
         public void run()
         {
-            Game.previewCrusades = !Game.previewCrusades;
+            Game.options.misc.previewCrusades = !Game.options.misc.previewCrusades;
 
-            if (Game.previewCrusades)
+            if (Game.options.misc.previewCrusades)
                 previewCrusades.setText(previewCrusadesText, ScreenOptions.onText);
             else
                 previewCrusades.setText(previewCrusadesText, ScreenOptions.offText);
@@ -65,9 +65,9 @@ public class ScreenOptionsMisc extends Screen
         @Override
         public void run()
         {
-            Hotbar.circular = !Hotbar.circular;
+            Game.options.misc.circularHotbar = !Game.options.misc.circularHotbar;
 
-            if (Hotbar.circular)
+            if (Game.options.misc.circularHotbar)
                 circularHotbar.setText(hotbarText, circularText);
             else
                 circularHotbar.setText(hotbarText, bottomText);
@@ -84,22 +84,22 @@ public class ScreenOptionsMisc extends Screen
         this.music = "menu_options.ogg";
         this.musicID = "menu";
 
-        if (Game.autostart)
+        if (Game.options.misc.autoStart)
             autostart.setText(autostartText, ScreenOptions.onText);
         else
             autostart.setText(autostartText, ScreenOptions.offText);
 
-        if (Game.fullStats)
+        if (Game.options.misc.fullStats)
             fullStats.setText(fullStatsText, ScreenOptions.onText);
         else
             fullStats.setText(fullStatsText, ScreenOptions.offText);
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
             previewCrusades.setText(previewCrusadesText, ScreenOptions.onText);
         else
             previewCrusades.setText(previewCrusadesText, ScreenOptions.offText);
 
-        if (Hotbar.circular)
+        if (Game.options.misc.circularHotbar)
             circularHotbar.setText(hotbarText, circularText);
         else
             circularHotbar.setText(hotbarText, bottomText);

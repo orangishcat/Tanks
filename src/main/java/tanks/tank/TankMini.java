@@ -34,7 +34,7 @@ public class TankMini extends TankAIControlled
 		this.mineAvoidSensitivity = 0.5;
 		this.stayNearParent = true;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/square.png";
 			this.emblemColor.set(this.secondaryColor);

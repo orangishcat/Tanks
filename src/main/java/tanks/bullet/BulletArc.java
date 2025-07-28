@@ -163,12 +163,12 @@ public class BulletArc extends Bullet
         this.drawShadow();
 
         double dt = this.destroyTimer;
-        if (!Game.enable3d && dt <= 0)
+        if (!Game.options.graphics.enable3d && dt <= 0)
             this.destroyTimer = Math.min(this.posZ / 1000, 0.8) * 60;
 
         super.draw();
 
-        if (!Game.enable3d && dt <= 0)
+        if (!Game.options.graphics.enable3d && dt <= 0)
             this.destroyTimer = 0;
 
         double time = (this.vZ + Math.sqrt(this.vZ * this.vZ + 2 * gravity * (this.posZ - Game.tile_size / 2))) / gravity;
@@ -199,7 +199,7 @@ public class BulletArc extends Bullet
         Drawing.drawing.setColor(this.baseColor, frac * 255 * d, 1);
         Drawing.drawing.drawImage(frac * Math.PI / 2, "cursor.png", x, y, s, s);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             Drawing.drawing.setColor(this.outlineColor, frac * 255 * d, 1);
             Drawing.drawing.fillGlow(x, y, this.size * 4, this.size * 4);
@@ -248,12 +248,12 @@ public class BulletArc extends Bullet
     @Override
     public void addDestroyEffect()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             this.posY -= this.posZ - Game.tile_size / 4;
 
         super.addDestroyEffect();
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             this.posY += this.posZ - Game.tile_size / 4;
     }
 

@@ -93,7 +93,7 @@ public class EventSendClientDetails extends PersonalEvent implements IServerThre
 		
 		s.clientID = this.clientID;
 	
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			s.username = Game.chatFilter.filterChat(this.username);
 		else
 			s.username = this.username;

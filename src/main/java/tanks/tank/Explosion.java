@@ -96,9 +96,9 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
         else
             Drawing.drawing.playSound("suck.ogg", (float) (Mine.mine_radius / r));
 
-        if (Game.effectsEnabled)
+        if (Game.options.graphics.effect.particleEffects)
         {
-            for (int j = 0; j < Math.min(800, 200 * this.radius / 125) * Game.effectMultiplier; j++)
+            for (int j = 0; j < Math.min(800, 200 * this.radius / 125) * Game.options.graphics.effect.particlePercentage; j++)
             {
                 double random = Math.random();
                 Effect e = Effect.createNewEffect(this.posX, this.posY, Effect.EffectType.piece);
@@ -107,7 +107,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
                 e.colG = (1 - random) * 155 + Math.random() * 100;
                 e.colB = 0;
 
-                if (Game.enable3d)
+                if (Game.options.graphics.enable3d)
                     e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.asin(Math.random()), random * (this.radius - Game.tile_size / 2) / Game.tile_size * 2);
                 else
                     e.setPolarMotion(Math.random() * 2 * Math.PI, random * (this.radius - Game.tile_size / 2) / Game.tile_size * 2);
@@ -116,7 +116,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
 
             if (this.bulletKnockback != 0 || this.tankKnockback != 0)
             {
-                for (int j = 0; j < Math.min(800, 200 * this.knockbackRadius / 125) * Game.effectMultiplier / 4; j++)
+                for (int j = 0; j < Math.min(800, 200 * this.knockbackRadius / 125) * Game.options.graphics.effect.particlePercentage / 4; j++)
                 {
                     if (k < 0)
                     {
@@ -129,7 +129,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
 
                         double m = Math.random() * 4 + 2;
 
-                        if (Game.enable3d)
+                        if (Game.options.graphics.enable3d)
                             e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.asin(Math.random()), k * m);
                         else
                             e.setPolarMotion(Math.random() * 2 * Math.PI, k * m);
@@ -152,7 +152,7 @@ public class Explosion extends Movable implements ICopyable<Explosion>, ITanksON
                         e.colG = e.colR;
                         e.colB = e.colR;
 
-                        if (Game.enable3d)
+                        if (Game.options.graphics.enable3d)
                             e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI * 0.125, k1);
                         else
                             e.setPolarMotion(Math.random() * 2 * Math.PI, k1);

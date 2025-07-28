@@ -30,7 +30,7 @@ public class TankOrangeRed extends TankAIControlled
 
         this.setBullet(DefaultItems.explosive_bullet);
 
-        if (Game.tankTextures)
+        if (Game.options.graphics.tankTextures)
         {
             this.baseSkin = TankModels.diagonalStripes;
             this.emblem = "emblems/bang.png";

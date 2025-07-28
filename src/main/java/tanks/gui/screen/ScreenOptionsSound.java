@@ -37,7 +37,7 @@ public class ScreenOptionsSound extends Screen
         soundVolume.g1 = 210;
         soundVolume.b1 = 210;
 
-        if (Game.enableLayeredMusic)
+        if (Game.options.sound.enableLayeredMusic)
             layeredMusic.setText(layeredMusicText, ScreenOptions.onText);
         else
             layeredMusic.setText(layeredMusicText, ScreenOptions.offText);
@@ -51,9 +51,9 @@ public class ScreenOptionsSound extends Screen
             if (musicVolume.inputText.length() <= 0)
                 musicVolume.inputText = musicVolume.previousInputText;
 
-            Game.musicVolume = Integer.parseInt(musicVolume.inputText) / 100f;
+            Game.options.sound.musicVolume = Integer.parseInt(musicVolume.inputText) / 100f;
 
-            Game.musicEnabled = Game.musicVolume > 0;
+            Game.musicEnabled = Game.options.sound.musicVolume > 0;
 
             if (Game.musicEnabled)
                 Panel.panel.playScreenMusic(0);
@@ -61,7 +61,7 @@ public class ScreenOptionsSound extends Screen
                 Drawing.drawing.stopMusic();
         }
     }
-            , Math.round(Game.musicVolume * 100f), 0, 100, 1);
+            , Math.round(Game.options.sound.musicVolume * 100f), 0, 100, 1);
 
 
     TextBoxSlider soundVolume = new TextBoxSlider(this.centerX, this.centerY - this.objYSpace * 1.25, this.objWidth, this.objHeight, "Sound volume", new Runnable()
@@ -72,21 +72,21 @@ public class ScreenOptionsSound extends Screen
             if (soundVolume.inputText.length() <= 0)
                 soundVolume.inputText = soundVolume.previousInputText;
 
-            Game.soundVolume = Integer.parseInt(soundVolume.inputText) / 100f;
+            Game.options.sound.soundVolume = Integer.parseInt(soundVolume.inputText) / 100f;
 
-            Game.soundsEnabled = Game.soundVolume > 0;
+            Game.soundsEnabled = Game.options.sound.soundVolume > 0;
         }
     }
-            , Math.round(Game.soundVolume * 100f), 0, 100, 1);
+            , Math.round(Game.options.sound.soundVolume * 100f), 0, 100, 1);
 
     Button layeredMusic = new Button(this.centerX, this.centerY + this.objYSpace * 1.25, this.objWidth, this.objHeight, "", new Runnable()
     {
         @Override
         public void run()
         {
-            Game.enableLayeredMusic = !Game.enableLayeredMusic;
+            Game.options.sound.enableLayeredMusic = !Game.options.sound.enableLayeredMusic;
 
-            if (Game.enableLayeredMusic)
+            if (Game.options.sound.enableLayeredMusic)
                 layeredMusic.setText(layeredMusicText, ScreenOptions.onText);
             else
                 layeredMusic.setText(layeredMusicText, ScreenOptions.offText);

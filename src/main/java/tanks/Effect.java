@@ -128,7 +128,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
         }
         else if (type.equals(EffectType.charge))
         {
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 this.add3dPolarMotion(Math.random() * Math.PI * 2, -Math.atan(Math.random()), Math.random() * 3 + 3);
             else
                 this.addPolarMotion(Math.random() * Math.PI * 2, Math.random() * 3 + 3);
@@ -245,7 +245,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double green = Math.min(255, (255 - 255.0*(this.age / 20.0)));
             drawing.setColor(255, green, 0,  Math.min(255, Math.max(0, (opacity * opacityMultiplier))));
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -260,7 +260,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(0, 0, 0, Math.min(255, Math.max(0, (opacity * opacityMultiplier * opacityModifier))));
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -273,7 +273,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double opacity = (rawOpacity * 50);
             drawing.setColor(127, 127, 127, Math.min(255, Math.max(0, (opacity * opacityMultiplier))));
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -287,7 +287,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             else
                 Drawing.drawing.setColor(0, 0, 0, 50);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -324,7 +324,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = Bullet.bullet_size - this.age / 2;
             drawing.setColor(255, 0, 0);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -334,7 +334,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = 1 + (Bullet.bullet_size * (1 - this.age / this.maxAge));
             drawing.setColor(this.colR, this.colG, this.colB, 255, 0.5);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -344,7 +344,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size2 = 1 + 1.5 * (Bullet.bullet_size * (1 - this.age / this.maxAge));
             drawing.setColor(this.colR, this.colG, this.colB);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size2, size2);
             else
                 drawing.fillOval(this.posX, this.posY, size2, size2);
@@ -378,7 +378,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = 1 + (Bullet.bullet_size * (this.age / this.maxAge));
             drawing.setColor(this.colR, this.colG, this.colB, 255, 0.5);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -393,7 +393,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double red = Math.min(255, (128 - 128.0 * (this.age / 20.0)));
             drawing.setColor(red / 2, 0, red,  Math.min(255, Math.max(0, (opacity * opacityMultiplier))));
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -409,7 +409,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             drawing.setColor(this.colR, this.colG, this.colB, 255, 0.5);
             double[] o = Movable.getLocationInDirection(angle, distance);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX + o[0], this.posY + o[1], this.posZ, size, size);
             else
                 drawing.fillOval(this.posX + o[0], this.posY + o[1], size, size);
@@ -419,7 +419,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = Math.max(0, Bullet.bullet_size - this.age / 2);
             drawing.setColor(0, 255, 255);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -429,14 +429,14 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = Bullet.bullet_size - this.age / 2;
             drawing.setColor(0, 255, 0);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
         }
         else if (this.type == EffectType.bushBurn)
         {
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 Drawing.drawing.setColor(this.colR, this.colG, this.colB);
                 Drawing.drawing.fillBox(this.posX, this.posY, 0, Obstacle.draw_size, Obstacle.draw_size, this.posZ);
@@ -459,7 +459,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = 1 + (40 * (1 - this.age / this.maxAge));
             drawing.setColor(255, 255, 255, 40);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size, false, true);
                 drawing.fillOval(this.posX, this.posY, this.posZ, size / 2, size / 2, false, true);
@@ -483,7 +483,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = 1 + (Bullet.bullet_size * (1 - this.age / this.maxAge));
             drawing.setColor(this.colR, this.colG, this.colB, 255, 0.5);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.fillOval(this.posX, this.posY, size, size);
@@ -493,7 +493,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double a = Math.min(25, 50 - this.age) * 2.55 * 4;
             drawing.setColor(255, 255, 255, a);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 drawing.drawImage("shield.png", this.posX, this.posY, this.posZ + this.age, this.size * 1.25, this.size * 1.25);
                 drawing.setFontSize(24 * this.size / Game.tile_size);
@@ -536,7 +536,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(r2, g2, b2, a, 0.5);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 drawing.fillOval(this.posX, this.posY, this.posZ + this.age, this.size, this.size);
                 drawing.setColor(this.colR, this.colG, this.colB, a, 0);
@@ -571,7 +571,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             double[] col = Game.getRainbowColor(c);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 drawing.setFontSize(24 * this.size / Game.tile_size);
                 drawing.setColor(col[0] / 2, col[1] / 2, col[2] / 2, a, 0.5);
@@ -623,7 +623,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             if (this.radius == 7)
                 text = "Got it!";
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
             {
                 drawing.setFontSize(24 * this.size / Game.tile_size);
                 drawing.setColor(col[0] / 2, col[1] / 2, col[2] / 2, a, 0.5);
@@ -666,7 +666,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(this.colR - this.glowR, this.colG - this.glowG, this.colB - this.glowB, 127, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size * 8, size * 8);
             else
                 drawing.fillGlow(this.posX, this.posY, size * 8, size * 8);
@@ -700,7 +700,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(this.colR - this.glowR, this.colG - this.glowG, this.colB - this.glowB, 127, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size * 8, size * 8);
             else
                 drawing.fillGlow(this.posX, this.posY, size * 8, size * 8);
@@ -715,7 +715,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(this.colR - this.glowR, this.colG - this.glowG, this.colB - this.glowB, 255, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX + o[0], this.posY + o[1], this.posZ, size * 8, size * 8);
             else
                 drawing.fillGlow(this.posX + o[0], this.posY + o[1], size * 8, size * 8);
@@ -726,7 +726,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(255, 255, 255, 40, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size * 8, size * 8, false, true);
             else
                 drawing.fillGlow(this.posX, this.posY, size * 8, size * 8);
@@ -737,7 +737,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
 
             drawing.setColor(this.colR - this.glowR, this.colG - this.glowG, this.colB - this.glowB, 127, 1);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size * 8, size * 8, false, true);
             else
                 drawing.fillGlow(this.posX, this.posY, size * 8, size * 8);
@@ -747,12 +747,12 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             double size = this.size * (1 + this.age / this.maxAge);
             drawing.setColor(this.colR, this.colG, this.colB, (1 - this.age / this.maxAge) * 255);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size, size, true);
             else
                 drawing.fillGlow(this.posX, this.posY, size, size, true);
 
-            /*if (Game.enable3d)
+            /*if (Game.options.graphics.enable3d)
                 drawing.drawImage("glow.png", this.posX, this.posY, this.posZ, size, size);
             else
                 drawing.drawImage("glow.png", this.posX, this.posY, size, size);*/
@@ -762,7 +762,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             drawing.setColor(255, 255, 255, 50, 1);
             double size = this.size / Bullet.bullet_size * 24;
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 drawing.fillGlow(this.posX, this.posY, this.posZ, size, size, false);
             else
                 drawing.fillGlow(this.posX, this.posY, size, size, false);
@@ -880,11 +880,11 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
             this.prevGridX = (int) (this.posX / Game.tile_size);
             this.prevGridY = (int) (this.posY / Game.tile_size);
         }
-        else if (this.type == EffectType.bushBurn && Game.effectsEnabled)
+        else if (this.type == EffectType.bushBurn && Game.options.graphics.effect.particleEffects)
         {
-            if (Math.random() < Panel.frameFrequency * Game.effectMultiplier * 0.1)
+            if (Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage * 0.1)
             {
-                if (Game.enable3d)
+                if (Game.options.graphics.enable3d)
                 {
                     Effect e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, this.posZ, EffectType.piece);
                     e.colR = 255;
@@ -903,7 +903,7 @@ public class Effect extends Movable implements IDrawableWithGlow, IBatchRenderab
                 }
             }
 
-            if (Game.enable3d && Math.random() < Panel.frameFrequency * Game.effectMultiplier * 0.1 * (2 - this.posZ / Game.tile_size))
+            if (Game.options.graphics.enable3d && Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage * 0.1 * (2 - this.posZ / Game.tile_size))
             {
                 Effect e2 = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Game.tile_size, this.posY + (Math.random() - 0.5) * Game.tile_size, this.posZ - Game.tile_size / 4, EffectType.obstaclePiece3d);
                 e2.addPolarMotion(Math.random() * 2 * Math.PI, Math.random());

@@ -20,9 +20,9 @@ public class ScreenOptionsWindow extends Screen
         @Override
         public void run()
         {
-            Drawing.drawing.showStats(!Drawing.drawing.enableStats);
+            Drawing.drawing.showStats(!Game.options.window.infoBar);
 
-            if (Drawing.drawing.enableStats)
+            if (Game.options.window.infoBar)
                 showStats.setText(infoBarText, ScreenOptions.onText);
             else
                 showStats.setText(infoBarText, ScreenOptions.offText);
@@ -41,9 +41,9 @@ public class ScreenOptionsWindow extends Screen
         @Override
         public void run()
         {
-            Game.warnBeforeClosing = !Game.warnBeforeClosing;
+            Game.options.window.warnBeforeClosing = !Game.options.window.warnBeforeClosing;
 
-            if (Game.warnBeforeClosing)
+            if (Game.options.window.warnBeforeClosing)
                 confirmClose.setText(warnText, ScreenOptions.onText);
             else
                 confirmClose.setText(warnText, ScreenOptions.offText);
@@ -56,9 +56,9 @@ public class ScreenOptionsWindow extends Screen
            @Override
            public void run()
            {
-               Game.constrainMouse = !Game.constrainMouse;
+               Game.options.window.constrainMouse = !Game.options.window.constrainMouse;
 
-               if (Game.constrainMouse)
+               if (Game.options.window.constrainMouse)
                    constrainMouse.setText(constrainMouseText, ScreenOptions.onText);
                else
                    constrainMouse.setText(constrainMouseText, ScreenOptions.offText);
@@ -106,17 +106,17 @@ public class ScreenOptionsWindow extends Screen
         height.checkMinValue = true;
         height.maxChars = 4;
 
-        if (Drawing.drawing.enableStats)
+        if (Game.options.window.infoBar)
             showStats.setText(infoBarText, ScreenOptions.onText);
         else
             showStats.setText(infoBarText, ScreenOptions.offText);
 
-        if (Game.warnBeforeClosing)
+        if (Game.options.window.warnBeforeClosing)
             confirmClose.setText(warnText, ScreenOptions.onText);
         else
             confirmClose.setText(warnText, ScreenOptions.offText);
 
-        if (Game.constrainMouse)
+        if (Game.options.window.constrainMouse)
             constrainMouse.setText(constrainMouseText, ScreenOptions.onText);
         else
             constrainMouse.setText(constrainMouseText, ScreenOptions.offText);

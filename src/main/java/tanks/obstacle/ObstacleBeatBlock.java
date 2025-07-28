@@ -102,7 +102,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
 
         drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA, this.glow);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             for (int i = 0; i < Math.min(this.stackHeight, default_max_height); i++)
             {
@@ -115,7 +115,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
                 {
                     byte o = (byte) (option | this.getOptionsByte(((i + 1) + stackHeight % 1.0) * Game.tile_size));
 
-                    if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+                    if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
                         options[i] = o;
 
                     drawBox( i * Game.tile_size + this.startHeight * Game.tile_size, o);
@@ -124,7 +124,7 @@ public class ObstacleBeatBlock extends ObstacleStackable
                 {
                     byte o = (byte) (option | this.getOptionsByte((i + stackHeight % 1.0) * Game.tile_size));
 
-                    if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+                    if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
                         options[i] = o;
 
                     drawBox((i - 1 + stackHeight % 1.0) * Game.tile_size + this.startHeight * Game.tile_size, o);

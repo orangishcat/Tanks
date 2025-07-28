@@ -20,7 +20,7 @@ public class TankDarkGreen extends TankAIControlled
 
 		this.setBullet(DefaultItems.mini_bullet);
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.baseSkin = TankModels.camo;
 			this.colorSkin = TankModels.camo;

@@ -26,7 +26,7 @@ public class TankLightPink extends TankAIControlled
         this.avoidanceSeekOpenSpaces = true;
         this.bulletAvoidBehvavior = BulletAvoidBehavior.dodge;
 
-        if (Game.tankTextures)
+        if (Game.options.graphics.tankTextures)
         {
             this.emblem = "emblems/angry.png";
             this.emblemColor.set(this.secondaryColor);

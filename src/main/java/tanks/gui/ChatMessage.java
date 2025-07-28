@@ -25,7 +25,7 @@ public class ChatMessage
 		this.rawMessage = s;
 		this.message = s;
 		
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			this.message = Game.chatFilter.filterChat(s);
 
 		this.lines = Drawing.drawing.wrapText(this.message, Drawing.drawing.interfaceSizeX - 40, 24);
@@ -56,7 +56,7 @@ public class ChatMessage
 		this.rawMessage = n + ": " + s;
 		this.message = n + ": " + s;
 		
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			this.message = Game.chatFilter.filterChat(n) + ": " + Game.chatFilter.filterChat(s);
 
 		this.lines = Drawing.drawing.wrapText(this.message, Drawing.drawing.interfaceSizeX - 40, 24);
@@ -74,7 +74,7 @@ public class ChatMessage
 		this.rawMessage = n + ": " + s;
 		this.message = n + ": " + s;
 
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			this.message = Game.chatFilter.filterChat(n) + ": " + Game.chatFilter.filterChat(s);
 
 		this.lines = Drawing.drawing.wrapText(this.message, Drawing.drawing.interfaceSizeX - 40, 24);

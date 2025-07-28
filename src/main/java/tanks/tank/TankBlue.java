@@ -24,7 +24,7 @@ public class TankBlue extends TankAIControlled
 		this.cooldownBase = 200;
 		this.cooldownRandom = 0;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.emblem = "emblems/electric.png";

@@ -126,7 +126,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 			drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, sizeY * 3 / 4, 0.6, 0, 0, 0, 100, false);
 
 		drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -142,7 +142,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		double m = 0.8;
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			if (selected)
 				Button.drawGlow(this.posX, this.posY + 3.5, this.sizeX - this.sizeY * (1 - m), this.sizeY * m, 0.55, 0, 0, 0, 160, false);
@@ -191,7 +191,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		if (enableHover)
 		{
-			if (Game.glowEnabled && !Game.game.window.drawingShadow)
+			if (Game.options.graphics.glowEnabled && !Game.game.window.drawingShadow)
 			{
 				if (infoSelected && !Game.game.window.touchscreen)
 				{
@@ -228,7 +228,7 @@ public class TextBox implements IDrawable, ITrigger
 
 		if (selected && inputText.length() > 0)
 		{
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 			{
 				if (clearSelected && !Game.game.window.touchscreen)
 				{
@@ -323,7 +323,7 @@ public class TextBox implements IDrawable, ITrigger
 			this.checkKeys();
 		}
 
-		if (Game.glowEnabled && !Game.game.window.drawingShadow)
+		if (Game.options.graphics.glowEnabled && !Game.game.window.drawingShadow)
 		{
 			if (this.lastFrame < Panel.panel.ageFrames - 1)
 				this.glowEffects.clear();
@@ -356,7 +356,7 @@ public class TextBox implements IDrawable, ITrigger
 
 	public void addEffect()
 	{
-		this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.effectMultiplier;
+		this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.options.graphics.effect.particlePercentage;
 
 		while (this.effectTimer >= 0.4 / Panel.frameFrequency)
 		{
@@ -493,7 +493,7 @@ public class TextBox implements IDrawable, ITrigger
 		Game.game.window.showKeyboard = false;
 		Panel.selectedTextBox = null;
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			this.submitEffect();
 		}
@@ -501,7 +501,7 @@ public class TextBox implements IDrawable, ITrigger
 
 	public void submitEffect()
 	{
-		for (int i = 0; i < 0.2 * (this.sizeX + this.sizeY) * Game.effectMultiplier; i++)
+		for (int i = 0; i < 0.2 * (this.sizeX + this.sizeY) * Game.options.graphics.effect.particlePercentage; i++)
 			Button.addEffect(this.posX, this.posY, this.sizeX - this.sizeY * (1 - 0.8), this.sizeY * 0.8, this.glowEffects, Math.random() * 4, 0.8, 0.25);
 	}
 

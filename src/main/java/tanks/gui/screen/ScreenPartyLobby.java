@@ -66,7 +66,7 @@ public class ScreenPartyLobby extends Screen
 
 	Button shared = new Button(Drawing.drawing.interfaceSizeX / 2 + 190, Drawing.drawing.interfaceSizeY / 2 - 120, this.objWidth, this.objHeight, "Download", () -> Game.screen = new ScreenSharedSummary(sharedLevels, sharedCrusades));
 
-	Button toggleIP = new Button(-1000, -1000, this.objHeight, this.objHeight, "", () -> Game.showIP = !Game.showIP, "Toggle showing IP address");
+	Button toggleIP = new Button(-1000, -1000, this.objHeight, this.objHeight, "", () -> Game.options.multiplayer.server.showIP = !Game.options.multiplayer.server.showIP, "Toggle showing IP address");
 
 	@Override
 	public void update()
@@ -98,13 +98,13 @@ public class ScreenPartyLobby extends Screen
 		if (Client.handler.steamID != null)
 			title = "Connected to party via Steam Peer-to-Peer";
 
-		if (!Game.showIP)
+		if (!Game.options.multiplayer.server.showIP)
 			title = Translation.translate("Connected to party");
 
 		this.toggleIP.posX = this.centerX + Game.game.window.fontRenderer.getStringSizeX(Drawing.drawing.fontSize, title) / Drawing.drawing.interfaceScale / 2 + 30;
 		this.toggleIP.posY = this.centerY - 270;
 
-		if (Game.showIP)
+		if (Game.options.multiplayer.server.showIP)
 			this.toggleIP.setText("-");
 		else
 			this.toggleIP.setText("+");

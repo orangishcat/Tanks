@@ -29,7 +29,7 @@ public class TankMustard extends TankAIControlled
         this.cooldownRandom = 100;
         this.aimAccuracyOffset = 0;
 
-        if (Game.tankTextures)
+        if (Game.options.graphics.tankTextures)
         {
             this.colorSkin = TankModels.fixed;
         }

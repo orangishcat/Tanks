@@ -25,7 +25,7 @@ public class TankPink extends TankAIControlled
 		this.turretIdleTimerRandom = 500;
 		this.enableLookingAtTargetEnemy = false;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.baseSkin = TankModels.diagonalStripes;

@@ -28,7 +28,7 @@ public class ObstacleExplosive extends ObstacleStackable implements IAvoidObject
         this.colorG = Math.random() * 40 + 80;
         this.colorB = 0;
 
-        if (!Game.fancyTerrain)
+        if (!Game.options.graphics.fancyTerrain)
             this.colorG = 100;
 
         for (int i = 0; i < default_max_height; i++)
@@ -37,7 +37,7 @@ public class ObstacleExplosive extends ObstacleStackable implements IAvoidObject
             this.stackColorG[i] = Math.random() * 40 + 80;
             this.stackColorB[i] = 0;
 
-            if (!Game.fancyTerrain)
+            if (!Game.options.graphics.fancyTerrain)
                 this.stackColorG[i] = 100;
         }
 

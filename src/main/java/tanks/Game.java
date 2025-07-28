@@ -73,7 +73,6 @@ public class Game
 	public static SynchronizedList<Player> players = new SynchronizedList<>();
 
 	public static ArrayList<Player> botPlayers = new ArrayList<>();
-	public static int botPlayerCount = 0;
 
 	/**
 	 * Obstacles that need to change how they look next frame
@@ -141,76 +140,33 @@ public class Game
 
     public static final int network_protocol = 58;
 	public static boolean debug = false;
-	public static boolean traceAllRays = false;
-	public static boolean showTankIDs = false;
-	public static boolean drawAutoZoom = false;
-	public static boolean drawFaces = false;
 	public static final boolean cinematic = false;
 
 	public static long steamLobbyInvite = -1;
 
 	public static String lastVersion = "Tanks v0";
-
-	public static int port = 8080;
-
-	public static String lastParty = "";
-	public static String lastOnlineServer = "";
-	public static boolean showIP = true;
-	public static boolean enableIPConnections = true;
 	public static SteamMatchmaking.LobbyType steamVisibility = SteamMatchmaking.LobbyType.Private;
-
-	public static boolean agreedToWorkshopAgreement = false;
-
-	public static double levelSize = 1;
 
 	public static TankPlayer playerTank;
 
 	public static boolean bulletLocked = false;
 
-	public static boolean vsync = true;
-	public static int maxFPS = 0;
-	public static int networkRate = 60;
-
-	public static boolean enable3d = true;
-	public static boolean enable3dBg = true;
-	public static boolean angledView = false;
-	public static boolean xrayBullets = true;
-	public static boolean immutableFaces = false;
-
-	public static boolean followingCam = false;
-	public static boolean firstPerson = false;
-
-	public static boolean fancyLights = false;
-
-	public static boolean tankTextures = true;
-
-	public static boolean soundsEnabled = true;
-	public static boolean musicEnabled = true;
-
-	public static boolean antialiasing = false;
-
-	public static boolean enableVibrations = true;
-
-	public static boolean enableChatFilter = true;
-	public static boolean nameInMultiplayer = true;
-
-	public static boolean showSpeedrunTimer = false;
-	public static boolean showBestTime = false;
-
-	public static boolean previewCrusades = true;
-
-	public static boolean deterministicMode = false;
-	public static boolean deterministic30Fps = false;
-	public static int seed = 0;
-
-	public static boolean invulnerable = false;
-
-	public static boolean warnBeforeClosing = true;
-
 	public static String crashMessage = "Why would this game ever even crash anyway?";
 	public static String crashLine = "What, did you think I was a bad programmer? smh";
 
 	public static long crashTime = 0;
+    public static int seed = 0;
+
+    public static GameOptions options = new GameOptions();
+
+    public static double levelSize = 1;
+
+    public static double startTime = 400;
+
+    public static boolean musicEnabled = true;
+    public static boolean soundsEnabled = true;
+
+    public static boolean nameInMultiplayer = true;
 
 	//public static boolean autoMinimapEnabled = true;
 	//public static float defaultZoom = 1.5f;
@@ -221,27 +177,6 @@ public class Game
 	public static Screen prevScreen;
 
 	public static String ip = "";
-
-	public static boolean fancyTerrain = true;
-	public static boolean effectsEnabled = true;
-	public static boolean bulletTrails = true;
-	public static boolean fancyBulletTrails = true;
-	public static boolean glowEnabled = true;
-
-	public static double effectMultiplier = 1;
-
-	public static boolean shadowsEnabled = Game.framework != Framework.libgdx;
-	public static int shadowQuality = 10;
-
-	public static boolean autostart = true;
-	public static boolean autoReady = false;
-	public static double startTime = 400;
-	public static boolean fullStats = true;
-
-	public static boolean constrainMouse = false;
-
-	public static double partyStartTime = 400;
-	public static boolean disablePartyFriendlyFire = false;
 
 	public static Screen lastOfflineScreen = null;
 
@@ -258,9 +193,6 @@ public class Game
 	public ShaderGroundIntro shaderIntro;
 	public ShaderGroundOutOfBounds shaderOutOfBounds;
 	public ShaderTracks shaderTracks;
-
-	public static boolean enableExtensions = false;
-	public static boolean autoLoadExtensions = true;
 	public static ExtensionRegistry extensionRegistry = new ExtensionRegistry();
 
 	public static Extension[] extraExtensions = null;
@@ -304,10 +236,6 @@ public class Game
 	public static final String resourcesPath = directoryPath + "/resources/";
 	public static final String languagesPath = resourcesPath + "languages/";
 
-	public static float soundVolume = 1f;
-	public static float musicVolume = 0.5f;
-	public static boolean enableLayeredMusic = true;
-
 	public static boolean isOnlineServer;
 	public static boolean connectedToOnline = false;
 
@@ -317,12 +245,6 @@ public class Game
 
 	public static String homedir;
 	public static Game game = new Game();
-
-	// Note: this is not used by the game to determine fullscreen status
-	// It is simply a value defined before
-	// Refer to Game.game.window.fullscreen for true fullscreen status
-	// Value is set before Game.game.window is initialized
-	public boolean fullscreen = false;
 
 	private Game()
 	{
@@ -735,7 +657,7 @@ public class Game
 			}
 		}
 
-		if (!enableExtensions && extraExtensions != null)
+		if (!options.misc.extension.enableExtensions && extraExtensions != null)
 		{
 			System.err.println("Notice: The game has been launched from Tanks.launchWithExtensions() with extensions in options.txt disabled. Only extensions provided to launchWithExtensions() will be used.");
 		}
@@ -1158,7 +1080,7 @@ public class Game
 		if (py < 0)
 			y--;
 
-		if (!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
+		if (!Game.options.graphics.fancyTerrain || !Game.options.graphics.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			return 0;
 
 		return Objects.requireNonNull(Chunk.getTile(x, y)).depth;
@@ -1176,7 +1098,7 @@ public class Game
 			y--;
 
 		double r;
-		if (!Game.fancyTerrain || !Game.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
+		if (!Game.options.graphics.fancyTerrain || !Game.options.graphics.enable3d || x < 0 || x >= Game.currentSizeX || y < 0 || y >= Game.currentSizeY)
 			r = 0;
 		else
 			r = Game.getTileHeight(px, py);

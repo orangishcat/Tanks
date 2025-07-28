@@ -27,7 +27,7 @@ public abstract class SolidGameObject extends GameObject implements ISolidObject
         if (this.faces == null)
             this.faces = new Face[4];
 
-        if (this.faces[0] == null || !Game.immutableFaces)
+        if (this.faces[0] == null || !Game.options.debug.immutableFaces)
         {
             for (int i = 0; i < 4; i++)
                 this.faces[i] = new Face(this, Direction.fromIndex(i), tankCollision(), bulletCollision());

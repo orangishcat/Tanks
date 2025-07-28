@@ -43,7 +43,7 @@ public class ScreenParty extends Screen
 		Game.players.clear();
 		Game.players.add(Game.player);
 
-		ScreenPartyHost.setBotCount(Game.botPlayerCount);
+		ScreenPartyHost.setBotCount(Game.options.multiplayer.partyHost.botPlayerCount);
 
 		ScreenPartyHost.disconnectedPlayers.clear();
 
@@ -62,14 +62,14 @@ public class ScreenParty extends Screen
 		{
 			try
 			{
-				Game.port = Integer.parseInt(port.inputText);
+				Game.options.multiplayer.server.port = Integer.parseInt(port.inputText);
 				ScreenOptions.saveOptions(Game.homedir);
 			}
 			catch (Exception ignored) { }
-			port.inputText = Game.port + "";
+			port.inputText = Game.options.multiplayer.server.port + "";
 		}
 	},
-			Game.port + "", "Sets port for multiplayer------Make sure all players are using---the same port");
+			Game.options.multiplayer.server.port + "", "Sets port for multiplayer------Make sure all players are using---the same port");
 
 	@Override
 	public void update() 

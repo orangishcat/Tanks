@@ -85,7 +85,7 @@ public class Trail3D extends Trail
         if (delay - age > currentLength)
             return;
 
-        boolean depth = Game.enable3d;
+        boolean depth = Game.options.graphics.enable3d;
 
         if (!expired)
         {
@@ -162,7 +162,7 @@ public class Trail3D extends Trail
                            double backAngleOffset, double backAngleOffsetPitch,
                            double backR, double backG, double backB, double backA)
     {
-        Game.game.window.shapeRenderer.setBatchMode(true, true, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(true, true, Game.options.graphics.enable3d, this.glow, false);
 
         int polyCount = 20;
         for (int i = 0; i < polyCount; i++)
@@ -226,7 +226,7 @@ public class Trail3D extends Trail
             Drawing.drawing.addVertex(frontX2, frontY2, z2Front);
         }
 
-        Game.game.window.shapeRenderer.setBatchMode(false, true, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(false, true, Game.options.graphics.enable3d, this.glow, false);
     }
 
     AxisRotation[] rotations = new AxisRotation[]{new AxisRotation(Game.game.window, AxisRotation.Axis.roll, 0), new AxisRotation(Game.game.window, AxisRotation.Axis.pitch, 0)};

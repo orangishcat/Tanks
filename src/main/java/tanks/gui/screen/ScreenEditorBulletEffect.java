@@ -210,7 +210,7 @@ public class ScreenEditorBulletEffect extends ScreenEditorTanksONable<BulletEffe
         }
 
         BulletEffect be = this.target.get();
-        if (be.enableParticles && Game.bulletTrails && Math.random() < Panel.frameFrequency * Game.effectMultiplier && Game.effectsEnabled)
+        if (be.enableParticles && Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off && Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage && Game.options.graphics.effect.particleEffects)
         {
             Effect e = Effect.createNewEffect(start, 175, Effect.EffectType.interfacePiece);
             double var = 50;

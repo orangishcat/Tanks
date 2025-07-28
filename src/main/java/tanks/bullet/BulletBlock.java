@@ -271,7 +271,7 @@ public class BulletBlock extends BulletArc
         Drawing.drawing.setColor(this.outlineColor);
 
         // todo 2d
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             double frac2 = time / this.initialTime;
             double yaw = this.initialAngle * frac2 + this.finalAngle * (1.0 - frac2);
@@ -343,8 +343,8 @@ public class BulletBlock extends BulletArc
                 this.destroy = true;
                 Drawing.drawing.playGlobalSound("break.ogg");
 
-                if (Game.enable3d)
-                    ObstacleStackable.destroyAnimation3d(this.posX, this.posY, this.posZ - Game.tile_size / 2, this.posX - this.vX, this.posY - this.vY, Game.tile_size, Effect.EffectType.obstaclePiece3d, Game.tile_size, Game.effectMultiplier, this.originalOutlineColor.red, this.originalOutlineColor.green, this.originalOutlineColor.blue);
+                if (Game.options.graphics.enable3d)
+                    ObstacleStackable.destroyAnimation3d(this.posX, this.posY, this.posZ - Game.tile_size / 2, this.posX - this.vX, this.posY - this.vY, Game.tile_size, Effect.EffectType.obstaclePiece3d, Game.tile_size, Game.options.graphics.effect.particlePercentage, this.originalOutlineColor.red, this.originalOutlineColor.green, this.originalOutlineColor.blue);
 
                 this.outOfBounds = true;
             }

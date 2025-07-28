@@ -129,7 +129,7 @@ public class Selector implements IDrawable, ITrigger
 
         drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             TextBox.drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, sizeY * 3 / 4, 0.6, 0, 0, 0, 100, false);
 
         drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -145,7 +145,7 @@ public class Selector implements IDrawable, ITrigger
 
         double m = 0.8;
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             if (selected && !Game.game.window.touchscreen)
                 Button.drawGlow(this.posX, this.posY + 5, this.sizeX - this.sizeY * (1 - m), this.sizeY * m, 0.65, 0, 0, 0, 80, false);
@@ -179,7 +179,7 @@ public class Selector implements IDrawable, ITrigger
 
         if (enableHover)
         {
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
             {
                 if (infoSelected && !Game.game.window.touchscreen)
                 {
@@ -273,7 +273,7 @@ public class Selector implements IDrawable, ITrigger
             }
         }
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             if (this.lastFrame < Panel.panel.ageFrames - 1)
                 this.glowEffects.clear();
@@ -294,7 +294,7 @@ public class Selector implements IDrawable, ITrigger
 
             if (this.selected && this.enabled && !Game.game.window.touchscreen)
             {
-                this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.effectMultiplier;
+                this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.options.graphics.effect.particlePercentage;
 
                 while (this.effectTimer >= 0.4 / Panel.frameFrequency)
                 {
@@ -312,7 +312,7 @@ public class Selector implements IDrawable, ITrigger
 
     public void submitEffect()
     {
-        for (int i = 0; i < 0.2 * (this.sizeX + this.sizeY) * Game.effectMultiplier; i++)
+        for (int i = 0; i < 0.2 * (this.sizeX + this.sizeY) * Game.options.graphics.effect.particlePercentage; i++)
             Button.addEffect(this.posX, this.posY, this.sizeX - this.sizeY * (1 - 0.8), this.sizeY * 0.8, this.glowEffects, Math.random() * 4, 0.8, 0.25);
     }
 

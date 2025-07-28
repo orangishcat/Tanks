@@ -28,7 +28,7 @@ public class TankGray extends TankAIControlled
 
 		this.coinValue = 1;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.horizontalStripes;
 		}

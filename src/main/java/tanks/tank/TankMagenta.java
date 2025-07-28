@@ -20,7 +20,7 @@ public class TankMagenta extends TankAIControlled
 		
 		this.coinValue = 3;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.baseSkin = TankModels.cross;
 		}

@@ -107,7 +107,7 @@ public class OverlayEditorMenu extends ScreenLevelEditorOverlay
         Drawing.drawing.setColor(editor.fontBrightness, editor.fontBrightness, editor.fontBrightness);
         Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - this.objYSpace * 3.5, "Level menu");
 
-        if (Game.showSpeedrunTimer && showTime)
+        if (Game.options.speedrun.showSpeedrunTimer && showTime)
             SpeedrunTimer.draw();
     }
 }

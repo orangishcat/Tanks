@@ -108,7 +108,7 @@ public class BulletGas extends Bullet implements IDrawableWithGlow
 
         Drawing.drawing.setColor(this.startColor.red * frac + this.endColor.red * (1 - frac), this.startColor.green * frac + this.endColor.green * (1 - frac), this.startColor.blue * frac + this.endColor.blue * (1 - frac), opacity, this.effect.luminance);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             Drawing.drawing.fillOval(this.posX, this.posY, this.posZ, size, size);
         else
             Drawing.drawing.fillOval(this.posX, this.posY, size, size);
@@ -130,7 +130,7 @@ public class BulletGas extends Bullet implements IDrawableWithGlow
         else
             Drawing.drawing.setColor(this.effect.glowColor.red, this.effect.glowColor.green, this.effect.glowColor.blue, opacity, opacity / 255 * this.effect.glowIntensity);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             Drawing.drawing.fillGlow(this.posX, this.posY, this.posZ, size * this.effect.glowSize, size * this.effect.glowSize, true, false);
         else
             Drawing.drawing.fillGlow(this.posX, this.posY, size * this.effect.glowSize, size * this.effect.glowSize);

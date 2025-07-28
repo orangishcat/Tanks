@@ -18,7 +18,7 @@ public class ScreenSteamWorkshopAgreement extends Screen
     {
         Game.screen = new ScreenSteamWorkshop();
         Game.screen = new ScreenShareLevel();
-        Game.agreedToWorkshopAgreement = true;
+        Game.options.other.agreedToWorkshopAgreement = true;
     });
 
     @Override

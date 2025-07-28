@@ -54,7 +54,7 @@ public class Trail implements IDrawable
     public boolean showOutsideFront = true;
     public boolean showOutsideBack = true;
 
-    public boolean trail3d = Game.followingCam;
+    public boolean trail3d = Game.options.debug.followingCam;
 
     public double speed;
 
@@ -208,7 +208,7 @@ public class Trail implements IDrawable
         if (delay - age > currentLength)
             return;
 
-        boolean depth = Game.enable3d;
+        boolean depth = Game.options.graphics.enable3d;
 
         if (!expired)
         {
@@ -371,7 +371,7 @@ public class Trail implements IDrawable
 
     public void drawTube3D(double frontX, double frontY, double frontWidth, double frontAngleOffset, double frontR, double frontG, double frontB, double frontA, double backX, double backY, double backWidth, double backAngleOffset, double backR, double backG, double backB, double backA)
     {
-        Game.game.window.shapeRenderer.setBatchMode(true, true, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(true, true, Game.options.graphics.enable3d, this.glow, false);
 
         int polyCount = 20;
         for (int i = 0; i < polyCount; i++)
@@ -408,12 +408,12 @@ public class Trail implements IDrawable
             Drawing.drawing.addVertex(frontX2, frontY2, z2Front);
         }
 
-        Game.game.window.shapeRenderer.setBatchMode(false, true, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(false, true, Game.options.graphics.enable3d, this.glow, false);
     }
 
     public void drawCap3D(double frontX, double frontY, double frontWidth, boolean back)
     {
-        Game.game.window.shapeRenderer.setBatchMode(true, false, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(true, false, Game.options.graphics.enable3d, this.glow, false);
 
         int outerPolyCount = 8;
 
@@ -487,6 +487,6 @@ public class Trail implements IDrawable
             }
         }
 
-        Game.game.window.shapeRenderer.setBatchMode(false, false, Game.enable3d, this.glow, false);
+        Game.game.window.shapeRenderer.setBatchMode(false, false, Game.options.graphics.enable3d, this.glow, false);
     }
 }

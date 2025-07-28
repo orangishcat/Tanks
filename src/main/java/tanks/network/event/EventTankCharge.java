@@ -32,7 +32,7 @@ public class EventTankCharge extends PersonalEvent implements IStackableEvent
 		if (t == null)
 			return;
 
-        if (Math.random() * Game.effectMultiplier < charge && Game.effectsEnabled)
+        if (Math.random() * Game.options.graphics.effect.particlePercentage < charge && Game.options.graphics.effect.particleEffects)
         {
             Effect e = Effect.createNewEffect(t.posX, t.posY, t.size / 4, Effect.EffectType.charge);
 

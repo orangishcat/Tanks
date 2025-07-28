@@ -25,7 +25,7 @@ public class ObstacleSnow extends Obstacle
     {
         super(name, posX, posY);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             this.drawLevel = 1;
         else
             this.drawLevel = 9;
@@ -41,7 +41,7 @@ public class ObstacleSnow extends Obstacle
 
         double darkness = Math.random() * 20;
 
-        if (!Game.fancyTerrain)
+        if (!Game.options.graphics.fancyTerrain)
             darkness = 10;
 
         this.colorR = 255 - darkness;
@@ -92,13 +92,13 @@ public class ObstacleSnow extends Obstacle
 
         Game.redrawObstacles.add(this);
 
-        if (Game.effectsEnabled && !ScreenGame.finished)
+        if (Game.options.graphics.effect.particleEffects && !ScreenGame.finished)
         {
             double speed = Math.sqrt((Math.pow(m.vX, 2) + Math.pow(m.vY, 2)));
 
             double mul = 0.0625 / 4;
 
-            double amt = speed * mul * Panel.frameFrequency * Game.effectMultiplier;
+            double amt = speed * mul * Panel.frameFrequency * Game.options.graphics.effect.particlePercentage;
 
             if (amt < 1 && Math.random() < amt % 1)
                 amt += 1;
@@ -123,7 +123,7 @@ public class ObstacleSnow extends Obstacle
     @Override
     public void draw()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             if (Game.screen instanceof ScreenGame && (ScreenPartyHost.isServer || ScreenPartyLobby.isClient || !((ScreenGame) Game.screen).paused))
                 this.visualDepth = Math.min(this.visualDepth + Panel.frameFrequency / 255, 1);
@@ -143,7 +143,7 @@ public class ObstacleSnow extends Obstacle
         this.colorG = this.baseColorG * (this.depth + 3) / 4;
         this.colorB = this.baseColorB * (this.depth + 2) / 3;
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, this.depth * this.visualDepth * 255);
             Drawing.drawing.fillRect(this, this.posX, this.posY, Obstacle.draw_size, Obstacle.draw_size);

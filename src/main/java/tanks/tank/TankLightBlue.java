@@ -29,7 +29,7 @@ public class TankLightBlue extends TankAIControlled
 
 		this.coinValue = 8;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/pinwheel.png";
 			this.emblemColor.set(this.secondaryColor);

@@ -122,7 +122,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
     {
         Drawing.drawing.setColor(this.outlineColorR, this.outlineColorG, this.outlineColorB, 255, 0.5);
 
-        if (Game.enable3d && Game.enable3dBg && Game.fancyTerrain)
+        if (Game.options.graphics.enable3d && Game.options.graphics.enable3dBg && Game.options.graphics.fancyTerrain)
         {
             this.height = Math.max(this.height, Game.sampleTerrainGroundHeight(this.posX - this.size / 2, this.posY - this.size / 2));
             this.height = Math.max(this.height, Game.sampleTerrainGroundHeight(this.posX + this.size / 2, this.posY - this.size / 2));
@@ -130,7 +130,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
             this.height = Math.max(this.height, Game.sampleTerrainGroundHeight(this.posX + this.size / 2, this.posY + this.size / 2));
         }
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             for (double i = height; i < height + 6; i++)
             {
@@ -141,14 +141,14 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
 
             Drawing.drawing.setColor(this.outlineColorR, this.outlineColorG, this.outlineColorB, 255, 1);
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 Drawing.drawing.fillGlow(this.posX, this.posY, this.posZ + height + 1, this.size * 4, this.size * 4, true, false);
         }
         else
         {
             Drawing.drawing.fillOval(this.posX, this.posY, this.size, this.size);
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 Drawing.drawing.fillGlow(this.posX, this.posY, this.size * 4, this.size * 4);
         }
 
@@ -157,7 +157,7 @@ public class Mine extends Movable implements IAvoidObject, ICopyable<Mine>, ITan
         if (timer < 150 && ((int) timer % 20) / 10 == 1)
             Drawing.drawing.setColor(255, 255, 0, 255, 0.5);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             Drawing.drawing.fillOval(this.posX, this.posY, this.posZ + height + 7.5, this.size * 0.8, this.size * 0.8, true, false);
         else
             Drawing.drawing.fillOval(this.posX, this.posY, this.size * 0.8, this.size * 0.8);

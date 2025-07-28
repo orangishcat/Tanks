@@ -453,7 +453,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 		for (String m : this.tankMusics)
 		{
 			if (!this.prevTankMusics.contains(m))
-				Drawing.drawing.addSyncedMusic(m, Game.musicVolume * 0.5f, true, 500);
+				Drawing.drawing.addSyncedMusic(m, Game.options.sound.musicVolume * 0.5f, true, 500);
 		}
 	}
 
@@ -1587,7 +1587,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 	{
 		Drawing.drawing.playVibration("click");
 
-		for (int z = 0; z < 100 * Game.effectMultiplier; z++)
+		for (int z = 0; z < 100 * Game.options.graphics.effect.particlePercentage; z++)
 		{
 			Effect e = Effect.createNewEffect(m.posX, m.posY, ((Tank) m).size / 2, Effect.EffectType.piece);
 			double var = 50;
@@ -1595,7 +1595,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			e.colG = Math.min(255, Math.max(0, ((Tank) m).color.green + Math.random() * var - var / 2));
 			e.colB = Math.min(255, Math.max(0, ((Tank) m).color.blue + Math.random() * var - var / 2));
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * 2);
 			else
 				e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * 2);
@@ -1998,7 +1998,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			Drawing.drawing.setColor(174, 92, 16);
 
 			double mul = 1;
-			if (Game.angledView)
+			if (Game.options.graphics.angledView)
 				mul = 2;
 
 			Drawing.drawing.fillShadedInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2,
@@ -2012,7 +2012,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		for (Obstacle o : Game.obstacles)
 		{
-			if (!o.batchDraw || !Game.enable3d)
+			if (!o.batchDraw || !Game.options.graphics.enable3d)
 				drawables[o.drawLevel].add(o);
 		}
 
@@ -2021,7 +2021,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 		for (int i = 0; i < this.drawables.length; i++)
 		{
-			if (i == 5 && Game.enable3d)
+			if (i == 5 && Game.options.graphics.enable3d)
 			{
 				Drawing drawing = Drawing.drawing;
 				Drawing.drawing.setColor(174, 92, 16);
@@ -2039,7 +2039,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 					((Movable) d).drawTeam();
 			}
 
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 			{
 				for (int j = 0; j < this.drawables[i].size(); j++)
 				{
@@ -2067,7 +2067,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 			{
 				Drawing.drawing.setColor(255, 0, 0, 64, 0.3);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 				{
 					if (hoverObstacle == null)
 						Drawing.drawing.fillBox(mousePlaceable.posX, mousePlaceable.posY, 0, Game.tile_size, Game.tile_size, Game.tile_size, (byte) 64);
@@ -2108,7 +2108,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 				{
 					Drawing.drawing.setColor(0, 200, 255, 127);
 
-					if (!Game.enable3d)
+					if (!Game.options.graphics.enable3d)
 						Drawing.drawing.drawImage("emblems/player_spawn.png", mousePlaceable.posX, mousePlaceable.posY, ((Tank) mousePlaceable).size * 0.7, ((Tank) mousePlaceable).size * 0.7);
 					else
 						Drawing.drawing.drawImage("emblems/player_spawn.png", mousePlaceable.posX, mousePlaceable.posY, Game.tile_size * 0.82, ((Tank) mousePlaceable).size * 0.5, ((Tank) mousePlaceable).size * 0.5);
@@ -2124,7 +2124,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 								Game.getObstacle(x, y).isSurfaceTile != mousePlaceable.isSurfaceTile && !mousePlaceable.tankCollision))*/)
 				{
 					Obstacle mouseObstacle = (Obstacle) mousePlaceable;
-					if (Game.enable3d)
+					if (Game.options.graphics.enable3d)
 					{
 						if (Game.isOrdered(-1, x, Game.currentSizeX) && Game.isOrdered(-1, y, Game.currentSizeY) /*&&
 								(Game.getObstacle(x, y) == null || !Game.isOrdered(Game.getObstacle(x, y).startHeight, mousePlaceable.stackHeight + mousePlaceableStartHeight, Game.getObstacle(x, y).stackHeight))*/)
@@ -2271,7 +2271,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 					int gridX = (int) (x / Game.tile_size);
 					int gridY = (int) (y / Game.tile_size);
 
-					if (Game.enable3d)
+					if (Game.options.graphics.enable3d)
 					{
 //						if (Game.getObstacle(gridX, gridY) != null)
 //						{
@@ -2597,7 +2597,7 @@ public class ScreenLevelEditor extends Screen implements ILevelPreviewScreen
 
 				s.changeMetadata(this, o, num);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 				{
 					Drawing.drawing.terrainRenderer.remove(o);
 					Game.redrawObstacles.add(o);

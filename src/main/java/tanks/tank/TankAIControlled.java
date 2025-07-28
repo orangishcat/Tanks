@@ -1,7 +1,6 @@
 package tanks.tank;
 
 import basewindow.Color;
-import basewindow.IModel;
 import tanks.*;
 import tanks.bullet.*;
 import tanks.effect.AttributeModifier;
@@ -14,7 +13,6 @@ import tanks.obstacle.Obstacle;
 import tanks.obstacle.ObstacleTeleporter;
 import tanks.registry.RegistryTank;
 import tanks.tankson.*;
-import tanks.translation.Translation;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -779,7 +777,7 @@ public class TankAIControlled extends Tank implements ITankField
 		Game.eventsOut.add(new EventTankUpdateColor(this));
 		Game.eventsOut.add(new EventTankCharge(this.networkID, frac));
 
-		if (Math.random() * this.lastCooldown * Game.effectMultiplier > cooldown && Game.effectsEnabled)
+		if (Math.random() * this.lastCooldown * Game.options.graphics.effect.particlePercentage > cooldown && Game.options.graphics.effect.particleEffects)
 		{
 			Effect e = Effect.createNewEffect(this.posX, this.posY, this.size / 4, Effect.EffectType.charge);
 
@@ -2832,9 +2830,9 @@ public class TankAIControlled extends Tank implements ITankField
 
 			Game.eventsOut.add(new EventTankMimicTransform(this, (Tank) this.targetEnemy));
 
-			if (Game.effectsEnabled)
+			if (Game.options.graphics.effect.particleEffects)
 			{
-				for (int i = 0; i < 50 * Game.effectMultiplier; i++)
+				for (int i = 0; i < 50 * Game.options.graphics.effect.particlePercentage; i++)
 				{
 					Effect e = Effect.createNewEffect(this.posX, this.posY, this.size / 4, Effect.EffectType.piece);
 					double var = 50;
@@ -2842,7 +2840,7 @@ public class TankAIControlled extends Tank implements ITankField
 					e.colG = Math.min(255, Math.max(0, this.possessingTank.color.green + Math.random() * var - var / 2));
 					e.colB = Math.min(255, Math.max(0, this.possessingTank.color.blue + Math.random() * var - var / 2));
 
-					if (Game.enable3d)
+					if (Game.options.graphics.enable3d)
 						e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, 1 + Math.random() * this.size / 50.0);
 					else
 						e.setPolarMotion(Math.random() * 2 * Math.PI, 1 + Math.random() * this.size / 50.0);

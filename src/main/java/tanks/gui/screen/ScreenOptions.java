@@ -2,18 +2,12 @@ package tanks.gui.screen;
 
 import basewindow.BaseFile;
 import com.codedisaster.steamworks.SteamMatchmaking;
-import tanks.Drawing;
-import tanks.Game;
-import tanks.Panel;
+import tanks.*;
 import tanks.gui.Button;
-import tanks.hotbar.Hotbar;
-import tanks.tank.TankPlayer;
-import tanks.tank.TankPlayerRemote;
-import tanks.tank.Turret;
+import tanks.tank.*;
 import tanks.translation.Translation;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 
 public class ScreenOptions extends Screen
@@ -195,7 +189,7 @@ public class ScreenOptions extends Screen
 
 		try
 		{
-			boolean fullscreen = Game.game.fullscreen;
+			boolean fullscreen = Game.options.window.fullscreen;
 
 			if (Game.game.window != null)
 				fullscreen = Game.game.window.fullscreen;
@@ -204,58 +198,58 @@ public class ScreenOptions extends Screen
 			f.startWriting();
 			f.println("# This file stores game settings that you have set");
 			f.println("username=" + Game.player.username);
-			f.println("fancy_terrain=" + Game.fancyTerrain);
-			f.println("effects=" + Game.effectsEnabled);
-			f.println("effect_multiplier=" + (int) Math.round(Game.effectMultiplier * 100));
-			f.println("bullet_trails=" + Game.bulletTrails);
-			f.println("fancy_bullet_trails=" + Game.fancyBulletTrails);
-			f.println("glow=" + Game.glowEnabled);
-			f.println("3d=" + Game.enable3d);
-			f.println("3d_ground=" + Game.enable3dBg);
-			f.println("shadows_enabled=" + Game.shadowsEnabled);
-			f.println("shadow_quality=" + Game.shadowQuality);
-			f.println("vsync=" + Game.vsync);
-			f.println("max_fps=" + Game.maxFPS);
-			f.println("antialiasing=" + Game.antialiasing);
+			f.println("fancy_terrain=" + Game.options.graphics.fancyTerrain);
+			f.println("effects=" + Game.options.graphics.effect.particleEffects);
+			f.println("effect_multiplier=" + (int) Math.round(Game.options.graphics.effect.particlePercentage * 100));
+			f.println("bullet_trails=" + (Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off));
+			f.println("fancy_bullet_trails=" + (Game.options.graphics.bulletTrails == GameOptions.BulletTrails.fancy));
+			f.println("glow=" + Game.options.graphics.glowEnabled);
+			f.println("3d=" + Game.options.graphics.enable3d);
+			f.println("3d_ground=" + Game.options.graphics.enable3dBg);
+			f.println("shadows_enabled=" + Game.options.graphics.shadow.shadowsEnabled);
+			f.println("shadow_quality=" + Game.options.graphics.shadow.shadowQuality);
+			f.println("vsync=" + Game.options.graphics.vsync);
+			f.println("max_fps=" + Game.options.graphics.maxFps);
+			f.println("antialiasing=" + Game.options.graphics.antialiasing);
 			f.println("perspective=" + ScreenOptionsGraphics.viewNo);
-			f.println("preview_crusades=" + Game.previewCrusades);
-			f.println("tank_textures=" + Game.tankTextures);
-			f.println("xray_bullets=" + Game.xrayBullets);
-			f.println("circular_hotbar=" + Hotbar.circular);
+			f.println("preview_crusades=" + Game.options.misc.previewCrusades);
+			f.println("tank_textures=" + Game.options.graphics.tankTextures);
+			f.println("xray_bullets=" + Game.options.graphics.xrayBullets);
+			f.println("circular_hotbar=" + Game.options.misc.circularHotbar);
 			f.println("mouse_target=" + Panel.showMouseTarget);
 			f.println("mouse_target_height=" + Panel.showMouseTargetHeight);
-			f.println("constrain_mouse=" + Game.constrainMouse);
+			f.println("constrain_mouse=" + Game.options.window.constrainMouse);
 			f.println("fullscreen=" + fullscreen);
-			f.println("vibrations=" + Game.enableVibrations);
+			f.println("vibrations=" + Game.options.other.enableVibrations);
 			f.println("mobile_joystick=" + TankPlayer.controlStickMobile);
 			f.println("snap_joystick=" + TankPlayer.controlStickSnap);
 			f.println("dual_joystick=" + TankPlayer.shootStickEnabled);
 			f.println("sound=" + Game.soundsEnabled);
-			f.println("sound_volume=" + Game.soundVolume);
+			f.println("sound_volume=" + Game.options.sound.soundVolume);
 			f.println("music=" + Game.musicEnabled);
-			f.println("music_volume=" + Game.musicVolume);
-			f.println("layered_music=" + Game.enableLayeredMusic);
-			f.println("auto_start=" + Game.autostart);
-			f.println("full_stats=" + Game.fullStats);
-			f.println("timer=" + Game.showSpeedrunTimer);
-			f.println("best_run=" + Game.showBestTime);
-			f.println("deterministic=" + Game.deterministicMode);
-			f.println("deterministic_30fps=" + Game.deterministic30Fps);
-			f.println("warn_before_closing=" + Game.warnBeforeClosing);
-			f.println("info_bar=" + Drawing.drawing.enableStats);
-			f.println("port=" + Game.port);
-			f.println("last_party=" + Game.lastParty);
-			f.println("last_online_server=" + Game.lastOnlineServer);
-			f.println("show_ip=" + Game.showIP);
-			f.println("allow_ip_connections=" + Game.enableIPConnections);
+			f.println("music_volume=" + Game.options.sound.musicVolume);
+			f.println("layered_music=" + Game.options.sound.enableLayeredMusic);
+			f.println("auto_start=" + Game.options.misc.autoStart);
+			f.println("full_stats=" + Game.options.misc.fullStats);
+			f.println("timer=" + Game.options.speedrun.showSpeedrunTimer);
+			f.println("best_run=" + Game.options.speedrun.showBestTime);
+			f.println("deterministic=" + (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off));
+			f.println("deterministic_30fps=" + (Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps));
+			f.println("warn_before_closing=" + Game.options.window.warnBeforeClosing);
+			f.println("info_bar=" + Game.options.window.infoBar);
+			f.println("port=" + Game.options.multiplayer.server.port);
+			f.println("last_party=" + Game.options.multiplayer.server.lastParty);
+			f.println("last_online_server=" + Game.options.multiplayer.server.lastOnlineServer);
+			f.println("show_ip=" + Game.options.multiplayer.server.showIP);
+			f.println("allow_ip_connections=" + Game.options.multiplayer.server.enableIPConnections);
 			f.println("steam_visibility=" + Game.steamVisibility.ordinal());
-			f.println("chat_filter=" + Game.enableChatFilter);
-			f.println("auto_ready=" + Game.autoReady);
+			f.println("chat_filter=" + Game.options.multiplayer.chatFilter);
+			f.println("auto_ready=" + Game.options.multiplayer.autoReady);
 			f.println("anticheat=" + TankPlayerRemote.checkMotion);
 			f.println("anticheat_weak=" + TankPlayerRemote.weakTimeCheck);
-			f.println("disable_party_friendly_fire=" + Game.disablePartyFriendlyFire);
-			f.println("party_countdown=" + Game.partyStartTime);
-			f.println("party_bots=" + Game.botPlayerCount);
+			f.println("disable_party_friendly_fire=" + Game.options.multiplayer.partyHost.disablePartyFriendlyFire);
+			f.println("party_countdown=" + Game.options.multiplayer.partyHost.partyStartTime);
+			f.println("party_bots=" + Game.options.multiplayer.partyHost.botPlayerCount);
 			f.println("tank_secondary_color=" + Game.player.enableSecondaryColor);
 			f.println("tank_tertiary_color=" + Game.player.enableTertiaryColor);
 			f.println("tank_red=" + Game.player.color.red);
@@ -268,10 +262,10 @@ public class ScreenOptions extends Screen
 			f.println("tank_green_3=" + Game.player.color3.green);
 			f.println("tank_blue_3=" + Game.player.color3.blue);
 			f.println("translation=" + (Translation.currentTranslation == null ? "null" : Translation.currentTranslation.fileName));
-			f.println("agreed_steam_workshop=" + Game.agreedToWorkshopAgreement);
+			f.println("agreed_steam_workshop=" + Game.options.other.agreedToWorkshopAgreement);
 			f.println("last_version=" + Game.lastVersion);
-			f.println("enable_extensions=" + Game.enableExtensions);
-			f.println("auto_load_extensions=" + Game.autoLoadExtensions);
+			f.println("enable_extensions=" + Game.options.misc.extension.enableExtensions);
+			f.println("auto_load_extensions=" + Game.options.misc.extension.autoLoadExtensions);
 			f.println("debug_mode=" + alwaysDebug);
 			f.stopWriting();
 		}
@@ -308,43 +302,40 @@ public class ScreenOptions extends Screen
 							Game.player.username = "";
 						break;
 					case "fancy_terrain":
-						Game.fancyTerrain = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.fancyTerrain = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "effects":
-						Game.effectsEnabled = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.effect.particleEffects = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "effect_multiplier":
-						Game.effectMultiplier = Integer.parseInt(optionLine[1]) / 100.0;
+						Game.options.graphics.effect.particlePercentage = Integer.parseInt(optionLine[1]) / 100.0;
 						break;
-					case "bullet_trails":
-						Game.bulletTrails = Boolean.parseBoolean(optionLine[1]);
-						break;
-					case "fancy_bullet_trails":
-						Game.fancyBulletTrails = Boolean.parseBoolean(optionLine[1]);
-						break;
+					case "bullet_trail_quality":
+                        Game.options.graphics.bulletTrails = GameOptions.BulletTrails.valueOf(optionLine[1]);
+                        break;
 					case "glow":
-						Game.glowEnabled = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.glowEnabled = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "3d":
-						Game.enable3d = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.enable3d = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "3d_ground":
-						Game.enable3dBg = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.enable3dBg = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "shadows_enabled":
-						Game.shadowsEnabled = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.shadow.shadowsEnabled = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "shadow_quality":
-						Game.shadowQuality = Integer.parseInt(optionLine[1]);
+						Game.options.graphics.shadow.shadowQuality = Integer.parseInt(optionLine[1]);
 						break;
 					case "vsync":
-						Game.vsync = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.vsync = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "max_fps":
-						Game.maxFPS = Integer.parseInt(optionLine[1]);
+						Game.options.graphics.maxFps = Integer.parseInt(optionLine[1]);
 						break;
 					case "antialiasing":
-						Game.antialiasing = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.antialiasing = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "mouse_target":
 						Panel.showMouseTarget = Boolean.parseBoolean(optionLine[1]);
@@ -353,10 +344,10 @@ public class ScreenOptions extends Screen
 						Panel.showMouseTargetHeight = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "constrain_mouse":
-						Game.constrainMouse = Boolean.parseBoolean(optionLine[1]);
+						Game.options.window.constrainMouse = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "vibrations":
-						Game.enableVibrations = Boolean.parseBoolean(optionLine[1]);
+						Game.options.other.enableVibrations = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "mobile_joystick":
 						TankPlayer.controlStickMobile = Boolean.parseBoolean(optionLine[1]);
@@ -374,107 +365,104 @@ public class ScreenOptions extends Screen
 						Game.musicEnabled = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "layered_music":
-						Game.enableLayeredMusic = Boolean.parseBoolean(optionLine[1]);
+						Game.options.sound.enableLayeredMusic = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "sound_volume":
-						Game.soundVolume = Float.parseFloat(optionLine[1]);
+						Game.options.sound.soundVolume = Float.parseFloat(optionLine[1]);
 						break;
 					case "music_volume":
-						Game.musicVolume =  Float.parseFloat(optionLine[1]);
+						Game.options.sound.musicVolume =  Float.parseFloat(optionLine[1]);
 						break;
 					case "auto_start":
-						Game.autostart = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.autoStart = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "full_stats":
-						Game.fullStats = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.fullStats = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "timer":
-						Game.showSpeedrunTimer = Boolean.parseBoolean(optionLine[1]);
+						Game.options.speedrun.showSpeedrunTimer = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "best_run":
-						Game.showBestTime = Boolean.parseBoolean(optionLine[1]);
+						Game.options.speedrun.showBestTime = Boolean.parseBoolean(optionLine[1]);
 						break;
-					case "deterministic":
-						Game.deterministicMode = Boolean.parseBoolean(optionLine[1]);
-						break;
-					case "deterministic_30fps":
-						Game.deterministic30Fps = Boolean.parseBoolean(optionLine[1]);
+                    case "deterministic":
+						Game.options.speedrun.deterministicMode = GameOptions.Deterministic.valueOf(optionLine[1]);
 						break;
 					case "info_bar":
 						Drawing.drawing.showStats(Boolean.parseBoolean(optionLine[1]));
 						break;
 					case "warn_before_closing":
-						Game.warnBeforeClosing = Boolean.parseBoolean(optionLine[1]);
+						Game.options.window.warnBeforeClosing = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "perspective":
 						ScreenOptionsGraphics.viewNo = Integer.parseInt(optionLine[1]);
 						switch (ScreenOptionsGraphics.viewNo)
 						{
 							case 0:
-								Game.angledView = false;
-								Game.followingCam = false;
-								Game.firstPerson = false;
+								Game.options.graphics.angledView = false;
+								Game.options.debug.followingCam = false;
+								Game.options.debug.firstPerson = false;
 								break;
 							case 1:
-								Game.angledView = true;
-								Game.followingCam = false;
-								Game.firstPerson = false;
+								Game.options.graphics.angledView = true;
+								Game.options.debug.followingCam = false;
+								Game.options.debug.firstPerson = false;
 								break;
 							case 2:
-								Game.angledView = false;
-								Game.followingCam = true;
-								Game.firstPerson = false;
+								Game.options.graphics.angledView = false;
+								Game.options.debug.followingCam = true;
+								Game.options.debug.firstPerson = false;
 								break;
 							case 3:
-								Game.angledView = false;
-								Game.followingCam = true;
-								Game.firstPerson = true;
+								Game.options.graphics.angledView = false;
+								Game.options.debug.followingCam = true;
+								Game.options.debug.firstPerson = true;
 						}
 						break;
 					case "tank_textures":
-						Game.tankTextures = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.tankTextures = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "xray_bullets":
-						Game.xrayBullets = Boolean.parseBoolean(optionLine[1]);
+						Game.options.graphics.xrayBullets = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "circular_hotbar":
-						Hotbar.circular = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.circularHotbar = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "preview_crusades":
-						Game.previewCrusades = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.previewCrusades = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "fullscreen":
-						Game.game.fullscreen = Boolean.parseBoolean(optionLine[1]);
+						Game.options.window.fullscreen = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "port":
-						Game.port = Integer.parseInt(optionLine[1]);
+						Game.options.multiplayer.server.port = Integer.parseInt(optionLine[1]);
 						break;
 					case "last_party":
 						if (optionLine.length >= 2)
-							Game.lastParty = optionLine[1];
+							Game.options.multiplayer.server.lastParty = optionLine[1];
 						else
-							Game.lastParty = "";
+							Game.options.multiplayer.server.lastParty = "";
 						break;
 					case "last_online_server":
 						if (optionLine.length >= 2)
-							Game.lastOnlineServer = optionLine[1];
+							Game.options.multiplayer.server.lastOnlineServer = optionLine[1];
 						else
-							Game.lastOnlineServer = "";
+							Game.options.multiplayer.server.lastOnlineServer = "";
 						break;
 					case "show_ip":
-						Game.showIP = Boolean.parseBoolean(optionLine[1]);
+						Game.options.multiplayer.server.showIP = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "allow_ip_connections":
-						Game.enableIPConnections = Boolean.parseBoolean(optionLine[1]);
+						Game.options.multiplayer.server.enableIPConnections = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "steam_visibility":
 						Game.steamVisibility = SteamMatchmaking.LobbyType.values()[Integer.parseInt(optionLine[1])];
 						break;
 					case "chat_filter":
-						Game.enableChatFilter = Boolean.parseBoolean(optionLine[1]);
+						Game.options.multiplayer.chatFilter = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "auto_ready":
-						Game.autoReady = Boolean.parseBoolean(optionLine[1]);
+						Game.options.multiplayer.autoReady = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "anticheat":
 						TankPlayerRemote.checkMotion = Boolean.parseBoolean(optionLine[1]);
@@ -483,13 +471,13 @@ public class ScreenOptions extends Screen
 						TankPlayerRemote.weakTimeCheck = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "disable_party_friendly_fire":
-						Game.disablePartyFriendlyFire = Boolean.parseBoolean(optionLine[1]);
+						Game.options.multiplayer.partyHost.disablePartyFriendlyFire = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "party_countdown":
-						Game.partyStartTime = Double.parseDouble(optionLine[1]);
+						Game.options.multiplayer.partyHost.partyStartTime = Double.parseDouble(optionLine[1]);
 						break;
 					case "party_bots":
-						Game.botPlayerCount = Integer.parseInt(optionLine[1]);
+						Game.options.multiplayer.partyHost.botPlayerCount = Integer.parseInt(optionLine[1]);
 						break;
 					case "tank_secondary_color":
 						Game.player.enableSecondaryColor = Boolean.parseBoolean(optionLine[1]);
@@ -531,13 +519,13 @@ public class ScreenOptions extends Screen
 						Game.lastVersion = optionLine[1];
 						break;
 					case "enable_extensions":
-						Game.enableExtensions = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.extension.enableExtensions = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "auto_load_extensions":
-						Game.autoLoadExtensions = Boolean.parseBoolean(optionLine[1]);
+						Game.options.misc.extension.autoLoadExtensions = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "agreed_steam_workshop":
-						Game.agreedToWorkshopAgreement = Boolean.parseBoolean(optionLine[1]);
+						Game.options.other.agreedToWorkshopAgreement = Boolean.parseBoolean(optionLine[1]);
 						break;
 					case "debug_mode":
 						alwaysDebug = Boolean.parseBoolean(optionLine[1]);
@@ -553,10 +541,10 @@ public class ScreenOptions extends Screen
 				Panel.showMouseTarget = false;
 
 			if (!Game.soundsEnabled)
-				Game.soundVolume = 0;
+				Game.options.sound.soundVolume = 0;
 
 			if (!Game.musicEnabled)
-				Game.musicVolume = 0;
+				Game.options.sound.musicVolume = 0;
 
 
 			if (TankPlayerRemote.weakTimeCheck)

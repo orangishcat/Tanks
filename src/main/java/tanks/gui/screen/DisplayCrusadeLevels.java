@@ -176,14 +176,14 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
         Transformation prevShadow = Game.game.window.lightBaseTransformation[0];
         Game.game.window.lightBaseTransformation[0] = this.shadowScale;
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             Game.game.window.transformations.add(this.transform);
         }
 
         Game.game.window.loadPerspective();
 
-        if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+        if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
             this.age += Panel.frameFrequency;
 
         ArrayList<Movable> movables = Game.movables;
@@ -292,7 +292,7 @@ public class DisplayCrusadeLevels extends Screen implements ILevelPreviewScreen
                             d.draw();
                     }
 
-                    if (Game.glowEnabled)
+                    if (Game.options.graphics.glowEnabled)
                     {
                         for (IDrawable d : drawable)
                         {

@@ -249,7 +249,7 @@ public class ScreenJoinParty extends Screen
 				try
 				{
 					String ipaddress = ipText;
-					int port = Game.port;
+					int port = Game.options.multiplayer.server.port;
 
 					if (ipText.contains(":"))
 					{
@@ -259,7 +259,7 @@ public class ScreenJoinParty extends Screen
 					}
 
 					if (ipText.equals(""))
-						Client.connect("localhost", Game.port, false, connectionID);
+						Client.connect("localhost", Game.options.multiplayer.server.port, false, connectionID);
 					else
 						Client.connect(ipaddress, port, false, connectionID);
 				}
@@ -293,11 +293,11 @@ public class ScreenJoinParty extends Screen
 		@Override
 		public void run() 
 		{
-			Game.lastParty = ip.inputText;
+			Game.options.multiplayer.server.lastParty = ip.inputText;
 			ScreenOptions.saveOptions(Game.homedir);
 		}
 	}	
-			, Game.lastParty, "You can find this on the---party host's screen");
+			, Game.options.multiplayer.server.lastParty, "You can find this on the---party host's screen");
 	
 	@Override
 	public void update() 

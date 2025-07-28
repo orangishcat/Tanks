@@ -14,7 +14,7 @@ public class GameWindowHandler implements IWindowHandler
 		if (Panel.panel.continuation != null)
 			return true;
 
-		if (!Game.warnBeforeClosing)
+		if (!Game.options.window.warnBeforeClosing)
 			return true;
 
 		if (!Game.screen.allowClose)

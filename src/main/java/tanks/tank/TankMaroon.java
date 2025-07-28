@@ -29,7 +29,7 @@ public class TankMaroon extends TankAIControlled
 		this.enablePathfinding = true;
 		this.stopSeekingOnSight = true;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/circle.png";
 			this.emblemColor.set(this.color.red * 0.7, this.color.green * 0.7, this.color.blue * 0.7);

@@ -20,7 +20,7 @@ public class TankYellow extends TankAIControlled
 
 		this.mineTimer = this.mineTimerBase + this.mineTimerRandom * this.random.nextDouble();
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/circle_double.png";
 			this.emblemColor.set(this.secondaryColor);

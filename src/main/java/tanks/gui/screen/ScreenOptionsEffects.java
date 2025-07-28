@@ -14,9 +14,9 @@ public class ScreenOptionsEffects extends Screen
         @Override
         public void run()
         {
-            Game.effectsEnabled = !Game.effectsEnabled;
+            Game.options.graphics.effect.particleEffects = !Game.options.graphics.effect.particleEffects;
 
-            if (Game.effectsEnabled)
+            if (Game.options.graphics.effect.particleEffects)
                 effects.setText(effectsText, ScreenOptions.onText);
             else
                 effects.setText(effectsText, ScreenOptions.offText);
@@ -33,10 +33,10 @@ public class ScreenOptionsEffects extends Screen
             if (effectMultiplier.inputText.length() <= 0)
                 effectMultiplier.inputText = effectMultiplier.previousInputText;
 
-            Game.effectMultiplier = Integer.parseInt(effectMultiplier.inputText) / 100.0;
+            Game.options.graphics.effect.particlePercentage = Integer.parseInt(effectMultiplier.inputText) / 100.0;
         }
     }
-            , (int) Math.round(Game.effectMultiplier * 100), 10, 100, 10);
+            , (int) Math.round(Game.options.graphics.effect.particlePercentage * 100), 10, 100, 10);
 
     Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenOptionsGraphics()
     );
@@ -58,7 +58,7 @@ public class ScreenOptionsEffects extends Screen
         effectMultiplier.g1 = 210;
         effectMultiplier.b1 = 210;
 
-        if (Game.effectsEnabled)
+        if (Game.options.graphics.effect.particleEffects)
             effects.setText(effectsText, ScreenOptions.onText);
         else
             effects.setText(effectsText, ScreenOptions.offText);

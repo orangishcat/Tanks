@@ -19,7 +19,7 @@ public class ObstacleBouncy extends ObstacleStackable
 			stackColorG[i] = 0;
 			stackColorB[i] = 255;
 
-			if (!Game.fancyTerrain)
+			if (!Game.options.graphics.fancyTerrain)
 				stackColorR[i] = 191;
 		}
 
@@ -27,7 +27,7 @@ public class ObstacleBouncy extends ObstacleStackable
 		stackColorG[0] = colorG;
 		stackColorB[0] = colorB;
 		
-		if (!Game.fancyTerrain)
+		if (!Game.options.graphics.fancyTerrain)
 			this.colorR = 191;
 
 		this.description = "A destructible block which allows bullets to bounce more";
@@ -38,7 +38,7 @@ public class ObstacleBouncy extends ObstacleStackable
 	{
 		double[] col = new double[3];
 
-		if (Game.fancyTerrain)
+		if (Game.options.graphics.fancyTerrain)
 		{
 			col[0] = Math.random() * 127 + 128;
 			col[1] = 0;

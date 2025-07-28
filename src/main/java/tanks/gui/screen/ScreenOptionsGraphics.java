@@ -1,7 +1,6 @@
 package tanks.gui.screen;
 
-import tanks.Drawing;
-import tanks.Game;
+import tanks.*;
 import tanks.gui.Button;
 
 public class ScreenOptionsGraphics extends Screen
@@ -30,14 +29,14 @@ public class ScreenOptionsGraphics extends Screen
         this.music = "menu_options.ogg";
         this.musicID = "menu";
 
-        if (Game.fancyTerrain)
+        if (Game.options.graphics.fancyTerrain)
             terrain.setText(terrainText, fancyText);
         else
             terrain.setText(terrainText, fastText);
 
-        if (Game.bulletTrails)
+        if (Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off)
         {
-            if (Game.fancyBulletTrails)
+            if (Game.options.graphics.bulletTrails == GameOptions.BulletTrails.fancy)
                 bulletTrails.setText(trailsText, fancyText);
             else
                 bulletTrails.setText(trailsText, fastText);
@@ -45,12 +44,12 @@ public class ScreenOptionsGraphics extends Screen
         else
             bulletTrails.setText(trailsText, ScreenOptions.offText);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             glow.setText(glowText, ScreenOptions.onText);
         else
             glow.setText(glowText, ScreenOptions.offText);
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
             graphics3d.setText(graphics3dText, ScreenOptions.onText);
         else
             graphics3d.setText(graphics3dText, ScreenOptions.offText);
@@ -62,34 +61,34 @@ public class ScreenOptionsGraphics extends Screen
             case 0:
                 altPerspective.setText(perspectiveText, birdsEyeText);
 
-                Game.angledView = false;
-                Game.followingCam = false;
-                Game.firstPerson = false;
+                Game.options.graphics.angledView = false;
+                Game.options.debug.followingCam = false;
+                Game.options.debug.firstPerson = false;
                 break;
             case 1:
                 altPerspective.setText(perspectiveText, angledText);
 
-                Game.angledView = true;
-                Game.followingCam = false;
-                Game.firstPerson = false;
+                Game.options.graphics.angledView = true;
+                Game.options.debug.followingCam = false;
+                Game.options.debug.firstPerson = false;
                 break;
             case 2:
                 altPerspective.setText(perspectiveText, "\u00a7200000000255third person");
 
-                Game.angledView = false;
-                Game.followingCam = true;
-                Game.firstPerson = false;
+                Game.options.graphics.angledView = false;
+                Game.options.debug.followingCam = true;
+                Game.options.debug.firstPerson = false;
                 break;
             case 3:
                 altPerspective.setText(perspectiveText, "\u00a7255000000255first person");
 
-                Game.angledView = false;
-                Game.followingCam = true;
-                Game.firstPerson = true;
+                Game.options.graphics.angledView = false;
+                Game.options.debug.followingCam = true;
+                Game.options.debug.firstPerson = true;
                 break;
         }
 
-        if (!Game.antialiasing)
+        if (!Game.options.graphics.antialiasing)
             antialiasing.setText(antialiasingText, ScreenOptions.offText);
         else
             antialiasing.setText(antialiasingText, ScreenOptions.onText);
@@ -108,33 +107,33 @@ public class ScreenOptionsGraphics extends Screen
         }
 
 //        if (Game.framework == Game.Framework.libgdx)
-//            Game.shadowsEnabled = false;
+//            Game.options.graphics.shadows.shadowsEnabled = false;
 
-        if (!Game.shadowsEnabled)
+        if (!Game.options.graphics.shadow.shadowsEnabled)
             shadows.setText("Shadows: ", ScreenOptions.offText);
         else
-            shadows.setText("Shadow quality: %s", (Object)("\u00A7000200000255" + Game.shadowQuality));
+            shadows.setText("Shadow quality: %s", (Object)("\u00A7000200000255" + Game.options.graphics.shadow.shadowQuality));
 
-        if (!Game.effectsEnabled)
+        if (!Game.options.graphics.effect.particleEffects)
             effects.setText("Particle effects: ", ScreenOptions.offText);
-        else if (Game.effectMultiplier < 1)
-            effects.setText("Particle effects: %s", (Object)("\u00A7200100000255" + (int) Math.round(Game.effectMultiplier * 100) + "%"));
+        else if (Game.options.graphics.effect.particlePercentage < 1)
+            effects.setText("Particle effects: %s", (Object)("\u00A7200100000255" + (int) Math.round(Game.options.graphics.effect.particlePercentage * 100) + "%"));
         else
             effects.setText("Particle effects: ", ScreenOptions.onText);
 
-        if (Game.tankTextures)
+        if (Game.options.graphics.tankTextures)
             tankTextures.setText(tankTexturesText, ScreenOptions.onText);
         else
             tankTextures.setText(tankTexturesText, ScreenOptions.offText);
 
-        if (Game.vsync)
+        if (Game.options.graphics.vsync)
             maxFPS.setText("Max FPS: \u00A7200100000255V-Sync");
-        else if (Game.maxFPS > 0)
-            maxFPS.setText("Max FPS: %s", (Object)("\u00A7000200000255" + Game.maxFPS));
+        else if (Game.options.graphics.maxFps > 0)
+            maxFPS.setText("Max FPS: %s", (Object)("\u00A7000200000255" + Game.options.graphics.maxFps));
         else
             maxFPS.setText("Max FPS: \u00A7000100200255unlimited");
 
-        if (Game.deterministicMode)
+        if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
         {
             maxFPS.setText("Max FPS: %s", (Object) ("\u00A7000200000255" + 60));
             maxFPS.enabled = false;
@@ -144,11 +143,11 @@ public class ScreenOptionsGraphics extends Screen
 
     protected void update3dGroundButton()
     {
-        if (Game.fancyTerrain && Game.enable3d)
+        if (Game.options.graphics.fancyTerrain && Game.options.graphics.enable3d)
         {
             ground3d.enabled = true;
 
-            if (Game.enable3dBg)
+            if (Game.options.graphics.enable3dBg)
                 ground3d.setText(ground3dText, ScreenOptions.onText);
             else
                 ground3d.setText(ground3dText, ScreenOptions.offText);
@@ -159,9 +158,9 @@ public class ScreenOptionsGraphics extends Screen
             ground3d.setText(ground3dText, ScreenOptions.offText);
         }
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
-            if (Game.xrayBullets)
+            if (Game.options.graphics.xrayBullets)
                 xrayBullets.setText(xrayBulletsText, ScreenOptions.onText);
             else
                 xrayBullets.setText(xrayBulletsText, ScreenOptions.offText);
@@ -180,9 +179,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.fancyTerrain = !Game.fancyTerrain;
+            Game.options.graphics.fancyTerrain = !Game.options.graphics.fancyTerrain;
 
-            if (Game.fancyTerrain)
+            if (Game.options.graphics.fancyTerrain)
                 terrain.setText(terrainText, fancyText);
             else
                 terrain.setText(terrainText, fastText);
@@ -200,19 +199,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            if (!Game.bulletTrails)
-                Game.bulletTrails = true;
-            else if (!Game.fancyBulletTrails)
-                Game.fancyBulletTrails = true;
-            else
+            if (Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off)
             {
-                Game.fancyBulletTrails = false;
-                Game.bulletTrails = false;
-            }
-
-            if (Game.bulletTrails)
-            {
-                if (Game.fancyBulletTrails)
+                if (Game.options.graphics.bulletTrails == GameOptions.BulletTrails.fancy)
                     bulletTrails.setText(trailsText, fancyText);
                 else
                     bulletTrails.setText(trailsText, fastText);
@@ -227,9 +216,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.glowEnabled = !Game.glowEnabled;
+            Game.options.graphics.glowEnabled = !Game.options.graphics.glowEnabled;
 
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
                 glow.setText(glowText, ScreenOptions.onText);
             else
                 glow.setText(glowText, ScreenOptions.offText);
@@ -242,9 +231,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.enable3d = !Game.enable3d;
+            Game.options.graphics.enable3d = !Game.options.graphics.enable3d;
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 graphics3d.setText(graphics3dText, ScreenOptions.onText);
             else
                 graphics3d.setText(graphics3dText, ScreenOptions.offText);
@@ -262,9 +251,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.enable3dBg = !Game.enable3dBg;
+            Game.options.graphics.enable3dBg = !Game.options.graphics.enable3dBg;
 
-            if (Game.enable3dBg)
+            if (Game.options.graphics.enable3dBg)
                 ground3d.setText(ground3dText, ScreenOptions.onText);
             else
                 ground3d.setText(ground3dText, ScreenOptions.offText);
@@ -292,30 +281,30 @@ public class ScreenOptionsGraphics extends Screen
                 case 0:
                     altPerspective.setText(perspectiveText, birdsEyeText);
 
-                    Game.angledView = false;
-                    Game.followingCam = false;
-                    Game.firstPerson = false;
+                    Game.options.graphics.angledView = false;
+                    Game.options.debug.followingCam = false;
+                    Game.options.debug.firstPerson = false;
                     break;
                 case 1:
                     altPerspective.setText(perspectiveText, angledText);
 
-                    Game.angledView = true;
-                    Game.followingCam = false;
-                    Game.firstPerson = false;
+                    Game.options.graphics.angledView = true;
+                    Game.options.debug.followingCam = false;
+                    Game.options.debug.firstPerson = false;
                     break;
                 case 2:
                     altPerspective.setText(perspectiveText, "\u00a7200000000255third person");
 
-                    Game.angledView = false;
-                    Game.followingCam = true;
-                    Game.firstPerson = false;
+                    Game.options.graphics.angledView = false;
+                    Game.options.debug.followingCam = true;
+                    Game.options.debug.firstPerson = false;
                     break;
                 case 3:
                     altPerspective.setText(perspectiveText, "\u00a7255000000255first person");
 
-                    Game.angledView = false;
-                    Game.followingCam = true;
-                    Game.firstPerson = true;
+                    Game.options.graphics.angledView = false;
+                    Game.options.debug.followingCam = true;
+                    Game.options.debug.firstPerson = true;
                     break;
             }
         }
@@ -327,14 +316,14 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.antialiasing = !Game.antialiasing;
+            Game.options.graphics.antialiasing = !Game.options.graphics.antialiasing;
 
-            if (!Game.antialiasing)
+            if (!Game.options.graphics.antialiasing)
                 antialiasing.setText(antialiasingText, ScreenOptions.offText);
             else
                 antialiasing.setText(antialiasingText, ScreenOptions.onText);
 
-            if (Game.antialiasing != Game.game.window.antialiasingEnabled)
+            if (Game.options.graphics.antialiasing != Game.game.window.antialiasingEnabled)
                 Game.screen = new ScreenAntialiasingWarning();
 
             ScreenOptions.saveOptions(Game.homedir);
@@ -347,9 +336,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.tankTextures = !Game.tankTextures;
+            Game.options.graphics.tankTextures = !Game.options.graphics.tankTextures;
 
-            if (Game.tankTextures)
+            if (Game.options.graphics.tankTextures)
                 tankTextures.setText(tankTexturesText, ScreenOptions.onText);
             else
                 tankTextures.setText(tankTexturesText, ScreenOptions.offText);
@@ -362,9 +351,9 @@ public class ScreenOptionsGraphics extends Screen
         @Override
         public void run()
         {
-            Game.xrayBullets = !Game.xrayBullets;
+            Game.options.graphics.xrayBullets = !Game.options.graphics.xrayBullets;
 
-            if (Game.xrayBullets)
+            if (Game.options.graphics.xrayBullets)
                 xrayBullets.setText(xrayBulletsText, ScreenOptions.onText);
             else
                 xrayBullets.setText(xrayBulletsText, ScreenOptions.offText);
@@ -401,7 +390,7 @@ public class ScreenOptionsGraphics extends Screen
 
         back.update();
 
-        if (Game.antialiasing != Game.game.window.antialiasingEnabled)
+        if (Game.options.graphics.antialiasing != Game.game.window.antialiasingEnabled)
         {
             antialiasing.bgColG = 238;
             antialiasing.bgColB = 220;

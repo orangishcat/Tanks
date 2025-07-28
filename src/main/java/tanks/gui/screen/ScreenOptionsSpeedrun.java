@@ -18,9 +18,9 @@ public class ScreenOptionsSpeedrun extends Screen
         @Override
         public void run()
         {
-            Game.showSpeedrunTimer = !Game.showSpeedrunTimer;
+            Game.options.speedrun.showSpeedrunTimer = !Game.options.speedrun.showSpeedrunTimer;
 
-            if (Game.showSpeedrunTimer)
+            if (Game.options.speedrun.showSpeedrunTimer)
                 timer.setText(timerText, ScreenOptions.onText);
             else
                 timer.setText(timerText, ScreenOptions.offText);
@@ -33,9 +33,9 @@ public class ScreenOptionsSpeedrun extends Screen
         @Override
         public void run()
         {
-            Game.showBestTime = !Game.showBestTime;
+            Game.options.speedrun.showBestTime = !Game.options.speedrun.showBestTime;
 
-            if (Game.showBestTime)
+            if (Game.options.speedrun.showBestTime)
                 bestRun.setText(bestRunText, ScreenOptions.onText);
             else
                 bestRun.setText(bestRunText, ScreenOptions.offText);
@@ -49,19 +49,19 @@ public class ScreenOptionsSpeedrun extends Screen
         @Override
         public void run()
         {
-            if (Game.deterministic30Fps)
+            if (Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
             {
-                Game.deterministicMode = false;
-                Game.deterministic30Fps = false;
+                Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off = false;
+                Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps = false;
             }
-            else if (Game.deterministicMode)
-                Game.deterministic30Fps = true;
+            else if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
+                Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps = true;
             else
-                Game.deterministicMode = true;
+                Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off = true;
 
-            if (Game.deterministicMode && Game.deterministic30Fps)
+            if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off && Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
                 deterministic.setText(deterministicText, deterministic30);
-            else if (Game.deterministicMode)
+            else if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
                 deterministic.setText(deterministicText, deterministic60);
             else
                 deterministic.setText(deterministicText, ScreenOptions.offText);
@@ -78,19 +78,19 @@ public class ScreenOptionsSpeedrun extends Screen
         this.music = "menu_options.ogg";
         this.musicID = "menu";
 
-        if (Game.showSpeedrunTimer)
+        if (Game.options.speedrun.showSpeedrunTimer)
             timer.setText(timerText, ScreenOptions.onText);
         else
             timer.setText(timerText, ScreenOptions.offText);
 
-        if (Game.deterministicMode && Game.deterministic30Fps)
+        if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off && Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
             deterministic.setText(deterministicText, deterministic30);
-        else if (Game.deterministicMode)
+        else if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
             deterministic.setText(deterministicText, deterministic60);
         else
             deterministic.setText(deterministicText, ScreenOptions.offText);
 
-        if (Game.showBestTime)
+        if (Game.options.speedrun.showBestTime)
             bestRun.setText(bestRunText, ScreenOptions.onText);
         else
             bestRun.setText(bestRunText, ScreenOptions.offText);

@@ -31,7 +31,7 @@ public class TankMint extends TankAIControlled
 		this.avoidanceSeekOpenSpaces = true;
 		this.bulletAvoidBehvavior = BulletAvoidBehavior.dodge;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.baseSkin = TankModels.diagonalStripes;
 		}

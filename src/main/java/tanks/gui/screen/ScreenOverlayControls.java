@@ -38,12 +38,12 @@ public class ScreenOverlayControls
         else
             mouseTarget.setText(mouseTargetText, ScreenOptions.offText);
 
-        if (Panel.showMouseTargetHeight && Game.enable3d)
+        if (Panel.showMouseTargetHeight && Game.options.graphics.enable3d)
             mouseTargetHeight.setText(mouseTargetHeightText, ScreenOptions.onText);
         else
             mouseTargetHeight.setText(mouseTargetHeightText, ScreenOptions.offText);
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             mouseTargetHeight.enabled = false;
     }
 

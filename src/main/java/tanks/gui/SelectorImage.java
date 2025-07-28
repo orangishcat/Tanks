@@ -48,7 +48,7 @@ public class SelectorImage extends Selector
 
         drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             TextBox.drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, sizeY * 3 / 4, 0.6, 0, 0, 0, 100, false);
 
         drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -64,7 +64,7 @@ public class SelectorImage extends Selector
 
         double m = 0.8;
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             if (selected && !Game.game.window.touchscreen)
                 TextBox.drawTallGlow(this.posX - sizeX / 2 + sizeY * 7 / 8, this.posY + 5, this.sizeY * (3.0 / 4 + m), this.sizeY * m, sizeY * 3 / 4, 0.65, 0, 0, 0, 80, false);
@@ -103,7 +103,7 @@ public class SelectorImage extends Selector
 
         if (enableHover)
         {
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
             {
                 if (infoSelected && !Game.game.window.touchscreen)
                 {

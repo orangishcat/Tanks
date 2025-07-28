@@ -59,7 +59,7 @@ public class SelectorDrawable extends Button
 
         drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             TextBox.drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, sizeY * 3 / 4, 0.6, 0, 0, 0, 100, false);
 
         drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -75,7 +75,7 @@ public class SelectorDrawable extends Button
 
         double m = 0.8;
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             if (selected && !Game.game.window.touchscreen)
                 Button.drawGlow(this.posX, this.posY + 5, this.sizeX - this.sizeY * (1 - m), this.sizeY * m, 0.65, 0, 0, 0, 80, false);
@@ -114,7 +114,7 @@ public class SelectorDrawable extends Button
 
         if (enableHover)
         {
-            if (Game.glowEnabled)
+            if (Game.options.graphics.glowEnabled)
             {
                 if (infoSelected && !Game.game.window.touchscreen)
                 {

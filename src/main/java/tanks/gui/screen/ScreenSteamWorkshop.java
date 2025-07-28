@@ -14,7 +14,7 @@ public class ScreenSteamWorkshop extends Screen
 
     Button uploadLevel = new Button(this.centerX - this.objXSpace / 2, this.centerY - this.objYSpace, this.objWidth, this.objHeight, "Upload level", () ->
     {
-        if (Game.agreedToWorkshopAgreement)
+        if (Game.options.other.agreedToWorkshopAgreement)
             Game.screen = new ScreenShareLevel();
         else
             Game.screen = new ScreenSteamWorkshopAgreement();
@@ -30,7 +30,7 @@ public class ScreenSteamWorkshop extends Screen
 
     Button uploadCrusade = new Button(this.centerX + this.objXSpace / 2, this.centerY - this.objYSpace, this.objWidth, this.objHeight, "Upload crusade", () ->
     {
-        if (Game.agreedToWorkshopAgreement)
+        if (Game.options.other.agreedToWorkshopAgreement)
             Game.screen = new ScreenShareCrusade();
         else
             Game.screen = new ScreenSteamWorkshopAgreement();

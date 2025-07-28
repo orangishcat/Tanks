@@ -20,7 +20,7 @@ public class EventEnterLevel extends PersonalEvent
 			ScreenGame s = new ScreenGame();
 			Game.screen = s;
 
-			if (Game.autoReady)
+			if (Game.options.multiplayer.autoReady)
 				Game.eventsOut.add(new EventPlayerAutoReady());
 
 			Crusade.currentCrusade = null;

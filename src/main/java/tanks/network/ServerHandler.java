@@ -57,7 +57,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter
 	{
 		this.ctx = ctx;
 
-		if (ctx != null && !Game.enableIPConnections)
+		if (ctx != null && !Game.options.multiplayer.server.enableIPConnections)
 			this.sendEventAndClose(new EventKick("This party is not accepting new players connecting by IP address"));
 
 		if (ctx != null)
@@ -171,7 +171,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter
 				}
 			}
 
-			long time = System.currentTimeMillis() * Game.networkRate / 1000;
+			long time = System.currentTimeMillis() * Game.options.misc.networkRate / 1000;
 			if (time != lastStackedEventSend)
 			{
 				lastStackedEventSend = time;

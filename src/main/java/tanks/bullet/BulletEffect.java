@@ -1,15 +1,9 @@
 package tanks.bullet;
 
 import basewindow.Color;
-import tanks.Drawing;
-import tanks.Effect;
-import tanks.Game;
-import tanks.Panel;
+import tanks.*;
 import tanks.tank.Turret;
-import tanks.tankson.ICopyable;
-import tanks.tankson.ITanksONEditable;
-import tanks.tankson.Property;
-import tanks.tankson.TanksONable;
+import tanks.tankson.*;
 
 import java.util.ArrayList;
 
@@ -160,7 +154,7 @@ public class BulletEffect implements ICopyable<BulletEffect>, ITanksONEditable
             Drawing.drawing.fillInterfaceOval(start, y, size * 0.6, size * 0.6);
         }
 
-        if (this.enableParticles && Game.bulletTrails && Math.random() < Panel.frameFrequency * Game.effectMultiplier && Game.effectsEnabled)
+        if (this.enableParticles && Game.options.graphics.bulletTrails != GameOptions.BulletTrails.off && Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage && Game.options.graphics.effect.particleEffects)
         {
             Effect e = Effect.createNewEffect(start, y, Effect.EffectType.interfacePiece);
             double var = 50;

@@ -85,7 +85,7 @@ public class TeleporterOrb extends Movable
 		//Drawing.drawing.setColor(255, 255, 255);
 		Drawing.drawing.setColor(this.tank.color.red * (1 - frac) + 255 * frac, this.tank.color.green * (1 - frac) + 255 * frac, this.tank.color.blue * (1 - frac) + 255 * frac);
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			Drawing.drawing.fillOval(this.posX, this.posY, this.posZ, (this.size - this.tank.size) / 2, (this.size - this.tank.size) / 2, true, true);
 
 		for (int i = 0; i < this.size - this.tank.size; i++)
@@ -93,7 +93,7 @@ public class TeleporterOrb extends Movable
 			Drawing.drawing.setColor(this.tank.color.red * (1 - frac) + 255 * frac, this.tank.color.green * (1 - frac) + 255 * frac, this.tank.color.blue * (1 - frac) + 255 * frac, 20);
 			//Drawing.drawing.setColor(255, 255, 255, 20);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillOval(this.posX, this.posY, this.posZ, i, i, false, true);
 			else
 				Drawing.drawing.fillOval(this.posX, this.posY, i, i);
@@ -124,7 +124,7 @@ public class TeleporterOrb extends Movable
 			this.tank.inControlOfMotion = true;
 			this.tank.positionLock = false;
 
-			for (int i = 0; i < 100 * Game.effectMultiplier; i++)
+			for (int i = 0; i < 100 * Game.options.graphics.effect.particlePercentage; i++)
 			{
 				this.createEffect();
 			}
@@ -179,7 +179,7 @@ public class TeleporterOrb extends Movable
 
 		this.tank.disabled = this.tank.size <= 0;
 
-		if (Math.random() < Panel.frameFrequency * Game.effectMultiplier)
+		if (Math.random() < Panel.frameFrequency * Game.options.graphics.effect.particlePercentage)
 			this.createEffect();
 
 		if (this.age > 0)
@@ -229,7 +229,7 @@ public class TeleporterOrb extends Movable
 		this.prevZ = this.posZ;
 
 		if (!this.addedTrail && !this.destroy &&
-				(GameObject.absoluteAngleBetween(this.getPolarDirection(), this.lastTrailAngle) >= 0.001 || (Game.enable3d && GameObject.absoluteAngleBetween(this.getPolarPitch(), this.lastTrailPitch) >= 0.1)))
+				(GameObject.absoluteAngleBetween(this.getPolarDirection(), this.lastTrailAngle) >= 0.001 || (Game.options.graphics.enable3d && GameObject.absoluteAngleBetween(this.getPolarPitch(), this.lastTrailPitch) >= 0.1)))
 		{
 			this.addTrail();
 		}
@@ -249,7 +249,7 @@ public class TeleporterOrb extends Movable
 
 		this.lastTrailAngle = this.getPolarDirection();
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			this.lastTrailPitch = this.getPolarPitch();
 
 		this.trailSet[0].frontColor.set(tank.color);
@@ -258,7 +258,7 @@ public class TeleporterOrb extends Movable
 		int i = 0;
 		for (Trail t : this.trailSet)
 		{
-			if (!Game.enable3d)
+			if (!Game.options.graphics.enable3d)
 				this.addTrailObj(new Trail(this, speed, x, y, this.size * speed / 3.125 * t.delay, this.size / 2 * t.backWidth, this.size / 2 * t.frontWidth, this.size * speed / 3.125 * t.maxLength, this.lastTrailAngle,
 						t.frontColor.red, t.frontColor.green, t.frontColor.blue, t.frontColor.alpha, t.backColor.red, t.backColor.green, t.backColor.blue, t.backColor.alpha, t.glow, t.luminosity, t.frontCircle, t.backCircle), i);
 			else
@@ -304,7 +304,7 @@ public class TeleporterOrb extends Movable
 	
 	public void createEffect()
 	{
-		if (!Game.effectsEnabled)
+		if (!Game.options.graphics.effect.particleEffects)
 			return;
 
 		Effect e = Effect.createNewEffect(this.posX, this.posY, this.posZ, Effect.EffectType.teleporterPiece);
@@ -315,7 +315,7 @@ public class TeleporterOrb extends Movable
 		e.colB = Math.min(this.tank.color.blue, Math.max(0, 255 + Math.random() * var - var / 2));
 		e.drawLevel = 9;
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI * 2, Math.random() * 4);
 		else
 			e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * 4);

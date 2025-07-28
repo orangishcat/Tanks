@@ -98,7 +98,7 @@ public class Level
 		String[] preset = new String[0], screen = new String[0], obstaclesPos = new String[0], tanks = new String[0], teams;
 
 		if (ScreenPartyHost.isServer)
-			this.startTime = Game.partyStartTime;
+			this.startTime = Game.options.multiplayer.partyHost.partyStartTime;
 
 		this.levelString = level.replaceAll("\u0000", "");
 
@@ -216,7 +216,7 @@ public class Level
 			playerBuilds.add(tp);
 		}
 
-		if (ScreenPartyHost.isServer && Game.disablePartyFriendlyFire)
+		if (ScreenPartyHost.isServer && Game.options.multiplayer.partyHost.disablePartyFriendlyFire)
 			this.disableFriendlyFire = true;
 
 		sizeX = (int) Double.parseDouble(screen[0]);
@@ -469,7 +469,7 @@ public class Level
 		Game.currentLevel = this;
 		Game.currentLevelString = this.levelString;
 
-		if (Game.deterministicMode)
+		if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
 			random = new Random(Game.seed);
 		else
 			random = new Random(tilesRandomSeed);

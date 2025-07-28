@@ -8,7 +8,6 @@ import tanks.*;
 import tanks.generator.LevelGeneratorVersus;
 import tanks.gui.*;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
-import tanks.hotbar.Hotbar;
 import tanks.hotbar.ItemBar;
 import tanks.item.Item;
 import tanks.item.ItemRemote;
@@ -559,7 +558,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Game.player.hotbar.resetTimers();
 		eliminatedPlayers.clear();
 		this.selfBatch = false;
-		this.enableMargins = !Game.followingCam;
+		this.enableMargins = !Game.options.debug.followingCam;
 
 		introMusicEnd = Long.parseLong(Game.game.fileManager.getInternalFileContents("/music/ready_music_intro_length.txt").get(0));
 		introBattleMusicEnd = Long.parseLong(Game.game.fileManager.getInternalFileContents("/music/battle_intro_length.txt").get(0));
@@ -927,7 +926,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	@Override
 	public void update()
 	{
-		if (ScreenPartyHost.isServer && this.shop.isEmpty() && Game.autoReady && !this.ready)
+		if (ScreenPartyHost.isServer && this.shop.isEmpty() && Game.options.multiplayer.autoReady && !this.ready)
 			this.readyButton.function.run();
 
 		if (Game.game.input.zoom.isValid())
@@ -1054,7 +1053,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				else
 					Drawing.drawing.playSound("battle_intro.ogg", 1f, true);
 
-				if (Game.currentLevel.beatBlocks > 0 && Game.enableLayeredMusic)
+				if (Game.currentLevel.beatBlocks > 0 && Game.options.sound.enableLayeredMusic)
 				{
 					Drawing.drawing.playSound("beatblocks/beat_blocks_intro.ogg", 1f, true);
 
@@ -1202,9 +1201,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				if (!this.prevTankMusics.contains(m))
 				{
 					if (this.playCounter == -2 && m.startsWith("beatblocks/"))
-						Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 0);
+						Drawing.drawing.addSyncedMusic(m, Game.options.sound.musicVolume, true, 0);
 					else
-						Drawing.drawing.addSyncedMusic(m, Game.musicVolume, true, 500);
+						Drawing.drawing.addSyncedMusic(m, Game.options.sound.musicVolume, true, 500);
 				}
 			}
 
@@ -1246,7 +1245,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 					this.pause();
 			}
 
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 				Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
 
 			if (this.paused)
@@ -1256,9 +1255,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			}
 			else
 			{
-				Game.game.window.setCursorLocked(Game.followingCam);
+				Game.game.window.setCursorLocked(Game.options.debug.followingCam);
 
-				if (Game.followingCam)
+				if (Game.options.debug.followingCam)
 					Game.game.window.setShowCursor(false);
 				else
 					Game.game.window.setShowCursor(!Panel.showMouseTarget);
@@ -1536,7 +1535,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			}
 			else
 			{
-				if ((ScreenPartyHost.isServer || ScreenPartyLobby.isClient || Game.autostart) && !cancelCountdown)
+				if ((ScreenPartyHost.isServer || ScreenPartyLobby.isClient || Game.options.misc.autoStart) && !cancelCountdown)
 					Game.startTime -= Panel.frameFrequency;
 
 				if (!ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)
@@ -1661,7 +1660,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			playing = true;
 			this.age += Panel.frameFrequency;
 
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 			{
 				Game.playerTank.angle += (Drawing.drawing.getInterfaceMouseX() - prevCursorX) / 100;
 				Game.game.window.setCursorLocked(true);
@@ -1882,7 +1881,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 						includedPlayers = ScreenPartyLobby.includedPlayers.size();
 					if (Game.effects.size() <= 0 && noMovables && !(isVersus && ((finishQuickTimer < introResultsMusicEnd / 10.0 - rankingsTimeIntro) || (rankingsOverlay.namesCount != includedPlayers))))
 					{
-						if (Game.followingCam)
+						if (Game.options.debug.followingCam)
 							Game.game.window.setCursorPos(Panel.windowWidth / 2, Panel.windowHeight / 2);
 
 						if (Obstacle.draw_size == Game.tile_size)
@@ -2212,7 +2211,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			{
 				for (int m: this.playingReadyMusics)
 				{
-					Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.musicVolume, true, 0);
+					Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.options.sound.musicVolume, true, 0);
 				}
 			}
 
@@ -2248,7 +2247,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 						num = 3;
 
 					this.specialReadyMusic = "ready_music_" + num + ".ogg";
-					Drawing.drawing.addSyncedMusic(this.specialReadyMusic, Game.musicVolume, true, fadeTime);
+					Drawing.drawing.addSyncedMusic(this.specialReadyMusic, Game.options.sound.musicVolume, true, fadeTime);
 				}
 
 				this.readyMusicIterations++;
@@ -2262,7 +2261,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 						Drawing.drawing.removeSyncedMusic(this.specialReadyMusic, fadeTime);
 						for (int m: this.playingReadyMusics)
 						{
-							Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.musicVolume, true, fadeTime);
+							Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.options.sound.musicVolume, true, fadeTime);
 						}
 					}
 				}
@@ -2290,7 +2289,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 						{
 							added++;
 							playingReadyMusics.add(m);
-							Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.musicVolume, true, fadeTime);
+							Drawing.drawing.addSyncedMusic("ready/" + ready_musics[m], Game.options.sound.musicVolume, true, fadeTime);
 						}
 					}
 
@@ -2482,7 +2481,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Game.game.window.clipMultiplier = 100;
 		Game.game.window.clipDistMultiplier = 1;
 
-		if (Game.angledView)
+		if (Game.options.graphics.angledView)
 		{
 			if (!Game.game.window.drawingShadow)
 			{
@@ -2495,7 +2494,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			this.slantRotation.pitch = this.slant * -Math.PI / 16;
 			this.slantTranslation.y = -this.slant * 0.05;
 
-			if (!Game.followingCam)
+			if (!Game.options.debug.followingCam)
 			{
 				Game.game.window.transformations.add(this.slantTranslation);
 				Game.game.window.transformations.add(this.slantRotation);
@@ -2504,14 +2503,14 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 			Game.game.window.loadPerspective();
 		}
 
-		if (Game.followingCam && Game.framework == Game.Framework.lwjgl && !Game.game.window.drawingShadow)
+		if (Game.options.debug.followingCam && Game.framework == Game.Framework.lwjgl && !Game.game.window.drawingShadow)
 		{
 			double frac = Panel.panel.zoomTimer;
 
 			Game.game.window.clipMultiplier = 1;
 			Game.game.window.clipDistMultiplier = 100;
 
-			if (!Game.firstPerson)
+			if (!Game.options.debug.firstPerson)
 			{
 				Game.game.window.transformations.add(new RotationAboutPoint(Game.game.window, 0, 0, frac * ((Game.playerTank.angle + Math.PI * 3 / 2) % (Math.PI * 2) - Math.PI), 0, -Drawing.drawing.statsHeight / Game.game.window.absoluteHeight / 2, 0));
 				Game.game.window.transformations.add(new Translation(Game.game.window, 0, 0.1 * frac, 0));
@@ -2533,7 +2532,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 	@Override
 	public void draw()
 	{
-        this.showDefaultMouse = !(((!this.paused && !this.npcShopScreen) && this.playing && Game.angledView || Game.firstPerson));
+        this.showDefaultMouse = !(((!this.paused && !this.npcShopScreen) && this.playing && Game.options.graphics.angledView || Game.options.debug.firstPerson));
 
 
 		this.setPerspective();
@@ -2541,7 +2540,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		Drawing.drawing.setColor(174, 92, 16);
 
 		double mul = 1;
-		if (Game.angledView)
+		if (Game.options.graphics.angledView)
 			mul = 2;
 
 		Drawing.drawing.fillShadedInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2,
@@ -2574,7 +2573,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		for (int i = 0; i < this.drawables.length; i++)
 		{
-			if (i == 5 && Game.enable3d)
+			if (i == 5 && Game.options.graphics.enable3d)
 			{
 				double frac = Obstacle.draw_size / Game.tile_size;
 				Drawing.drawing.setColor(174 * frac + Level.currentColor.red * (1 - frac), 92 * frac + Level.currentColor.green * (1 - frac), 16 * frac + Level.currentColor.blue * (1 - frac));
@@ -2595,7 +2594,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 					d.draw();
 			}
 
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 			{
 				for (IDrawable d: this.drawables[i])
 				{
@@ -2891,7 +2890,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 								ConnectedPlayer cp = readyPlayers.get(i);
 
 								String name;
-								if (Game.enableChatFilter)
+								if (Game.options.multiplayer.chatFilter)
 									name = Game.chatFilter.filterChat(cp.username);
 								else
 									name = cp.username;
@@ -2957,14 +2956,14 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 				if (ScreenPartyHost.isServer && this.cancelCountdown)
 					startNow.draw();
 
-				if ((ScreenPartyHost.isServer || ScreenPartyLobby.isClient || Game.autostart) && !cancelCountdown)
+				if ((ScreenPartyHost.isServer || ScreenPartyLobby.isClient || Game.options.misc.autoStart) && !cancelCountdown)
 				{
 					Drawing.drawing.setColor(127, 127, 127);
 					Drawing.drawing.fillInterfaceRect(play.posX, play.posY + play.sizeY / 2 - 5, play.sizeX * 32 / 35, 3);
 					Drawing.drawing.setColor(255, 127, 0);
 					Drawing.drawing.fillInterfaceProgressRect(play.posX, play.posY + play.sizeY / 2 - 5, play.sizeX * 32 / 35, 3, Math.max(Game.startTime / Game.currentLevel.startTime, 0));
 
-					if (Game.glowEnabled)
+					if (Game.options.graphics.glowEnabled)
 					{
 						Drawing.drawing.fillInterfaceGlow(play.posX + ((Game.startTime / Game.currentLevel.startTime - 0.5) * (play.sizeX * 32 / 35)), play.posY + play.sizeY / 2 - 5, 20, 20);
 					}
@@ -3000,18 +2999,18 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 		{
 			Game.player.hotbar.draw();
 
-			if (Hotbar.circular)
+			if (Game.options.misc.circularHotbar)
 				Game.player.hotbar.drawCircle();
 
-			if (((Game.showSpeedrunTimer || Game.showBestTime) && !(paused && screenshotMode) && !(Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).hideSpeedrunTimer)) || (Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).forceSpeedrunTimer))
+			if (((Game.options.speedrun.showSpeedrunTimer || Game.options.speedrun.showBestTime) && !(paused && screenshotMode) && !(Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).hideSpeedrunTimer)) || (Game.currentLevel instanceof Minigame && ((Minigame) Game.currentLevel).forceSpeedrunTimer))
 				SpeedrunTimer.draw();
 
 			minimap.draw();
 		}
 
-		if (Game.deterministicMode && !ScreenPartyLobby.isClient)
+		if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off && !ScreenPartyLobby.isClient)
 		{
-			if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.effectsEnabled))
+			if (Level.isDark() || (Game.screen instanceof IDarkScreen && Panel.win && Game.options.graphics.effect.particleEffects))
 				Drawing.drawing.setColor(255, 255, 255, 127);
 			else
 				Drawing.drawing.setColor(0, 0, 0, 127);
@@ -3024,7 +3023,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 			Drawing.drawing.setInterfaceFontSize(24);
 
-			if (Game.deterministic30Fps)
+			if (Game.options.speedrun.deterministicMode == GameOptions.Deterministic._30fps)
 				Drawing.drawing.drawInterfaceText(posX, posY, "Deterministic mode (30 FPS)", true);
 			else
 				Drawing.drawing.drawInterfaceText(posX, posY, "Deterministic mode (60 FPS)", true);
@@ -3167,7 +3166,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
 
 		Drawing.drawing.setInterfaceFontSize(this.textSize);
 
-		if (Game.drawFaces)
+		if (Game.options.debug.drawFaces)
 		{
 			drawing.setColor(255, 0, 0);
 			for (Face f : Game.verticalFaces)

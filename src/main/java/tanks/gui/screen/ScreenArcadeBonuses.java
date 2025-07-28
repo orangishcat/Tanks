@@ -208,9 +208,9 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
     public void update()
     {
         if (this.age <= 50)
-            Game.game.window.soundPlayer.setMusicVolume(Game.musicVolume * 0.25f);
+            Game.game.window.soundPlayer.setMusicVolume(Game.options.sound.musicVolume * 0.25f);
 
-        if (Game.effectsEnabled)
+        if (Game.options.graphics.effect.particleEffects)
             Panel.darkness = Math.min(Panel.darkness + Panel.frameFrequency * 1.5, 191);
 
         this.age += Panel.frameFrequency;
@@ -244,9 +244,9 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
                 else
                     Drawing.drawing.playSound("bonus" + (i + 1) + ".ogg", 1f);
 
-                if (Game.effectsEnabled)
+                if (Game.options.graphics.effect.particleEffects)
                 {
-                    for (int j = 0; j < Game.effectMultiplier * Math.min(1000, this.bonuses.get(2 - i).value); j++)
+                    for (int j = 0; j < Game.options.graphics.effect.particlePercentage * Math.min(1000, this.bonuses.get(2 - i).value); j++)
                     {
                         Drawing.drawing.setInterfaceFontSize(this.textSize);
                         Bonus b = this.bonuses.get(2 - i);
@@ -255,7 +255,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
                     }
                 }
 
-                Game.game.window.soundPlayer.setMusicVolume(Game.musicVolume * (0.25f + 0.25f * bonusCount));
+                Game.game.window.soundPlayer.setMusicVolume(Game.options.sound.musicVolume * (0.25f + 0.25f * bonusCount));
             }
         }
 
@@ -272,7 +272,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
 
             int bonusPoints = bonuses.get(0).value + bonuses.get(1).value + bonuses.get(2).value;
             String s = "Total: " + bonusPoints;
-            for (int j = 0; j < Game.effectMultiplier * Math.min(1000, bonusPoints) / 2; j++)
+            for (int j = 0; j < Game.options.graphics.effect.particlePercentage * Math.min(1000, bonusPoints) / 2; j++)
             {
                 Drawing.drawing.setInterfaceFontSize(this.textSize);
                 double size = Game.game.window.fontRenderer.getStringSizeX(Drawing.drawing.fontSize, s) / Drawing.drawing.interfaceScale;
@@ -281,7 +281,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
 
             bonusCount = 4;
 
-            if (!Game.effectsEnabled)
+            if (!Game.options.graphics.effect.particleEffects)
             {
                 this.score += bonuses.get(0).value + bonuses.get(1).value + bonuses.get(2).value;
                 this.lastPoints = this.age;
@@ -393,7 +393,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
 
         this.drawPoints();
 
-        if (Game.effectsEnabled && !Game.game.window.drawingShadow)
+        if (Game.options.graphics.effect.particleEffects && !Game.game.window.drawingShadow)
         {
             boolean spedUp = false;
             if (!Game.game.window.pressedKeys.isEmpty() || !Game.game.window.pressedButtons.isEmpty())
@@ -449,7 +449,7 @@ public class ScreenArcadeBonuses extends Screen implements IDarkScreen
 
         double heightFrac = Math.min(1, age / 25);
 
-        if (Game.effectsEnabled)
+        if (Game.options.graphics.effect.particleEffects)
             Drawing.drawing.setColor(heightFrac * 255, heightFrac * 255, heightFrac * 255, alpha);
         else
             Drawing.drawing.setColor(0, 0, 0, alpha);

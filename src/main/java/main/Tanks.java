@@ -87,9 +87,9 @@ public class Tanks
                             1400, 900 + Drawing.drawing.statsHeight,
                             Game.absoluteDepthBase,
                             new GameUpdater(), new GameDrawer(), new GameWindowHandler(),
-                            Game.vsync, !Panel.showMouseTarget
+                            Game.options.graphics.vsync, !Panel.showMouseTarget
                     );
-                    Game.game.window.antialiasingEnabled = Game.antialiasing;
+                    Game.game.window.antialiasingEnabled = Game.options.graphics.antialiasing;
 
                     if (!path.endsWith(".jar"))
                         Game.game.window.buildDate = "Running from source";

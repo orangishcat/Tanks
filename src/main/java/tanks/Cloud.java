@@ -24,7 +24,7 @@ public class Cloud extends Movable
     @Override
     public void draw()
     {
-        if (!Game.followingCam || !Game.enable3d || !Drawing.drawing.movingCamera)
+        if (!Game.options.debug.followingCam || !Game.options.graphics.enable3d || !Drawing.drawing.movingCamera)
             return;
 
         for (int i = 0; i < this.posY.size(); i++)

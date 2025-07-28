@@ -145,7 +145,7 @@ public class Firework extends Movable
 
 				Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB);
 
-				if (!Game.enable3d)
+				if (!Game.options.graphics.enable3d)
 					Drawing.drawing.fillInterfaceOval(posX, posY, this.size, this.size);
 				else
 					Drawing.drawing.fillInterfaceOval(posX, posY, posZ, this.size, this.size);
@@ -204,7 +204,7 @@ public class Firework extends Movable
 //
 //					double power = Math.random() * powerRandom + powerBase;
 //
-//					if (!Game.enable3d)
+//					if (!Game.options.graphics.enable3d)
 //						e.addPolarMotion(Math.random() * 2 * Math.PI, Math.random() * power);
 //					else
 //						e.add3dPolarMotion(Math.random() * Math.PI * 2, Math.asin(Math.random() * 2 - 1), power);
@@ -232,7 +232,7 @@ public class Firework extends Movable
 
 			double s = Math.max(0, this.size - (this.age * this.size / this.maxAge));
 
-			if (!Game.enable3d)
+			if (!Game.options.graphics.enable3d)
 				Drawing.drawing.fillInterfaceOval(posX, posY, s, s);
 			else
 				Drawing.drawing.fillInterfaceOval(posX, posY, posZ, s, s);
@@ -250,7 +250,7 @@ public class Firework extends Movable
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, opacity);
 			double s = this.size - (this.age * this.size / this.maxAge);
 
-			if (!Game.enable3d)
+			if (!Game.options.graphics.enable3d)
 				Drawing.drawing.fillInterfaceOval(posX, posY, s, s);
 			else
 				Drawing.drawing.fillInterfaceOval(posX, posY, posZ, s, s);
@@ -302,7 +302,7 @@ public class Firework extends Movable
 
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 			{
 				Drawing.drawing.fillInterfaceGlow(posX, posY, posZ, this.size * 4, this.size * 4);
 				Drawing.drawing.setColor(this.colorR / 2, this.colorG / 2, this.colorB / 2);
@@ -315,7 +315,7 @@ public class Firework extends Movable
 		{
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, Math.max(0, Math.min(255, 255 - (this.age * 255.0 / this.maxAge))));
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillInterfaceGlow(posX, posY, posZ, this.size * 2, this.size * 2);
 			else
 				Drawing.drawing.fillInterfaceGlow(posX, posY, this.size * 2, this.size * 2);
@@ -326,7 +326,7 @@ public class Firework extends Movable
 
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, opacity / 2.0);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 			{
 				Drawing.drawing.fillInterfaceGlow(posX, posY, posZ, this.size * 8, this.size * 8);
 				Drawing.drawing.setColor(this.colorR / 2, this.colorG / 2, this.colorB / 2);
@@ -342,7 +342,7 @@ public class Firework extends Movable
 
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, opacity / 2.0);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillInterfaceGlow(posX, posY, posZ, this.size * 40, this.size * 40);
 			else
 				Drawing.drawing.fillInterfaceGlow(posX, posY, this.size * 40, this.size * 40);
@@ -380,7 +380,7 @@ public class Firework extends Movable
 			this.posY = f.posY;
 			this.posZ = f.posZ;
 
-			if (!Game.enable3d)
+			if (!Game.options.graphics.enable3d)
 				this.posZ = 0;
 
 			this.color = f.colorFrac;
@@ -507,7 +507,7 @@ public class Firework extends Movable
 					velZ = power * Math.sin(angle2) + f.vZ;
 				}
 
-				if (!Game.enable3d)
+				if (!Game.options.graphics.enable3d)
 					velZ = 0;
 
 				double var = 50.0;

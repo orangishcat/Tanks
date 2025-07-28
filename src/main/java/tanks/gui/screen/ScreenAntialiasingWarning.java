@@ -29,7 +29,7 @@ public class ScreenAntialiasingWarning extends Screen
 
 		String s = "disabled";
 
-		if (Game.antialiasing)
+		if (Game.options.graphics.antialiasing)
 			s = "enabled";
 
 		Drawing.drawing.setInterfaceFontSize(this.titleSize);

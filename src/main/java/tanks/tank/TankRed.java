@@ -28,7 +28,7 @@ public class TankRed extends TankAIControlled
 		this.setBullet(DefaultItems.laser);
 		this.getBullet().recoil = 0;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.emblem = "emblems/laser.png";

@@ -30,9 +30,9 @@ public class ScreenOptionsInputTouchscreen extends Screen
         @Override
         public void run()
         {
-            Game.enableVibrations = !Game.enableVibrations;
+            Game.options.other.enableVibrations = !Game.options.other.enableVibrations;
 
-            if (Game.enableVibrations)
+            if (Game.options.other.enableVibrations)
                 vibrations.setText(vibrationsText, ScreenOptions.onText);
             else
                 vibrations.setText(vibrationsText, ScreenOptions.offText);
@@ -117,9 +117,9 @@ public class ScreenOptionsInputTouchscreen extends Screen
         vibrations.enabled = Game.game.window.vibrationsEnabled;
 
         if (!Game.game.window.vibrationsEnabled)
-            Game.enableVibrations = false;
+            Game.options.other.enableVibrations = false;
 
-        if (Game.enableVibrations)
+        if (Game.options.other.enableVibrations)
             vibrations.setText(vibrationsText, ScreenOptions.onText);
         else
             vibrations.setText(vibrationsText, ScreenOptions.offText);

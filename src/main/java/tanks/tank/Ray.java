@@ -28,7 +28,7 @@ public class Ray
 	public boolean ignoreDestructible = false;
 	public boolean ignoreShootThrough = false;
 
-	public boolean trace = Game.traceAllRays;
+	public boolean trace = Game.options.debug.traceAllRays;
 	public boolean dotted = false;
 
 	public double speed = 10;

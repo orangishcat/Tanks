@@ -49,7 +49,6 @@ public class Drawing
 	public boolean enableMovingCameraY = false;
 
 	public int statsHeight = 0;
-	public boolean enableStats = false;
 
 	public boolean movingCamera = true;
 
@@ -93,9 +92,9 @@ public class Drawing
 
 	public void showStats(boolean stats)
 	{
-		this.enableStats = stats;
+		Game.options.window.infoBar = stats;
 
-		if (this.enableStats)
+		if (Game.options.window.infoBar)
 			this.statsHeight = 40;
 		else
 			this.statsHeight = 0;
@@ -682,7 +681,7 @@ public class Drawing
 		double drawSizeY = sizeY * scale;
 		double drawSizeZ = sizeZ * scale;
 
-		if (!Game.followingCam && !Game.angledView && !disableFaceRemoval)
+		if (!Game.options.debug.followingCam && !Game.options.graphics.angledView && !disableFaceRemoval)
 		{
 			if (drawX < Game.game.window.absoluteWidth / 2)
 				options = (byte) (options | 16);
@@ -1275,7 +1274,7 @@ public class Drawing
 		double drawY = gameToAbsoluteY(y, 0);
 		double drawZ = z * scale;
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			Game.game.window.addVertex(drawX, drawY, drawZ);
 		else
 			Game.game.window.addVertex(drawX, drawY);
@@ -1287,7 +1286,7 @@ public class Drawing
 		double drawY = (interfaceScale * y + Math.max(0, Panel.windowHeight - statsHeight - interfaceSizeY * interfaceScale) / 2);
 		double drawZ = z * interfaceScale;
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			Game.game.window.addVertex(drawX, drawY, drawZ);
 		else
 			Game.game.window.addVertex(drawX, drawY);
@@ -1295,7 +1294,7 @@ public class Drawing
 
 	public void addFacingVertex(double x, double y, double z, double sX, double sY, double sZ)
 	{
-		if (Game.enable3d && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).slant != 0)
+		if (Game.options.graphics.enable3d && Game.screen instanceof ScreenGame && ((ScreenGame) Game.screen).slant != 0)
 		{
 			double angle = ((ScreenGame) Game.screen).slantRotation.pitch;
 
@@ -1401,20 +1400,20 @@ public class Drawing
 
 	public void addSyncedMusic(String sound, float volume, boolean looped, long fadeTime)
 	{
-		if (Game.game.window.soundsEnabled && Game.musicEnabled && Game.enableLayeredMusic)
+		if (Game.game.window.soundsEnabled && Game.musicEnabled && Game.options.sound.enableLayeredMusic)
 			Game.game.window.soundPlayer.addSyncedMusic("/music/" + sound, volume, looped, fadeTime);
 	}
 
 	public void removeSyncedMusic(String sound, long fadeTime)
 	{
-		if (Game.game.window.soundsEnabled && Game.musicEnabled && Game.enableLayeredMusic)
+		if (Game.game.window.soundsEnabled && Game.musicEnabled && Game.options.sound.enableLayeredMusic)
 			Game.game.window.soundPlayer.removeSyncedMusic("/music/" + sound, fadeTime);
 	}
 
 	public void playSound(String sound)
 	{
 		if (Game.game.window.soundsEnabled && Game.soundsEnabled)
-			Game.game.window.soundPlayer.playSound("/sounds/" + sound, 1, Game.soundVolume);
+			Game.game.window.soundPlayer.playSound("/sounds/" + sound, 1, Game.options.sound.soundVolume);
 	}
 
 	public void playGlobalSound(String sound)
@@ -1426,7 +1425,7 @@ public class Drawing
 	public void playSound(String sound, float pitch)
 	{
 		if (Game.game.window.soundsEnabled && Game.soundsEnabled)
-			Game.game.window.soundPlayer.playSound("/sounds/" + sound, pitch, Game.soundVolume);
+			Game.game.window.soundPlayer.playSound("/sounds/" + sound, pitch, Game.options.sound.soundVolume);
 	}
 
 	public void playSound(String sound, float volume, boolean asMusic)
@@ -1436,10 +1435,10 @@ public class Drawing
 			if (asMusic)
 			{
 				if (Game.musicEnabled)
-					Game.game.window.soundPlayer.playSound("/music/" + sound, 1.0f, volume * Game.musicVolume);
+					Game.game.window.soundPlayer.playSound("/music/" + sound, 1.0f, volume * Game.options.sound.musicVolume);
 			}
 			else if (Game.soundsEnabled)
-				Game.game.window.soundPlayer.playSound("/sound/" + sound, 1.0f, volume * Game.soundVolume);
+				Game.game.window.soundPlayer.playSound("/sound/" + sound, 1.0f, volume * Game.options.sound.soundVolume);
 		}
 	}
 
@@ -1452,7 +1451,7 @@ public class Drawing
 	public void playSound(String sound, float pitch, float volume)
 	{
 		if (Game.game.window.soundsEnabled && Game.soundsEnabled)
-			Game.game.window.soundPlayer.playSound("/sounds/" + sound, pitch, volume * Game.soundVolume);
+			Game.game.window.soundPlayer.playSound("/sounds/" + sound, pitch, volume * Game.options.sound.soundVolume);
 	}
 
 	public void playGlobalSound(String sound, float pitch, float volume)
@@ -1463,7 +1462,7 @@ public class Drawing
 
 	public void playVibration(String vibration)
 	{
-		if (!Game.game.window.vibrationsEnabled || !Game.enableVibrations)
+		if (!Game.game.window.vibrationsEnabled || !Game.options.other.enableVibrations)
 			return;
 
 		switch (vibration)
@@ -1565,7 +1564,7 @@ public class Drawing
 
 	public double getPlayerOffsetX()
 	{
-		if (!enableMovingCameraX && !Game.followingCam)
+		if (!enableMovingCameraX && !Game.options.debug.followingCam)
 			return 0;
 
 		double x = playerX;
@@ -1590,7 +1589,7 @@ public class Drawing
 
 		if (scale * Game.currentSizeX * Game.tile_size + margin > Panel.windowWidth)
 		{
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 				return -result * Panel.panel.zoomTimer;
 			else if (less && !greater)
 				return margin;
@@ -1601,7 +1600,7 @@ public class Drawing
 		}
 		else
 		{
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 				return -result * Panel.panel.zoomTimer;
 			else if (less && !greater)
 				return margin;
@@ -1616,7 +1615,7 @@ public class Drawing
 
 	public double getPlayerOffsetY()
 	{
-		if (!enableMovingCameraY && !Game.followingCam)
+		if (!enableMovingCameraY && !Game.options.debug.followingCam)
 			return 0;
 
 		double y = playerY;
@@ -1640,7 +1639,7 @@ public class Drawing
 
 		if (scale * Game.currentSizeY * Game.tile_size + margin > Panel.windowHeight - statsHeight)
 		{
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 				return -result * Panel.panel.zoomTimer;
 			else if (less && !greater)
 				return margin;
@@ -1651,7 +1650,7 @@ public class Drawing
 		}
 		else
 		{
-			if (Game.followingCam)
+			if (Game.options.debug.followingCam)
 				return -result * Panel.panel.zoomTimer;
 			else if (less && !greater)
 				return margin;
@@ -1775,10 +1774,10 @@ public class Drawing
 
 		int dist = 200;
 
-		if (Game.angledView)
+		if (Game.options.graphics.angledView)
 			dist = 300;
 
-		if (!Game.followingCam || !(Game.screen instanceof ScreenGame))
+		if (!Game.options.debug.followingCam || !(Game.screen instanceof ScreenGame))
 			return drawX - dist * scale > Panel.windowWidth || drawX + dist * scale < 0 || drawY - dist * scale > Panel.windowHeight || drawY + dist * scale < 0;
 		else
 		{
@@ -1797,7 +1796,7 @@ public class Drawing
 
 		int dist = 200;
 
-		if (Game.angledView)
+		if (Game.options.graphics.angledView)
 			dist = 300;
 
 		int xp1 = (x1 - dist * scale > Panel.windowWidth ? 1 : 0) + (x1 + dist * scale < 0 ? -1 : 0);
@@ -1811,7 +1810,7 @@ public class Drawing
 
 	public double getTrackOffset()
 	{
-		if (Game.followingCam)
+		if (Game.options.debug.followingCam)
 			return 0;
 		else
 			return 20;

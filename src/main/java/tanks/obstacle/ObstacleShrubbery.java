@@ -23,7 +23,7 @@ public class ObstacleShrubbery extends Obstacle
 	{
 		super(name, posX, posY);
 		
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			this.drawLevel = 1;
 		else
 			this.drawLevel = 9;
@@ -37,7 +37,7 @@ public class ObstacleShrubbery extends Obstacle
 		this.colorB = (Math.random() * 20);
 		this.type = ObstacleType.top;
 
-		if (!Game.fancyTerrain)
+		if (!Game.options.graphics.fancyTerrain)
 		{
 			this.colorR = 10;
 			this.colorG = 175;
@@ -59,7 +59,7 @@ public class ObstacleShrubbery extends Obstacle
 
 		this.height = Math.min(this.height + Panel.frameFrequency, 255);
 
-		if (ScreenGame.finishedQuick && !Game.enable3d)
+		if (ScreenGame.finishedQuick && !Game.options.graphics.enable3d)
 		{
 			this.height = Math.max(127, this.height - Panel.frameFrequency * 2);
 		}
@@ -77,7 +77,7 @@ public class ObstacleShrubbery extends Obstacle
 	{
 		this.finalHeight = this.baseGroundHeight + Game.tile_size * (0.2 + this.heightMultiplier * (1 - (255 - this.height) / 128));
 
-		if (!Game.enable3d)
+		if (!Game.options.graphics.enable3d)
 		{
 			if (Game.screen instanceof ILevelPreviewScreen || Game.screen instanceof ICrusadePreviewScreen || Game.screen instanceof IOverlayScreen || Game.screen instanceof ScreenGame && (!((ScreenGame) Game.screen).playing))
 			{
@@ -85,7 +85,7 @@ public class ObstacleShrubbery extends Obstacle
 			}
 		}
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 		{
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB);
 			Drawing.drawing.fillBox(this, this.posX, this.posY, 0, Game.tile_size, Game.tile_size, this.finalHeight, (byte) (this.getOptionsByte(this.getTileHeight()) + 1));
@@ -145,7 +145,7 @@ public class ObstacleShrubbery extends Obstacle
 			Game.removeObstacles.add(this);
 
 			Effect e;
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				e = Effect.createNewEffect(this.posX, this.posY,this.baseGroundHeight + draw_size * (0.2 + this.heightMultiplier * (1 - (255 - this.height) / 128)), Effect.EffectType.bushBurn);
 			else
 				e = Effect.createNewEffect(this.posX, this.posY, this.height, Effect.EffectType.bushBurn);
@@ -169,7 +169,7 @@ public class ObstacleShrubbery extends Obstacle
 	{
 		if (m instanceof Bullet && !((Bullet) m).lowersBushes)
 		{
-			if (Math.random() < Panel.frameFrequency / Math.pow(((Bullet) m).size, 2) * 20 * Game.effectMultiplier)
+			if (Math.random() < Panel.frameFrequency / Math.pow(((Bullet) m).size, 2) * 20 * Game.options.graphics.effect.particlePercentage)
 			{
 				Effect e = Effect.createNewEffect(this.posX + (Math.random() - 0.5) * Obstacle.draw_size, this.posY + (Math.random() - 0.5) * Obstacle.draw_size, this.getTileHeight() * (Math.random() * 0.8 + 0.2), Effect.EffectType.piece);
 				e.vX = m.vX * (Math.random() * 0.5 + 0.5);

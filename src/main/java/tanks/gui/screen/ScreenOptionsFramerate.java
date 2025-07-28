@@ -31,9 +31,9 @@ public class ScreenOptionsFramerate extends Screen
         @Override
         public void run()
         {
-            Game.vsync = true;
-            Game.maxFPS = 0;
-            Game.game.window.setVsync(Game.vsync);
+            Game.options.graphics.vsync = true;
+            Game.options.graphics.maxFps = 0;
+            Game.game.window.setVsync(Game.options.graphics.vsync);
         }
     },
             "Limits framerate to your screen's refresh rate------May fix issues with screen tearing");
@@ -44,16 +44,16 @@ public class ScreenOptionsFramerate extends Screen
         @Override
         public void run()
         {
-            Game.vsync = false;
-            Game.game.window.setVsync(Game.vsync);
+            Game.options.graphics.vsync = false;
+            Game.game.window.setVsync(Game.options.graphics.vsync);
 
             if (maxFPS.inputText.length() <= 0)
                 maxFPS.inputText = maxFPS.previousInputText;
 
-            Game.maxFPS = Integer.parseInt(maxFPS.inputText);
+            Game.options.graphics.maxFps = Integer.parseInt(maxFPS.inputText);
         }
     }
-            , Game.maxFPS, 10, 240, 10);
+            , Game.options.graphics.maxFps, 10, 240, 10);
 
 
     Button unlimited = new Button(this.centerX, this.centerY + this.objYSpace * 1, this.objWidth, this.objHeight, "Unlimited", new Runnable()
@@ -61,9 +61,9 @@ public class ScreenOptionsFramerate extends Screen
         @Override
         public void run()
         {
-            Game.vsync = false;
-            Game.maxFPS = 0;
-            Game.game.window.setVsync(Game.vsync);
+            Game.options.graphics.vsync = false;
+            Game.options.graphics.maxFps = 0;
+            Game.game.window.setVsync(Game.options.graphics.vsync);
         }
     },
             "Disables the framerate limit------May cause issues with inconsistent game speed");
@@ -73,11 +73,11 @@ public class ScreenOptionsFramerate extends Screen
         @Override
         public void run()
         {
-            Game.vsync = false;
-            Game.maxFPS = 60;
-            maxFPS.inputText = Game.maxFPS + "";
-            maxFPS.value = Game.maxFPS;
-            Game.game.window.setVsync(Game.vsync);
+            Game.options.graphics.vsync = false;
+            Game.options.graphics.maxFps = 60;
+            maxFPS.inputText = Game.options.graphics.maxFps + "";
+            maxFPS.value = Game.options.graphics.maxFps;
+            Game.game.window.setVsync(Game.options.graphics.vsync);
         }
     },
             "Set a manual framerate limit");
@@ -93,13 +93,13 @@ public class ScreenOptionsFramerate extends Screen
         if (Game.framework != Game.Framework.libgdx)
             unlimited.update();
 
-        if (Game.vsync)
+        if (Game.options.graphics.vsync)
         {
             vsync.enabled = false;
             unlimited.enabled = true;
             manual.update();
         }
-        else if (Game.maxFPS == 0)
+        else if (Game.options.graphics.maxFps == 0)
         {
             unlimited.enabled = false;
             vsync.enabled = true;
@@ -131,7 +131,7 @@ public class ScreenOptionsFramerate extends Screen
 
         }
 
-        if (Game.maxFPS > 0 && !Game.vsync)
+        if (Game.options.graphics.maxFps > 0 && !Game.options.graphics.vsync)
             maxFPS.draw();
         else
             manual.draw();
@@ -142,10 +142,10 @@ public class ScreenOptionsFramerate extends Screen
         Drawing.drawing.setInterfaceFontSize(this.titleSize);
         Drawing.drawing.setColor(0, 0, 0);
 
-        if (Game.vsync)
+        if (Game.options.graphics.vsync)
             Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - this.objYSpace * 3.5, "Maximum framerate: \u00A7200100000255V-Sync");
-        else if (Game.maxFPS > 0)
-            Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - this.objYSpace * 3.5, "Maximum framerate: %s", (Object)("\u00A7000200000255" + Game.maxFPS));
+        else if (Game.options.graphics.maxFps > 0)
+            Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - this.objYSpace * 3.5, "Maximum framerate: %s", (Object)("\u00A7000200000255" + Game.options.graphics.maxFps));
         else
             Drawing.drawing.displayInterfaceText(this.centerX, this.centerY - this.objYSpace * 3.5, "Maximum framerate: \u00A7000100200255unlimited");
 

@@ -16,7 +16,7 @@ public class TankDummy extends TankAIControlled
 		this.turretIdleSpeed = 0;
 		this.enableLookingAtTargetEnemy = false;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.emblem = "emblems/x.png";

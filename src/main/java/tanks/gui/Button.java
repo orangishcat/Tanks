@@ -177,7 +177,7 @@ public class Button implements IDrawable, ITrigger
 
 		//drawing.fillInterfaceRect(posX, posY, sizeX, sizeY);
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			if (!enabled)
 				drawGlow(this.posX, this.posY + 3.5, this.sizeX, this.sizeY, 0.55, 0, 0, 0, 160, false);
@@ -250,7 +250,7 @@ public class Button implements IDrawable, ITrigger
 		{
 			if (enableHover)
 			{
-				if (Game.glowEnabled && !fullInfo)
+				if (Game.options.graphics.glowEnabled && !fullInfo)
 				{
 					if (infoSelected && !Game.game.window.touchscreen)
 					{
@@ -363,7 +363,7 @@ public class Button implements IDrawable, ITrigger
 			}
 		}
 
-		if (Game.glowEnabled && !Game.game.window.drawingShadow)
+		if (Game.options.graphics.glowEnabled && !Game.game.window.drawingShadow)
 		{
 			if (this.lastFrame < Panel.panel.ageFrames - 1)
 				this.glowEffects.clear();
@@ -384,7 +384,7 @@ public class Button implements IDrawable, ITrigger
 
 			if (this.selected && this.enabled && !Game.game.window.touchscreen)
 			{
-				this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.effectMultiplier;
+				this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.options.graphics.effect.particlePercentage;
 
 				while (this.effectTimer >= 0.4 / Panel.frameFrequency)
 				{
@@ -545,7 +545,7 @@ public class Button implements IDrawable, ITrigger
 
 	public static void addEffect(double posX, double posY, double sizeX, double sizeY, ArrayList<Effect> glowEffects, double velocity, double mul, double max)
 	{
-		if (!Game.effectsEnabled)
+		if (!Game.options.graphics.effect.particleEffects)
 			return;
 
 		Effect e = Effect.createNewEffect(posX, posY, Effect.EffectType.interfacePiece);

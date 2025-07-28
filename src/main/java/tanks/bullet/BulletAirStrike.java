@@ -105,7 +105,7 @@ public class BulletAirStrike extends Bullet
         {
             this.pastPosX.add(this.posX);
 
-            if (Game.enable3d)
+            if (Game.options.graphics.enable3d)
                 this.pastPosY.add(this.posY);
             else
                 this.pastPosY.add(this.posY - this.posZ + 25);
@@ -124,12 +124,12 @@ public class BulletAirStrike extends Bullet
             Drawing.drawing.fillOval(this.posX, this.posY, this.size, this.size);
         }
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             this.posY -= this.posZ - Game.tile_size / 2;
 
         super.draw();
 
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             this.posY += this.posZ - Game.tile_size / 2;
     }
 

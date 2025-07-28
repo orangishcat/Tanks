@@ -301,7 +301,7 @@ public class ScreenEditorPlayerTankBuild<T extends TankPlayer> extends ScreenEdi
             this.preview.drawAge = 50;
             this.preview.depthTest = false;
 
-            this.preview.drawTank(true, Game.enable3d);
+            this.preview.drawTank(true, Game.options.graphics.enable3d);
 
             super.drawUIElements();
         }

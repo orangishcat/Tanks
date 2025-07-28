@@ -16,7 +16,7 @@ public class ObstacleHole extends Obstacle
 		this.drawLevel = 1;
 		this.destructible = false;
 		this.bulletCollision = false;
-		this.replaceTiles = Game.fancyTerrain;
+		this.replaceTiles = Game.options.graphics.fancyTerrain;
 
 		this.colorR = 0;
 		this.colorG = 0;
@@ -31,7 +31,7 @@ public class ObstacleHole extends Obstacle
 	@Override
 	public void draw()
 	{	
-		if (!Game.enable3d || !Game.fancyTerrain)
+		if (!Game.options.graphics.enable3d || !Game.options.graphics.fancyTerrain)
 		{
 			Drawing.drawing.setColor(this.colorR, this.colorG, this.colorB, this.colorA);
 			Drawing.drawing.fillRect(this, this.posX, this.posY, draw_size * size, draw_size * size);
@@ -55,7 +55,7 @@ public class ObstacleHole extends Obstacle
 	@Override
 	public void drawTile(IBatchRenderableObject o, double r, double g, double b, double d, double extra)
 	{
-		if (Game.fancyTerrain)
+		if (Game.options.graphics.fancyTerrain)
 		{
 			double s = this.size * Obstacle.draw_size / Game.tile_size;
 

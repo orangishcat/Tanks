@@ -218,7 +218,7 @@ public class Tutorial extends Minigame
 
             if (step == 2)
             {
-                Drawing.drawing.addSyncedMusic("arcade/rampage1.ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage1.ogg", Game.options.sound.musicVolume, true, 500);
                 Game.movables.add(new Crate(this.dummy1, 850));
                 Game.movables.add(new Crate(this.dummy2, 950));
                 Game.movables.add(new Crate(this.dummy3, 1050));
@@ -226,24 +226,24 @@ public class Tutorial extends Minigame
             }
             else if (step == 3)
             {
-                Drawing.drawing.addSyncedMusic("arcade/rampage2.ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage2.ogg", Game.options.sound.musicVolume, true, 500);
                 Game.movables.add(new Crate(this.dummy5, 1000));
             }
             else if (step == 4)
             {
                 Game.movables.add(new Crate(this.brown, 1000));
-                Drawing.drawing.addSyncedMusic("arcade/rampage3.ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage3.ogg", Game.options.sound.musicVolume, true, 500);
             }
             else if (step == 6)
             {
-                Drawing.drawing.addSyncedMusic("arcade/rampage4.ogg", Game.musicVolume, true, 500);
-                Drawing.drawing.addSyncedMusic("arcade/rampage5.ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage4.ogg", Game.options.sound.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage5.ogg", Game.options.sound.musicVolume, true, 500);
             }
             else if (step == 8)
             {
                 Game.movables.add(new Crate(this.gray, 1000));
-                Drawing.drawing.addSyncedMusic("arcade/rampage6.ogg", Game.musicVolume, true, 500);
-                Drawing.drawing.addSyncedMusic("arcade/rampage7.ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage6.ogg", Game.options.sound.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage7.ogg", Game.options.sound.musicVolume, true, 500);
             }
 
             stepAnimation = 0;

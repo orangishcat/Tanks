@@ -31,7 +31,7 @@ public class TankOrange extends TankAIControlled
 
 		this.coinValue = 4;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.baseSkin = TankModels.flames;
 			this.colorSkin = TankModels.flames;

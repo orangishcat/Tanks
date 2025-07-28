@@ -1296,7 +1296,7 @@ public abstract class ScreenEditorTanksONable<T> extends Screen implements IBlan
         for (String m : this.musics)
         {
             if (!this.prevMusics.contains(m))
-                Drawing.drawing.addSyncedMusic(m, Game.musicVolume * 0.5f, true, 500);
+                Drawing.drawing.addSyncedMusic(m, Game.options.sound.musicVolume * 0.5f, true, 500);
         }
     }
 

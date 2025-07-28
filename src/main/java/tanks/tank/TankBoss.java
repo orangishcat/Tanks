@@ -22,7 +22,7 @@ public class TankBoss extends TankAIControlled
 		this.getBullet().maxLiveBullets = 4;
 		this.getBullet().recoil = 0;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.emblem = "emblems/star.png";

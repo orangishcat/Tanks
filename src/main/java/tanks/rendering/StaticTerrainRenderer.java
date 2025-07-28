@@ -376,7 +376,7 @@ public class StaticTerrainRenderer extends TerrainRenderer
 
     public void stageObstacles()
     {
-        if (!Game.enable3d)
+        if (!Game.options.graphics.enable3d)
             return;
 
         double d = Obstacle.draw_size;

@@ -228,7 +228,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
         else
             this.lookInside.posY = this.crusadeName.posY - this.objYSpace * 1.5;
 
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
             this.background = new DisplayCrusadeLevels(this.crusade);
     }
 
@@ -304,7 +304,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
     @Override
     public void draw()
     {
-        if (Game.previewCrusades)
+        if (Game.options.misc.previewCrusades)
         {
             this.background.draw();
 
@@ -340,7 +340,7 @@ public class ScreenCrusadePreview extends Screen implements ICrusadePreviewScree
         }
         else
         {
-            if (Game.previewCrusades)
+            if (Game.options.misc.previewCrusades)
                 Drawing.drawing.setColor(255, 255, 255);
             else
                 Drawing.drawing.setColor(0, 0, 0);

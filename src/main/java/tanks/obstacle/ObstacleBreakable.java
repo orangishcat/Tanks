@@ -25,7 +25,7 @@ public class ObstacleBreakable extends ObstacleStackable
     {
         double frac = Math.random() * 0.2 + 0.8;
 
-        if (!Game.fancyTerrain)
+        if (!Game.options.graphics.fancyTerrain)
             frac = 0.9;
 
         double[] col = new double[3];
@@ -108,7 +108,7 @@ public class ObstacleBreakable extends ObstacleStackable
 
         double offset = Math.pow(this.fallAnimation / 100, 2) * Game.tile_size;
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             for (int i = 0; i < Math.min(this.stackHeight, default_max_height); i++)
             {

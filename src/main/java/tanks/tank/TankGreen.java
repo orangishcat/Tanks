@@ -27,7 +27,7 @@ public class TankGreen extends TankAIControlled
 		this.enableLookingAtTargetEnemy = false;
 		this.enableDefensiveFiring = true;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.colorSkin = TankModels.fixed;
 			this.baseSkin = TankModels.diagonalStripes;

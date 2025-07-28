@@ -25,7 +25,7 @@ public class ConnectedPlayer
 		this.rawUsername = name;
 		this.username = name;
 		
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			this.username = Game.chatFilter.filterChat(this.rawUsername);
 	}
 
@@ -41,7 +41,7 @@ public class ConnectedPlayer
 		this.username = p.username;
 		this.rawUsername = p.username;
 
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			this.username = Game.chatFilter.filterChat(this.rawUsername);
 
 		this.isBot = p.isBot;

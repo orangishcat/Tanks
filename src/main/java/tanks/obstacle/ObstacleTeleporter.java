@@ -53,7 +53,7 @@ public class ObstacleTeleporter extends Obstacle
 	{
 		double height = this.baseGroundHeight;
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 		{
 			for (double i = height; i < height + 5; i++)
 			{
@@ -73,11 +73,11 @@ public class ObstacleTeleporter extends Obstacle
 		else
 			this.brightness = Math.min(1, this.brightness + 0.01 * Panel.frameFrequency);
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 		{
 			Drawing.drawing.setColor(this.colorR * (2 - this.brightness) / 2, this.colorG * (2 - this.brightness) / 2, this.colorB * (2 - this.brightness) / 2, 255, 1);
 
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 				Drawing.drawing.fillGlow(this.posX, this.posY, height + 7, draw_size * 20 / 8, draw_size * 20 / 8, true, false);
 
 			Drawing.drawing.setColor(this.colorR * (2 - this.brightness) / 2, this.colorG * (2 - this.brightness) / 2, this.colorB * (2 - this.brightness) / 2, 255, (2 - this.brightness) / 2);
@@ -85,7 +85,7 @@ public class ObstacleTeleporter extends Obstacle
 			Drawing.drawing.setColor(this.brightness * this.colorR + 255 * (1 - this.brightness), this.brightness * this.colorG + 255 * (1 - this.brightness), this.brightness * this.colorB  + 255 * (1 - this.brightness), 255, (2 - this.brightness) / 2);
 			Drawing.drawing.fillOval(this.posX, this.posY, height + 7, draw_size / 2, draw_size / 2, true, false);
 
-			if (Game.fancyTerrain)
+			if (Game.options.graphics.fancyTerrain)
 			{
 				glow.posX = this.posX;
 				glow.posY = this.posY;
@@ -100,7 +100,7 @@ public class ObstacleTeleporter extends Obstacle
 		{
 			Drawing.drawing.setColor(this.colorR * (2 - this.brightness) / 2, this.colorG * (2 - this.brightness) / 2, this.colorB * (2 - this.brightness) / 2, 255, 1);
 
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 				Drawing.drawing.fillGlow(this.posX, this.posY, draw_size * 20 / 8, draw_size * 20 / 8);
 
 			Drawing.drawing.setColor(this.colorR * (2 - this.brightness) / 2, this.colorG * (2 - this.brightness) / 2, this.colorB * (2 - this.brightness) / 2, 255, (2 - this.brightness) / 2);

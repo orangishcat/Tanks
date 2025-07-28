@@ -298,12 +298,12 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 
 	public void playDestroyAnimation(double posX, double posY, double radius)
 	{
-		if (Game.effectsEnabled)
+		if (Game.options.graphics.effect.particleEffects)
 		{
 			Effect.EffectType effect = this.destroyEffect;
 			double freq = Math.min((Math.sqrt(Math.pow(posX - this.posX, 2) + Math.pow(posY - this.posY, 2)) + Game.tile_size * 2.5) / radius, 1);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 			{
 				if (effect == Effect.EffectType.obstaclePiece)
 					effect = Effect.EffectType.obstaclePiece3d;
@@ -315,7 +315,7 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 					{
 						for (double l = 0; l < Game.tile_size; l += s)
 						{
-							if (Math.random() > this.destroyEffectAmount * freq * freq * Game.effectMultiplier)
+							if (Math.random() > this.destroyEffectAmount * freq * freq * Game.options.graphics.effect.particlePercentage)
 								continue;
 
 							Effect e = Effect.createNewEffect(this.posX + j + s / 2 - Game.tile_size / 2, this.posY + k + s / 2 - Game.tile_size / 2, l, effect);
@@ -342,7 +342,7 @@ public abstract class Obstacle extends SolidGameObject implements IDrawableForIn
 				{
 					for (int k = 0; k < Game.tile_size - 6; k += 4)
 					{
-						if (Math.random() > this.destroyEffectAmount * freq * freq * Game.effectMultiplier)
+						if (Math.random() > this.destroyEffectAmount * freq * freq * Game.options.graphics.effect.particlePercentage)
 							continue;
 
 						Effect e = Effect.createNewEffect(this.posX + j + 5 - Game.tile_size / 2, this.posY + k + 5 - Game.tile_size / 2, effect);

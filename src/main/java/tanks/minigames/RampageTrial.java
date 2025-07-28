@@ -46,7 +46,7 @@ public class RampageTrial extends Minigame
         this.introMusic = "arcade/battle_intro.ogg";
         this.disableFriendlyFire = true;
 
-        if (Game.deterministicMode)
+        if (Game.options.speedrun.deterministicMode != GameOptions.Deterministic.off)
             this.random = new Random(0);
         else
             this.random = new Random();
@@ -136,7 +136,7 @@ public class RampageTrial extends Minigame
             Drawing.drawing.playSound("rampage.ogg", (float) Math.pow(2, (value - 1) / 12.0));
             if (chain / 3 <= 8)
             {
-                Drawing.drawing.addSyncedMusic("arcade/rampage" + value + ".ogg", Game.musicVolume, true, 500);
+                Drawing.drawing.addSyncedMusic("arcade/rampage" + value + ".ogg", Game.options.sound.musicVolume, true, 500);
             }
         }
     }

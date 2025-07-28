@@ -22,7 +22,7 @@ public class TankSalmon extends TankAIControlled
 
 		this.coinValue = 10;
 
-		if (Game.tankTextures)
+		if (Game.options.graphics.tankTextures)
 		{
 			this.emblem = "emblems/curve.png";
 			this.emblemColor.set(this.secondaryColor);

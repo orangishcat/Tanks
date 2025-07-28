@@ -18,9 +18,9 @@ public class ScreenOptionsMultiplayer extends Screen
 		@Override
 		public void run() 
 		{
-			Game.enableChatFilter = !Game.enableChatFilter;
+			Game.options.multiplayer.chatFilter = !Game.options.multiplayer.chatFilter;
 
-			if (Game.enableChatFilter)
+			if (Game.options.multiplayer.chatFilter)
 				chatFilter.setText(chatFilterText, ScreenOptions.onText);
 			else
 				chatFilter.setText(chatFilterText, ScreenOptions.offText);
@@ -33,9 +33,9 @@ public class ScreenOptionsMultiplayer extends Screen
 		@Override
 		public void run()
 		{
-			Game.autoReady = !Game.autoReady;
+			Game.options.multiplayer.autoReady = !Game.options.multiplayer.autoReady;
 
-			if (Game.autoReady)
+			if (Game.options.multiplayer.autoReady)
 				autoReady.setText(autoReadyText, ScreenOptions.onText);
 			else
 				autoReady.setText(autoReadyText, ScreenOptions.offText);
@@ -54,12 +54,12 @@ public class ScreenOptionsMultiplayer extends Screen
 		this.music = "menu_options.ogg";
 		this.musicID = "menu";
 
-		if (Game.enableChatFilter)
+		if (Game.options.multiplayer.chatFilter)
 			chatFilter.setText(chatFilterText, ScreenOptions.onText);
 		else
 			chatFilter.setText(chatFilterText, ScreenOptions.offText);
 
-		if (Game.autoReady)
+		if (Game.options.multiplayer.autoReady)
 			autoReady.setText(autoReadyText, ScreenOptions.onText);
 		else
 			autoReady.setText(autoReadyText, ScreenOptions.offText);

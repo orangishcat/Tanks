@@ -1,6 +1,5 @@
 package tanks.gui;
 
-import basewindow.InputCodes;
 import basewindow.InputPoint;
 import tanks.Drawing;
 import tanks.Effect;
@@ -21,7 +20,7 @@ public class SearchBox extends TextBox
 
 		drawing.setInterfaceFontSize(this.sizeY * 0.6);
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 			drawTallGlow(this.posX, this.posY + 5, this.sizeX, this.sizeY, 0, 0.6, 0, 0, 0, 100, false);
 
 		drawing.setColor(this.bgColorR, this.bgColorG, this.bgColorB);
@@ -34,7 +33,7 @@ public class SearchBox extends TextBox
 
 		double m = 0.8;
 
-		if (Game.glowEnabled)
+		if (Game.options.graphics.glowEnabled)
 		{
 			if (selected)
 				Button.drawGlow(this.posX + sizeY / 2, this.posY + 3.5, this.sizeX - this.sizeY * (2 - m), this.sizeY * m, 0.55, 0, 0, 0, 160, false);
@@ -74,7 +73,7 @@ public class SearchBox extends TextBox
 
 		if (inputText.length() > 0)
 		{
-			if (Game.glowEnabled)
+			if (Game.options.graphics.glowEnabled)
 			{
 				if (clearSelected && !Game.game.window.touchscreen)
 				{
@@ -173,7 +172,7 @@ public class SearchBox extends TextBox
 
 	public void addEffect()
 	{
-		this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.effectMultiplier;
+		this.effectTimer += 0.25 * (this.sizeX + this.sizeY) / 400 * Math.random() * Game.options.graphics.effect.particlePercentage;
 
 		while (this.effectTimer >= 0.4 / Panel.frameFrequency)
 		{

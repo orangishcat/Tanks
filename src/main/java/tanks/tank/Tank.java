@@ -507,9 +507,9 @@ public abstract class Tank extends Movable implements ISolidObject
 
 				this.onDestroy();
 
-				if (Game.effectsEnabled)
+				if (Game.options.graphics.effect.particleEffects)
 				{
-					for (int i = 0; i < this.size * 2 * Game.effectMultiplier; i++)
+					for (int i = 0; i < this.size * 2 * Game.options.graphics.effect.particlePercentage; i++)
 					{
 						Effect e = Effect.createNewEffect(this.posX, this.posY, this.size / 4, Effect.EffectType.piece);
 						double var = 50;
@@ -518,7 +518,7 @@ public abstract class Tank extends Movable implements ISolidObject
 						e.colG = Math.min(255, Math.max(0, this.color.green + Math.random() * var - var / 2));
 						e.colB = Math.min(255, Math.max(0, this.color.blue + Math.random() * var - var / 2));
 
-						if (Game.enable3d)
+						if (Game.options.graphics.enable3d)
 							e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.atan(Math.random()), Math.random() * this.size / 50.0);
 						else
 							e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
@@ -557,7 +557,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		double boost = em.getAttributeValue(AttributeModifier.ember_effect, 0);
 
-		if (Math.random() * Panel.frameFrequency < boost * Game.effectMultiplier && Game.effectsEnabled && !ScreenGame.finishedQuick)
+		if (Math.random() * Panel.frameFrequency < boost * Game.options.graphics.effect.particlePercentage && Game.options.graphics.effect.particleEffects && !ScreenGame.finishedQuick)
 		{
 			Effect e = Effect.createNewEffect(this.posX, this.posY, Game.tile_size / 2, Effect.EffectType.piece);
 			double var = 50;
@@ -566,7 +566,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			e.colG = Math.min(255, Math.max(0, 180 + Math.random() * var - var / 2));
 			e.colB = Math.min(255, Math.max(0, 0 + Math.random() * var - var / 2));
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random());
 			else
 				e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random());
@@ -641,9 +641,9 @@ public abstract class Tank extends Movable implements ISolidObject
 				Drawing.drawing.playGlobalSound("transform.ogg", 1.2f);
 				Game.eventsOut.add(new EventTankUpdateVisibility(this.networkID, false));
 
-				if (Game.effectsEnabled)
+				if (Game.options.graphics.effect.particleEffects)
 				{
-					for (int i = 0; i < 50 * Game.effectMultiplier; i++)
+					for (int i = 0; i < 50 * Game.options.graphics.effect.particlePercentage; i++)
 					{
 						Effect e = Effect.createNewEffect(this.posX, this.posY, this.size / 4, Effect.EffectType.piece);
 						double var = 50;
@@ -651,7 +651,7 @@ public abstract class Tank extends Movable implements ISolidObject
 						e.colG = Math.min(255, Math.max(0, this.color.green + Math.random() * var - var / 2));
 						e.colB = Math.min(255, Math.max(0, this.color.blue + Math.random() * var - var / 2));
 
-						if (Game.enable3d)
+						if (Game.options.graphics.enable3d)
 							e.set3dPolarMotion(Math.random() * 2 * Math.PI, Math.random() * Math.PI, Math.random() * this.size / 50.0);
 						else
 							e.setPolarMotion(Math.random() * 2 * Math.PI, Math.random() * this.size / 50.0);
@@ -739,7 +739,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		Drawing.drawing.setColor(teamColor[0] * this.glowModifier * this.glowIntensity, teamColor[1] * this.glowModifier * this.glowIntensity, teamColor[2] * this.glowModifier * this.glowIntensity, 255, 1);
 
-		if (Game.glowEnabled && !transparent)
+		if (Game.options.graphics.glowEnabled && !transparent)
 		{
 			double gs = this.glowSize;
 			if (forInterface && gs > 8)
@@ -883,7 +883,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			}
 		}
 
-		if (Game.showTankIDs)
+		if (Game.options.debug.showTankIDs)
 		{
 			Drawing.drawing.setColor(0, 0, 0);
 			Drawing.drawing.setFontSize(30);
@@ -912,7 +912,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			if (!Game.game.window.drawingShadow)
 				drawAge += Panel.frameFrequency;
 
-			this.drawTank(false, Game.enable3d);
+			this.drawTank(false, Game.options.graphics.enable3d);
 
 			if (this.possessor != null)
 			{
@@ -926,7 +926,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			{
 				Drawing.drawing.setColor(this.color.red, this.color.green, this.color.blue, 255, 1);
 
-				if (Game.enable3d)
+				if (Game.options.graphics.enable3d)
 					Drawing.drawing.fillGlow(this.posX, this.posY, this.size / 4, this.size * 4 - this.age * 2, this.size * 4 - this.age * 2, true, false);
 				else
 					Drawing.drawing.fillGlow(this.posX, this.posY, this.size * 4 - this.age * 2, this.size * 4 - this.age * 2);
@@ -950,8 +950,8 @@ public abstract class Tank extends Movable implements ISolidObject
 	{
 		drawAge = Game.tile_size;
 
-		this.drawTank(false, Game.enable3d, true);
-		this.drawTurret(false, Game.enable3d, true);
+		this.drawTank(false, Game.options.graphics.enable3d, true);
+		this.drawTurret(false, Game.options.graphics.enable3d, true);
 
 		Drawing.drawing.setColor(this.secondaryColor.red, this.secondaryColor.green, this.secondaryColor.blue);
 	}
@@ -1101,7 +1101,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public void setEffectHeight(Effect e)
 	{
-		if (Game.enable3d && Game.enable3dBg)
+		if (Game.options.graphics.enable3d && Game.options.graphics.enable3dBg)
 		{
 			e.posZ = Math.max(e.posZ, Game.sampleTerrainGroundHeight(e.posX - e.size / 2, e.posY - e.size / 2));
 			e.posZ = Math.max(e.posZ, Game.sampleTerrainGroundHeight(e.posX + e.size / 2, e.posY - e.size / 2));
@@ -1181,7 +1181,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			}
 		}
 
-		if (Game.drawAutoZoom)
+		if (Game.options.debug.drawAutoZoom)
 		{
 			if (farthestM != null)
 			{
@@ -1293,7 +1293,7 @@ public abstract class Tank extends Movable implements ISolidObject
 		double size = Math.max(800 * (0.5 - frac), 0) * fade * mul;
 		Drawing.drawing.setColor(this.color.red, this.color.green, this.color.blue, 64 * Math.sin(Math.min(frac * Math.PI, Math.PI / 2)) * fade);
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			Drawing.drawing.fillOval(this.posX, this.posY, this.size / 2, size, size, false, false);
 		else
 			Drawing.drawing.fillOval(this.posX, this.posY, size, size);
@@ -1303,7 +1303,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		Drawing.drawing.setColor(this.secondaryColor.red, this.secondaryColor.green, this.secondaryColor.blue, 64 * Math.sin(Math.min(frac2 * Math.PI, Math.PI / 2)) * fade);
 
-		if (Game.enable3d)
+		if (Game.options.graphics.enable3d)
 			Drawing.drawing.fillOval(this.posX, this.posY, this.size / 2, size2, size2, false, false);
 		else
 			Drawing.drawing.fillOval(this.posX, this.posY, size2, size2);
@@ -1329,7 +1329,7 @@ public abstract class Tank extends Movable implements ISolidObject
 			double v = size * Math.cos(frac * Math.PI * 2);
 			double v1 = size * Math.sin(frac * Math.PI * 2);
 
-			if (Game.enable3d)
+			if (Game.options.graphics.enable3d)
 				Drawing.drawing.fillOval(x + v, y + v1, z, s * dotSize, s * dotSize, false, false);
 			else
 				Drawing.drawing.fillOval(x + v, y + v1, s * dotSize, s * dotSize);

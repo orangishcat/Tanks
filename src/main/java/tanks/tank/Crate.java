@@ -6,8 +6,6 @@ import tanks.Movable;
 import tanks.Panel;
 import tanks.obstacle.Obstacle;
 
-import java.util.Random;
-
 public class Crate extends Movable
 {
     public Tank tank;
@@ -31,12 +29,12 @@ public class Crate extends Movable
         if (this.age <= 0)
             Drawing.drawing.playGlobalSound("accel.ogg", (float) (0.75f / this.iPosZ * 1000), 0.25f);
 
-        if (Game.game.window.drawingShadow || !Game.shadowsEnabled)
+        if (Game.game.window.drawingShadow || !Game.options.graphics.shadow.shadowsEnabled)
             this.age += Panel.frameFrequency;
 
         double size = this.size * Obstacle.draw_size / Game.tile_size * Math.min(1, this.age / (Game.tile_size * 1.5));
 
-        if (Game.enable3d)
+        if (Game.options.graphics.enable3d)
         {
             Drawing.drawing.setColor(this.tank.secondaryColor);
             Drawing.drawing.fillBox(this.posX, this.posY, this.posZ, size, size, size);
@@ -82,7 +80,7 @@ public class Crate extends Movable
         if (this.tank.emblem != null)
             Drawing.drawing.drawImage(this.tank.emblem, this.posX, this.posY, frac * this.size * 0.75, frac * this.size * 0.75);
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
         {
             Drawing.drawing.setColor(this.tank.secondaryColor.red, this.tank.secondaryColor.green, this.tank.secondaryColor.blue, frac * 255, 1);
             Drawing.drawing.fillGlow(this.posX, this.posY, this.size * 4, this.size * 4);

@@ -69,7 +69,7 @@ public class Laser extends Movable implements IDrawableWithGlow
 
         double frac = this.age / this.maxAge;
 
-        boolean depth = Game.enable3d;
+        boolean depth = Game.options.graphics.enable3d;
 
         if (!expired)
         {
@@ -114,7 +114,7 @@ public class Laser extends Movable implements IDrawableWithGlow
             }
         }
 
-        if (Game.glowEnabled)
+        if (Game.options.graphics.glowEnabled)
             drawGlow();
     }
 
@@ -129,7 +129,7 @@ public class Laser extends Movable implements IDrawableWithGlow
         double frac = this.age / this.maxAge;
         double mul = 4;
 
-        boolean depth = Game.enable3d;
+        boolean depth = Game.options.graphics.enable3d;
 
         if (!expired)
         {

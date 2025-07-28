@@ -105,12 +105,12 @@ public abstract class Screen implements IBatchRenderableObject
 		if (this.forceInBounds)
 			frac = 0;
 
-		if (drawBgRect && (!(this instanceof ScreenExit) && size >= 1 && (selfBatch || (!Game.fancyTerrain && !Game.enable3d))))
+		if (drawBgRect && (!(this instanceof ScreenExit) && size >= 1 && (selfBatch || (!Game.options.graphics.fancyTerrain && !Game.options.graphics.enable3d))))
 		{
 			Drawing.drawing.setColor(174 * frac + (1 - frac) * Level.currentColor.red, 92 * frac + (1 - frac) * Level.currentColor.green, 16 * frac + (1 - frac) * Level.currentColor.blue);
 
 			double mul = 1;
-			if (Game.angledView)
+			if (Game.options.graphics.angledView)
 				mul = 2;
 
 			Drawing.drawing.fillShadedInterfaceRect(Drawing.drawing.interfaceSizeX / 2, Drawing.drawing.interfaceSizeY / 2,

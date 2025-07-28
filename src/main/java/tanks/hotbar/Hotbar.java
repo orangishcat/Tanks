@@ -82,10 +82,10 @@ public class Hotbar
 		else
 			this.verticalOffset = 0;
 
-		if (this.persistent && !Hotbar.circular)
+		if (this.persistent && !Game.options.misc.circularHotbar)
 			this.hidden = false;
 
-		if (Hotbar.circular && Game.screen instanceof ScreenGame && !(((ScreenGame) Game.screen).shopScreen || ((ScreenGame) Game.screen).buildsScreen))
+		if (Game.options.misc.circularHotbar && Game.screen instanceof ScreenGame && !(((ScreenGame) Game.screen).shopScreen || ((ScreenGame) Game.screen).buildsScreen))
 			this.hidden = true;
 
 		if (ScreenGame.finished)
