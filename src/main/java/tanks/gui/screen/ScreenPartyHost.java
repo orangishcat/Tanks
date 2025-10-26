@@ -240,7 +240,7 @@ public class ScreenPartyHost extends Screen
     public static void privateChat(String s, UUID id)
     {
         String message = getServerMessage(s);
-        sendEventTo(new EventChat(message), id);
+        sendEventTo(new EventChat("\u00a7150150150255(PM) " + message), id);
         chat.add(0, new ChatMessage("\u00a7150150150255(To " + id.toString().substring(0, 8) + ") " + message));
     }
 

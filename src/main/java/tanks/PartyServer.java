@@ -35,27 +35,6 @@ public class PartyServer
         Command.register("play_versus", "Plays a versus level",
             (parts, clientID) -> ScreenPartyHost.playVersus()
         );
-        Command.register("transfer_host", "Transfers host to another player",
-            (parts, clientID) ->
-            {
-                List<UUID> newHost = ScreenPartyHost.server.connections.stream()
-                    .filter(c -> c.username.equals(parts[0]) && !c.clientID.equals(host))
-                    .map(c -> c.clientID).collect(Collectors.toList());
-                if (newHost.isEmpty())
-                {
-                    ScreenPartyHost.privateChat("Player not found! (or already host)", clientID);
-                    return;
-                }
-                if (newHost.size() > 1)
-                {
-                    ScreenPartyHost.privateChat("Multiple players found!", clientID);
-                    return;
-                }
-                host = newHost.get(0);
-                ScreenPartyHost.sendChatMessage("Host transferred to " + parts[0]);
-                ScreenPartyHost.privateChat("You are the party host!", host);
-            }, "player_username"
-        );
         Command.register("list_levels", "Lists all levels",
             (parts, clientID) ->
             {
@@ -73,7 +52,7 @@ public class PartyServer
                 );
             }
         );
-        Command.register("play_level", "Plays a level",
+        Command.register("play_level", "Plays a shared level",
             (parts, clientID) ->
             {
                 int id;
@@ -98,6 +77,27 @@ public class PartyServer
                     ScreenPartyHost.privateChat("Level load failed!", clientID);
                 }
             }, "id"
+        );
+        Command.register("transfer_host", "Transfers host to another player",
+            (parts, clientID) ->
+            {
+                List<UUID> newHost = ScreenPartyHost.server.connections.stream()
+                    .filter(c -> c.username.equals(parts[0]) && !c.clientID.equals(host))
+                    .map(c -> c.clientID).collect(Collectors.toList());
+                if (newHost.isEmpty())
+                {
+                    ScreenPartyHost.privateChat("Player not found! (or already host)", clientID);
+                    return;
+                }
+                if (newHost.size() > 1)
+                {
+                    ScreenPartyHost.privateChat("Multiple players found!", clientID);
+                    return;
+                }
+                host = newHost.get(0);
+                ScreenPartyHost.sendChatMessage("Host transferred to " + parts[0]);
+                ScreenPartyHost.privateChat("You are the party host!", host);
+            }, "player_username"
         );
         Command.register("reload", "Reload commands",
             (parts, clientID) ->
