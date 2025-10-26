@@ -181,7 +181,8 @@ public class Panel
 		for (Extension e : Game.extensionRegistry.extensions)
 			e.loadResources();
 
-		Game.screen = new ScreenIntro();
+        if (!PartyServer.isPartyServer)
+		    Game.screen = new ScreenIntro();
 
 		Game.loadTankMusic();
 
@@ -637,12 +638,19 @@ public class Panel
 		{
 			synchronized (ScreenPartyHost.server.connections)
 			{
-				for (int j = 0; j < ScreenPartyHost.server.connections.size(); j++)
+                for (ServerHandler s : ScreenPartyHost.server.connections)
 				{
-					if (ScreenPartyHost.server.connections.get(j).joined)
-						ScreenPartyHost.server.connections.get(j).addEvents(Game.eventsOut);
-
-					ScreenPartyHost.server.connections.get(j).reply();
+                    if (s.joined)
+                    {
+                        s.addEvents(Game.eventsOut);
+                        ScreenPartyHost.targetedEvents.computeIfPresent(s.clientID, (k, v) ->
+                        {
+                            s.addEvents(v);
+                            v.clear();
+                            return v;
+                        });
+                    }
+                    s.reply();
 				}
 			}
 

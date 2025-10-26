@@ -1,6 +1,6 @@
 package tanks.network.event;
 
-import tanks.Game;
+import tanks.*;
 import tanks.gui.ChatMessage;
 import tanks.gui.screen.*;
 import tanks.network.ServerHandler;
@@ -38,7 +38,7 @@ public class EventChat extends PersonalEvent
 						s.sendEventAndClose(new EventKick("Invalid chat message received!"));
                     else if (ScreenPartyHost.activeScreen.mutedPlayers.contains(this.clientID))
                         s.sendEvent(new EventChat("\u00A7255000000255The party host has disabled your ability to chat!"));
-					else
+					else if (!PartyServer.isPartyServer || PartyServer.onChatMessage(s.player, this.message))
 					{
 						ScreenPartyHost.chat.add(0, new ChatMessage(s.player, this.message));
 						Game.eventsOut.add(new EventPlayerChat(s.player, this.message));

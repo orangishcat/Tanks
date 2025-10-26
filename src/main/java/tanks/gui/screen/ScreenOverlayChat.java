@@ -172,15 +172,15 @@ public class ScreenOverlayChat
                             Drawing.drawing.drawInterfaceModel(TankModels.plainTankModel.turretBase, x, y, size, size, 0);
                         }
 
+                        if (isDark())
+                            Drawing.drawing.setColor(255, 255, 255, 255 * opacity);
+                        else
+                            Drawing.drawing.setColor(0, 0, 0, 255 * opacity);
+
                         for (int j = c.lines.size() - 1; j >= 0; j--)
                         {
                             double mx = 20;
                             double my = Drawing.drawing.getInterfaceEdgeY(true) - i * 30 - startY;
-
-                            if (isDark())
-                                Drawing.drawing.setColor(255, 255, 255, 255 * opacity);
-                            else
-                                Drawing.drawing.setColor(0, 0, 0, 255 * opacity);
 
                             Drawing.drawing.drawInterfaceText(mx, my, c.lines.get(j), false);
                             i++;

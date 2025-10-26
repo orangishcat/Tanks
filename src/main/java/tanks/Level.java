@@ -532,6 +532,9 @@ public class Level
 			Game.movables.add(t);
 		}
 
+        if (PartyServer.isPartyServer)
+            PartyServer.onLevelLoad(this);
+
 		this.availablePlayerSpawns.clear();
 
 		int playerCount = 1;

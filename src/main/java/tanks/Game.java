@@ -75,11 +75,8 @@ public class Game
 	 * lifespan value, and if it goes below zero, remove that track and repeat with the remainder of time elapsed.
      */
     public static Queue<Effect> tracks = new LinkedList<>();
-
-
     public static ArrayList<Player> botPlayers = new ArrayList<>();
 	public static int botPlayerCount = 0;
-
 	/**
 	 * Obstacles that need to change how they look next frame
 	 */
@@ -533,7 +530,7 @@ public class Game
 	{
 		version = "Tanks v" + Game.readVersionFromFile();
 		player = new Player(clientID, "");
-		Game.players.add(player);
+        Game.players.add(player);
 
 		Drawing.initialize();
 		Panel.initialize();
@@ -778,6 +775,9 @@ public class Game
 		ArrayList<String> overrideLocations = new ArrayList<>();
 		overrideLocations.add(Game.homedir + Game.resourcesPath);
 		Game.game.window.setOverrideLocations(overrideLocations, Game.game.fileManager);
+
+        if (PartyServer.isPartyServer)
+            PartyServer.onGameInit();
 	}
 
 	public static void createModels()

@@ -2,13 +2,8 @@ package tanks.gui.screen;
 
 import tanks.Drawing;
 import tanks.Game;
-import tanks.Player;
 import tanks.gui.Button;
 import tanks.gui.TextBox;
-import tanks.obstacle.ObstacleTeleporter;
-import tanks.tank.Turret;
-
-import java.util.UUID;
 
 public class ScreenParty extends Screen
 {
@@ -30,27 +25,7 @@ public class ScreenParty extends Screen
 	
 	Button back = new Button(this.centerX, this.centerY + this.objYSpace * 3.5, this.objWidth, this.objHeight, "Back", () -> Game.screen = new ScreenPlay());
 	
-	Button create = new Button(this.centerX, this.centerY, this.objWidth, this.objHeight, "Create a party", () ->
-	{
-		ScreenPartyHost.chat.clear();
-		ScreenPartyHost.isServer = false;
-		ScreenPartyHost.includedPlayers.clear();
-		ScreenPartyHost.readyPlayers.clear();
-		ScreenPartyHost.activeScreen = null;
-		ScreenSharedLevels.page = 0;
-
-		Game.players.clear();
-		Game.players.add(Game.player);
-
-		ScreenPartyHost.setBotCount(Game.botPlayerCount);
-
-		ScreenPartyHost.disconnectedPlayers.clear();
-
-		Drawing.drawing.playSound("join.ogg");
-
-		Game.screen = new ScreenPartyHost();
-	}
-	);
+	Button create = new Button(this.centerX, this.centerY, this.objWidth, this.objHeight, "Create a party", ScreenParty::createParty);
 	
 	Button join = new Button(this.centerX, this.centerY + this.objYSpace, this.objWidth, this.objHeight, "Join a party", () -> Game.screen = new ScreenJoinParty());
 	
@@ -70,7 +45,28 @@ public class ScreenParty extends Screen
 	},
 			Game.port + "", "Sets port for multiplayer------Make sure all players are using---the same port");
 
-	@Override
+    public static void createParty()
+    {
+        ScreenPartyHost.chat.clear();
+        ScreenPartyHost.isServer = false;
+        ScreenPartyHost.includedPlayers.clear();
+        ScreenPartyHost.readyPlayers.clear();
+        ScreenPartyHost.activeScreen = null;
+        ScreenSharedLevels.page = 0;
+
+        Game.players.clear();
+        Game.players.add(Game.player);
+
+        ScreenPartyHost.setBotCount(Game.botPlayerCount);
+
+        ScreenPartyHost.disconnectedPlayers.clear();
+
+        Drawing.drawing.playSound("join.ogg");
+
+        Game.screen = new ScreenPartyHost();
+    }
+
+    @Override
 	public void update() 
 	{
 		back.update();

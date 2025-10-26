@@ -39,6 +39,8 @@ public class Tanks
                 port = Integer.parseInt(arg.split("=")[1]);
             if (arg.equals("debug"))
                 Game.debug = true;
+            if (arg.equals("party_server"))
+                PartyServer.isPartyServer = true;
             if (arg.equals("mac") || arg.equals("no_relaunch"))
                 relaunch = false;
             if (arg.equals("no_steam"))

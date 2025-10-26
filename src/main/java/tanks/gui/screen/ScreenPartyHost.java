@@ -6,9 +6,7 @@ import tanks.generator.LevelGeneratorVersus;
 import tanks.gui.Button;
 import tanks.gui.ChatBox;
 import tanks.gui.ChatMessage;
-import tanks.network.Server;
-import tanks.network.ServerHandler;
-import tanks.network.SynchronizedList;
+import tanks.network.*;
 import tanks.network.event.*;
 import tanks.tank.Tank;
 import tanks.tank.Turret;
@@ -16,15 +14,14 @@ import tanks.translation.Translation;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 public class ScreenPartyHost extends Screen
 {
     Thread serverThread;
     public static Server server;
     public static boolean isServer = false;
+    public static HashMap<UUID, ArrayList<INetworkEvent>> targetedEvents = new HashMap<>();
     public static SynchronizedList<UUID> includedPlayers = new SynchronizedList<>();
     public static SynchronizedList<Player> readyPlayers = new SynchronizedList<>();
     public static SynchronizedList<UUID> disconnectedPlayers = new SynchronizedList<>();
@@ -68,9 +65,7 @@ public class ScreenPartyHost extends Screen
     });
 
     public Button invite = new Button(this.centerX + 190, this.centerY - 340, this.objWidth, this.objHeight, "Invite Steam friends", () ->
-    {
-        Game.screen = new ScreenInviteSteamFriends(Game.screen);
-    });
+        Game.screen = new ScreenInviteSteamFriends(Game.screen));
 
     public Button steamHostFailed = new Button(this.centerX, this.centerY - 340, this.objWidth, this.objHeight, "Retry Steam hosting", () ->
     {
@@ -78,12 +73,7 @@ public class ScreenPartyHost extends Screen
             Game.steamNetworkHandler.hostParty();
     }, "Hosting failed");
 
-    Button newLevel = new Button(this.centerX + 190, this.centerY - 250, this.objWidth, this.objHeight, "Random co-op", () ->
-    {
-        Game.cleanUp();
-        Game.loadRandomLevel();
-        Game.screen = new ScreenGame();
-    }
+    Button newLevel = new Button(this.centerX + 190, this.centerY - 250, this.objWidth, this.objHeight, "Random co-op", ScreenPartyHost::playRandomLevel
             , "Generate a random level to play");
 
     Button nextUsernamePage = new Button(this.centerX - 190,
@@ -94,16 +84,7 @@ public class ScreenPartyHost extends Screen
             300, 30, "Previous page", () -> usernamePage--
     );
 
-    Button versus = new Button(this.centerX + 190, this.centerY - 190, this.objWidth, this.objHeight, "Random versus", () ->
-    {
-        Game.cleanUp();
-        String s = LevelGeneratorVersus.generateLevelString();
-        Level l = new Level(s);
-        l.loadLevel();
-        ScreenGame.versus = true;
-
-        Game.screen = new ScreenGame();
-    }
+    Button versus = new Button(this.centerX + 190, this.centerY - 190, this.objWidth, this.objHeight, "Random versus", ScreenPartyHost::playVersus
             , "Fight other players in this party---in a randomly generated level");
 
     Button crusades = new Button(this.centerX + 190, this.centerY - 130, this.objWidth, this.objHeight, "Crusades", () ->
@@ -116,9 +97,7 @@ public class ScreenPartyHost extends Screen
             "Fight battles in an order,---and see how long you can survive!");
 
     Button minigames = new Button(this.centerX + 190, this.centerY - 70, this.objWidth, this.objHeight, "Minigames", () ->
-    {
-        Game.screen = new ScreenMinigames();
-    },
+        Game.screen = new ScreenMinigames(),
             "Play Tanks in new ways!");
 
     Button myLevels = new Button(this.centerX + 190, this.centerY - 10, this.objWidth, this.objHeight, "My levels", () -> Game.screen = new ScreenPlaySavedLevels(),
@@ -249,6 +228,51 @@ public class ScreenPartyHost extends Screen
 
         if (Game.steamNetworkHandler.initialized)
             Game.steamNetworkHandler.hostParty();
+    }
+
+    public static void sendChatMessage(String s)
+    {
+        String message = getServerMessage(s);
+        Game.eventsOut.add(new EventChat(message));
+        chat.add(0, new ChatMessage(message));
+    }
+
+    public static void privateChat(String s, UUID id)
+    {
+        String message = getServerMessage(s);
+        sendEventTo(new EventChat(message), id);
+        chat.add(0, new ChatMessage(message));
+    }
+
+    private static String getServerMessage(String s)
+    {
+        return "\u00a7255127000255[Server]\u00a7r " + s.replaceAll("\n", " \n ");
+    }
+
+    public static void sendEventTo(INetworkEvent e, UUID id)
+    {
+        if (!ScreenPartyHost.isServer)
+            return;
+
+        targetedEvents.computeIfAbsent(id, k -> new ArrayList<>()).add(e);
+    }
+
+    public static void playRandomLevel()
+    {
+        Game.cleanUp();
+        Game.loadRandomLevel();
+        Game.screen = new ScreenGame();
+    }
+
+    public static void playVersus()
+    {
+        Game.cleanUp();
+        String s = LevelGeneratorVersus.generateLevelString();
+        Level l = new Level(s);
+        l.loadLevel();
+        ScreenGame.versus = true;
+
+        Game.screen = new ScreenGame();
     }
 
     @Override

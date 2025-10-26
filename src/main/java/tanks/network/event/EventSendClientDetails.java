@@ -62,7 +62,7 @@ public class EventSendClientDetails extends PersonalEvent implements IServerThre
 			return;
 		}
 
-		if (Game.usernameInvalid(this.username) || this.username.equals(""))
+		if (Game.usernameInvalid(this.username) || this.username.isEmpty())
 		{
 			s.sendEventAndClose(new EventKick("Invalid username!"));
 			return;
@@ -155,5 +155,8 @@ public class EventSendClientDetails extends PersonalEvent implements IServerThre
 		Game.eventsOut.add(new EventPlaySound("join.ogg", 1.0f, 1.0f));
 
 		s.joined = true;
+
+        if (PartyServer.isPartyServer)
+            PartyServer.onClientConnect(this.clientID);
 	}
 }

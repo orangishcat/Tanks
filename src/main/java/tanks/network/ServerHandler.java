@@ -69,6 +69,9 @@ public class ServerHandler extends NetworkHandler
 
 				Game.eventsIn.add(new EventPlaySound("leave.ogg", 1.0f, 1.0f));
 				ScreenPartyHost.chat.add(0, new ChatMessage("\u00A7000127255255" + this.username + " has left the party\u00A7000000000255"));
+
+                if (PartyServer.isPartyServer)
+                    PartyServer.onClientDisconnect(this.clientID);
 			}
 		}
     }
@@ -85,6 +88,9 @@ public class ServerHandler extends NetworkHandler
 
 	public void addEvents(ArrayList<INetworkEvent> events)
 	{
+        if (events == null)
+            return;
+
 		synchronized (this.events)
 		{
 			int j = 0;
