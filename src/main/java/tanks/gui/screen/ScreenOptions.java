@@ -189,6 +189,9 @@ public class ScreenOptions extends Screen
 
 	public static void saveOptions(String homedir)
 	{
+        if (PartyServer.isPartyServer)
+            return;
+
 		String path = homedir + Game.optionsPath;
 
 		try

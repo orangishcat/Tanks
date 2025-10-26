@@ -91,6 +91,7 @@ public class PartyServer
                 {
                     Game.cleanUp();
                     new Level(ScreenPartyHost.activeScreen.sharedLevels.get(id).level).loadLevel();
+                    Game.screen = new ScreenGame();
                 }
                 catch (Exception e)
                 {
