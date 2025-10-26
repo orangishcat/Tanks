@@ -193,8 +193,6 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 
 	public boolean enableCollision = true;
 
-	public boolean externalBulletCollision = true;
-
 	public boolean affectsMaxLiveBullets;
 
 	/**
@@ -539,7 +537,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 			if (this.destroy && this.rebounds > 0)
 				this.rebound(o);
 		}
-		else if (o instanceof Bullet && ((Bullet) o).enableCollision && ((Bullet) o).enableExternalCollisions)
+		else if (o instanceof Bullet && canCollideWith((Bullet) o))
 		{
 			this.collidedWithBullet((Bullet) o);
 
@@ -629,6 +627,15 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 		this.addTrail();
 		b.addTrail();
 	}
+
+    public boolean canCollideWith(Bullet other)
+    {
+        if (!(enableCollision && enableExternalCollisions && other.enableCollision && other.enableExternalCollisions))
+            return false;
+        if (this instanceof BulletGas && other instanceof BulletGas)
+            return other.tank != tank && !this.typeName.equals(other.typeName);
+        return true;
+    }
 
 	public void collidedWithBullet(Bullet b)
 	{
@@ -923,7 +930,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
             if (m instanceof Bullet)
             {
                 Bullet b = (Bullet) m;
-                if (!b.enableCollision || b.delay > 0 || !b.bulletCollision || !b.externalBulletCollision || !this.bulletCollision)
+                if (!b.enableCollision || b.delay > 0 || !b.bulletCollision || !this.bulletCollision)
                     continue;
             }
 
@@ -1723,7 +1730,7 @@ public class Bullet extends Movable implements ICopyable<Bullet>, ITanksONEditab
 	@Override
 	public boolean bulletCollision()
 	{
-		return bulletCollision && externalBulletCollision && enableExternalCollisions;
+		return bulletCollision && enableExternalCollisions;
 	}
 
 	public double getSize()

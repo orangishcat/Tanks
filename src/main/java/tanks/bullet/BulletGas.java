@@ -50,7 +50,6 @@ public class BulletGas extends Bullet implements IDrawableWithGlow
         this.useCustomWallCollision = true;
         this.playPopSound = false;
         this.playBounceSound = false;
-        this.externalBulletCollision = false;
         this.destroyBullets = false;
         this.canMultiDamage = true;
         this.canBeCanceled = false;
