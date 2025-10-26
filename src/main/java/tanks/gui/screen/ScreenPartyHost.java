@@ -241,7 +241,7 @@ public class ScreenPartyHost extends Screen
     {
         String message = getServerMessage(s);
         sendEventTo(new EventChat(message), id);
-        chat.add(0, new ChatMessage(message));
+        chat.add(0, new ChatMessage("\u00a7150150150255(To " + id.toString().substring(0, 8) + ") " + message));
     }
 
     private static String getServerMessage(String s)
