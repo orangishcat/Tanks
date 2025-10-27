@@ -2,6 +2,7 @@ package tanks.gui.screen;
 
 import basewindow.*;
 import basewindow.transformation.*;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import tanks.*;
 import tanks.bullet.Bullet;
 import tanks.generator.LevelGeneratorVersus;
@@ -123,6 +124,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
     protected int specialReadyMusicIterationsLeft = 0;
     public String specialReadyMusic = null;
 
+    public ObjectArrayList<Button> pauseMenuButtons = new ObjectArrayList<>();
+
     @SuppressWarnings("unchecked")
     public ArrayList<IDrawable>[] drawables = (ArrayList<IDrawable>[]) (new ArrayList[10]);
 
@@ -170,7 +173,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
         }
         ready = true;
     }
-    );
+    ).tieToCommand(PartyServer.startNow);
 
 
     Button enterShop = new Button(Drawing.drawing.interfaceSizeX - 200, Drawing.drawing.interfaceSizeY - 110, 350, 40, "Shop", new Runnable()
@@ -682,9 +685,9 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
         }
 
         if (Game.currentLevel != null && Game.currentLevel.timed)
-        {
             this.timeRemaining = Game.currentLevel.timer;
-        }
+
+        addPauseMenuButtons();
 
         if (ScreenPartyHost.isServer)
         {
@@ -702,6 +705,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
     {
         this();
         this.name = s;
+        addPauseMenuButtons();
     }
 
     public ScreenGame(Crusade c)
@@ -715,6 +719,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
         {
             Game.currentLevel.itemNumbers.put(this.shop.get(i).itemStack.item.name, i + 1);
         }
+        addPauseMenuButtons();
     }
 
     public void botShopping()
@@ -1337,104 +1342,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
                 if (this.overlay != null)
                     this.overlay.update();
                 else
-                {
-                    if (ScreenPartyLobby.isClient)
-                    {
-                        closeMenuClient.update();
-                        exitParty.update();
-                    }
-                    else if (ScreenPartyHost.isServer)
-                    {
-                        if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames || ScreenInterlevel.fromQuickPlay != null)
-                        {
-                            closeMenuLowerPos.update();
-                            restartLowerPos.update();
-
-                            if (ScreenInterlevel.fromQuickPlay == null)
-                                back.update();
-                            else
-                                backToQuickPlay.update();
-                        }
-                        else if (Crusade.crusadeMode)
-                        {
-                            closeMenuLowerPos.update();
-
-                            if (Crusade.currentCrusade.finalLife())
-                            {
-                                restartCrusadePartyFinalLife.update();
-
-                                if (finishedQuick && Panel.win)
-                                    quitCrusadeParty.update();
-                                else
-                                    quitCrusadePartyFinalLife.update();
-                            }
-                            else
-                            {
-                                restartCrusadeParty.update();
-                                quitCrusadeParty.update();
-                            }
-                        }
-                        else
-                        {
-                            closeMenu.update();
-                            newLevel.update();
-                            restart.update();
-                            quitPartyGame.update();
-                        }
-                    }
-                    else if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-                    {
-                        resumeLowerPos.update();
-                        restartLowerPos.update();
-                        back.update();
-                    }
-                    else if (ScreenInterlevel.tutorialInitial)
-                    {
-                        resumeLowerPos.update();
-                        restartTutorial.update();
-                    }
-                    else if (ScreenInterlevel.tutorial)
-                    {
-                        resumeLowerPos.update();
-                        restartTutorial.update();
-                        quitHigherPos.update();
-                    }
-                    else if (Crusade.crusadeMode)
-                    {
-                        if (Crusade.currentCrusade.finalLife())
-                        {
-                            restartCrusadeFinalLife.update();
-                            quitCrusadeFinalLife.update();
-                        }
-                        else
-                        {
-                            restartCrusade.update();
-                            quitCrusade.update();
-                        }
-
-                        resumeLowerPos.update();
-                    }
-                    else if (ScreenInterlevel.fromQuickPlay != null)
-                    {
-                        backToQuickPlay.update();
-                        restartLowerPos.update();
-                        resumeLowerPos.update();
-                    }
-                    else if (name != null)
-                    {
-                        resume.update();
-                        edit.update();
-                        restart.update();
-                        quit.update();
-                    }
-                    else
-                    {
-                        resume.update();
-                        newLevel.update();
-                        restart.update();
-                        quit.update();
-                    }
-                }
+                    for (Button b : pauseMenuButtons)
+                        b.update();
             }
 
             if (!ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)
@@ -1733,7 +1642,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
                 {
                     Team t;
 
-                    if (Game.playerTank != null && m instanceof IServerPlayerTank && !Team.isAllied(m, Game.playerTank))
+                    if (!PartyServer.isPartyServer && Game.playerTank != null && m instanceof IServerPlayerTank && !Team.isAllied(m, Game.playerTank))
                     {
                         if (!isVersus)
                             Game.eventsOut.add(new EventSetLevelVersus());
@@ -2092,6 +2001,53 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
             this.tutorial.update();
         }
     }
+
+        public void addPauseMenuButtons()
+        {
+            pauseMenuButtons.clear();
+            addButtons(pauseMenuButtons,
+                ScreenPartyLobby.isClient ? new Button[]{closeMenuClient, exitParty} : null,
+                ScreenPartyHost.isServer ? getServerButtons() : null,
+                name != null ? new Button[]{resume, edit, restart, quit} : null,
+                (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames) ? new Button[]{resumeLowerPos,
+                    restartLowerPos, ScreenInterlevel.fromQuickPlay != null ? backToQuickPlay : back} : null,
+                ScreenInterlevel.tutorialInitial ? new Button[]{resumeLowerPos, restartTutorial} : null,
+                ScreenInterlevel.tutorial ? new Button[]{resumeLowerPos, restartTutorial, quitHigherPos} : null,
+                Crusade.crusadeMode ? getCrusadeButtons() : null
+            );
+            if (pauseMenuButtons.isEmpty())
+                addButtons(pauseMenuButtons, new Button[]{resume, newLevel, restart, quit});
+        }
+
+        private Button[] getServerButtons()
+        {
+            if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
+            {
+                return new Button[]{closeMenuLowerPos, restartLowerPos.tieToCommand(PartyServer.restart), back.tieToCommand(PartyServer.exitLevel)};
+            }
+            else if (Crusade.crusadeMode)
+            {
+                return new Button[]{closeMenuLowerPos, restartCrusadePartyFinalLife.tieToCommand(PartyServer.restart),
+                    ((finishedQuick && Panel.win) || !Crusade.currentCrusade.finalLife() ? quitCrusadeParty : quitCrusadePartyFinalLife).tieToCommand(PartyServer.exitLevel)};
+            }
+            else
+                return new Button[]{closeMenu, newLevel, restart.tieToCommand(PartyServer.restart, this), quitPartyGame.tieToCommand(PartyServer.exitLevel, this)};
+        }
+
+        private Button[] getCrusadeButtons()
+        {
+            if (Crusade.currentCrusade.finalLife())
+                return new Button[]{restartCrusadeFinalLife, quitCrusadeFinalLife, resumeLowerPos};
+            else
+                return new Button[]{restartCrusade,quitCrusade, resumeLowerPos};
+        }
+
+        private static void addButtons(ObjectArrayList < Button > buttons, Button[]...buttonGroups)
+        {
+            for (Button[] group : buttonGroups)
+                if (group != null)
+                    buttons.addElements(0, group);
+        }
 
     public static void handleRemovals()
     {
@@ -3097,102 +3053,8 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
             Drawing.drawing.setColor(127, 178, 228, 64);
             Game.game.window.shapeRenderer.fillRect(0, 0, Game.game.window.absoluteWidth + 1, Game.game.window.absoluteHeight + 1);
 
-            if (ScreenPartyLobby.isClient)
-            {
-                closeMenuClient.draw();
-                exitParty.draw();
-            }
-            else if (ScreenPartyHost.isServer)
-            {
-                if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames || ScreenInterlevel.fromQuickPlay != null)
-                {
-                    closeMenuLowerPos.draw();
-                    restartLowerPos.draw();
-
-                    if (ScreenInterlevel.fromQuickPlay == null)
-                        back.draw();
-                    else
-                        backToQuickPlay.draw();
-                }
-                else if (Crusade.crusadeMode)
-                {
-                    closeMenuLowerPos.draw();
-
-                    if (Crusade.currentCrusade.finalLife())
-                    {
-                        if (Panel.win && finishedQuick)
-                            quitCrusadeParty.draw();
-                        else
-                            quitCrusadePartyFinalLife.draw();
-
-                        restartCrusadePartyFinalLife.draw();
-                    }
-                    else
-                    {
-                        quitCrusadeParty.draw();
-                        restartCrusadeParty.draw();
-                    }
-                }
-                else
-                {
-                    closeMenu.draw();
-                    newLevel.draw();
-                    restart.draw();
-                    quitPartyGame.draw();
-                }
-            }
-            else if (ScreenInterlevel.fromSavedLevels || ScreenInterlevel.fromMinigames)
-            {
-                resumeLowerPos.draw();
-                restartLowerPos.draw();
-                back.draw();
-            }
-            else if (ScreenInterlevel.tutorialInitial)
-            {
-                resumeLowerPos.draw();
-                restartTutorial.draw();
-            }
-            else if (ScreenInterlevel.tutorial)
-            {
-                resumeLowerPos.draw();
-                restartTutorial.draw();
-                quitHigherPos.draw();
-            }
-            else if (Crusade.crusadeMode)
-            {
-                if (Crusade.currentCrusade.finalLife())
-                {
-                    quitCrusadeFinalLife.draw();
-                    restartCrusadeFinalLife.draw();
-                }
-                else
-                {
-                    quitCrusade.draw();
-                    restartCrusade.draw();
-                }
-
-                resumeLowerPos.draw();
-            }
-            else if (ScreenInterlevel.fromQuickPlay != null)
-            {
-                backToQuickPlay.draw();
-                restartLowerPos.draw();
-                resumeLowerPos.draw();
-            }
-            else if (name != null)
-            {
-                resume.draw();
-                edit.draw();
-                restart.draw();
-                quit.draw();
-            }
-            else
-            {
-                resume.draw();
-                newLevel.draw();
-                restart.draw();
-                quit.draw();
-            }
+            for (Button b : pauseMenuButtons)
+                b.draw();
 
             Drawing.drawing.setInterfaceFontSize(this.titleSize);
             Drawing.drawing.setColor(0, 0, 0);

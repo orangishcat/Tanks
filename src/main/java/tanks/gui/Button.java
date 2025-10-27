@@ -161,6 +161,19 @@ public class Button implements IDrawable, ITrigger
 		}
 	}
 
+    public Button tieToCommand(PartyServer.Command c)
+    {
+        return tieToCommand(c, Game.screen);
+    }
+
+    public Button tieToCommand(PartyServer.Command c, Screen s)
+    {
+        if (!PartyServer.isPartyServer)
+            return this;
+        c.tieToButton(s, this);
+        return this;
+    }
+
 	public static class Toggle extends Button
 	{
 		private static final Runnable emptyFunction = () -> {};

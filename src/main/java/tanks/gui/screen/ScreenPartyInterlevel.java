@@ -1,15 +1,8 @@
 package tanks.gui.screen;
 
-import tanks.Drawing;
-import tanks.Game;
-import tanks.Level;
-import tanks.Panel;
+import tanks.*;
 import tanks.generator.LevelGeneratorVersus;
-import tanks.gui.Button;
-import tanks.gui.SpeedrunTimer;
-
-import java.util.HashSet;
-import java.util.UUID;
+import tanks.gui.*;
 
 public class ScreenPartyInterlevel extends Screen implements IDarkScreen
 {
@@ -152,18 +145,18 @@ public class ScreenPartyInterlevel extends Screen implements IDarkScreen
         }
         else if (ScreenInterlevel.fromSavedLevels)
         {
-            quitHigherPos.update();
-            replayHigherPos.update();
+            quitHigherPos.tieToCommand(PartyServer.exitLevel).update();
+            replayHigherPos.tieToCommand(PartyServer.restart).update();
         }
         else if (ScreenInterlevel.fromMinigames)
         {
-            replayMinigame.update();
-            quitHigherPos.update();
+            replayMinigame.tieToCommand(PartyServer.restart).update();
+            quitHigherPos.tieToCommand(PartyServer.exitLevel).update();
         }
         else
         {
-            quit.update();
-            replay.update();
+            quit.tieToCommand(PartyServer.exitLevel).update();
+            replay.tieToCommand(PartyServer.restart).update();
             newLevel.update();
         }
 

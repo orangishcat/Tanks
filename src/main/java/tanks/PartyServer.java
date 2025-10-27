@@ -1,5 +1,6 @@
 package tanks;
 
+import tanks.gui.Button;
 import tanks.gui.screen.*;
 import tanks.network.SynchronizedList;
 import tanks.tank.TankPlayer;
@@ -9,19 +10,19 @@ import java.util.stream.*;
 
 public class PartyServer
 {
-    public static final String highlight_color = "\u00a7255127000255",
-        error_color = "\u00a7255000000255";
+    public static final String highlight_color = "\u00a7255127000255", error_color = "\u00a7255000000255";
 
     public static boolean isPartyServer = false;
     public static UUID host;
 
-    public static String commandPrefix = "/";
+    public static String serverName = "\u00a7255127000255[SERVER]", commandPrefix = "/";
 
     public static HashMap<String, Command> commands = new LinkedHashMap<>();
+    public static Command playRandom, playVersus, restart, startNow, exitLevel, nextLevel;
 
     public static void onGameInit()
     {
-        Game.player.username = "host";
+        Game.player.username = serverName;
         registerCommands();
         ScreenParty.createParty();
     }
@@ -29,12 +30,8 @@ public class PartyServer
     public static void registerCommands()
     {
         commands.clear();
-        Command.register("play_random", "Plays a random level",
-            (parts, clientID) -> ScreenPartyHost.playRandomLevel()
-        );
-        Command.register("play_versus", "Plays a versus level",
-            (parts, clientID) -> ScreenPartyHost.playVersus()
-        );
+        playRandom = Command.register("play_random", "Plays a random level", (s, uuid) -> ScreenPartyHost.playRandomLevel());
+        playVersus = Command.register("play_versus", "Plays a versus level", (s, u) -> ScreenPartyHost.playVersus());
         Command.register("list_levels", "Lists all levels",
             (parts, clientID) ->
             {
@@ -78,6 +75,10 @@ public class PartyServer
                 }
             }, "id"
         );
+        restart = Command.register("restart", "Restarts the current level");
+        nextLevel = Command.register("next", "Goes to the next level in a crusade");
+        startNow = Command.register("start_now", "Starts the game immediately");
+        exitLevel = Command.register("exit", "Exits the current level");
         Command.register("transfer_host", "Transfers host to another player",
             (parts, clientID) ->
             {
@@ -95,7 +96,7 @@ public class PartyServer
                     return;
                 }
                 host = newHost.get(0);
-                ScreenPartyHost.sendChatMessage("Host transferred to " + parts[0]);
+                ScreenPartyHost.sendChatMessage("Host was transferred to " + parts[0]);
                 ScreenPartyHost.privateChat("You are the party host!", host);
             }, "player_username"
         );
@@ -128,7 +129,7 @@ public class PartyServer
     public static void onLevelLoad(Level l)
     {
         Game.players.remove(Game.player);
-        Game.player.username = "server host";
+        Game.player.username = serverName;
         Game.playerTank = new TankPlayer(0, 0, 0);
         Game.playerTank.team = Game.playerTeam;
         Game.player.tank = Game.playerTank;
@@ -184,12 +185,20 @@ public class PartyServer
 
     public static class Command
     {
+        private static final BiConsumer<String[], UUID> reject_func = (p, u) -> ScreenPartyHost.privateChat(error_color + "Can't do this right now!", u);
+
         public String name;
         public String description;
         public String[] partNames;
+        public Button button;
         public BiConsumer<String[], UUID> function;
 
-        public static void register(String name, String description, BiConsumer<String[], UUID> function, String... partNames)
+        public static Command register(String name, String description, String... partNames)
+        {
+            return register(name, description, reject_func, partNames);
+        }
+
+        public static Command register(String name, String description, BiConsumer<String[], UUID> function, String... partNames)
         {
             Command c = new Command();
             c.name = name;
@@ -197,18 +206,46 @@ public class PartyServer
             c.function = function;
             c.partNames = partNames;
             commands.put(name, c);
+            return c;
+        }
+
+        /**
+         * Ties this command to a button, so that the button's function is run when the command is executed
+         */
+        public void tieToButton(Screen s, Button b)
+        {
+            if (button == b)
+                return;
+
+            button = b;
+            function = (parts, clientID) ->
+            {
+                if (Game.screen != s)
+                {
+                    ScreenPartyHost.privateChat(error_color + "Can't do this right now!", clientID);
+                    return;
+                }
+                b.function.run();
+            };
         }
 
         public void run(String[] parts, UUID clientID)
         {
-            if (parts.length != partNames.length)
+            try
             {
-                ScreenPartyHost.privateChat("\u00a7255000000255Invalid number of arguments! Expected " + partNames.length + " but got " + parts.length +
-                    "\nUsage: " + commandPrefix + name + " " +
-                    Arrays.stream(partNames).map(p -> "<" + p + ">").collect(Collectors.joining(" ")), clientID);
-                return;
+                if (parts.length != partNames.length)
+                {
+                    ScreenPartyHost.privateChat("\u00a7255000000255Invalid number of arguments! Expected " + partNames.length + " but got " + parts.length +
+                        "\nUsage: " + commandPrefix + name + " " +
+                        Arrays.stream(partNames).map(p -> "<" + p + ">").collect(Collectors.joining(" ")), clientID);
+                    return;
+                }
+                function.accept(parts, clientID);
             }
-            function.accept(parts, clientID);
+            catch (Exception e)
+            {
+                ScreenPartyHost.privateChat(error_color + "An error occurred while running this command!", clientID);
+            }
         }
     }
 }
