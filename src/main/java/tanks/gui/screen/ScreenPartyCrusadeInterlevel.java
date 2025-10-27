@@ -192,7 +192,7 @@ public class ScreenPartyCrusadeInterlevel extends Screen implements IDarkScreen
             {
                 if (Panel.levelPassed || Crusade.currentCrusade.replay)
                 {
-                    nextLevel.update();
+                    nextLevel.tieToCommand(PartyServer.nextLevel).update();
 
                     if (Crusade.currentCrusade.respawnTanks)
                         replayCrusadeWin.update();

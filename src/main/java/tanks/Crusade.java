@@ -255,6 +255,9 @@ public class Crusade
 
 	public void begin()
 	{
+        if (PartyServer.isPartyServer)
+            PartyServer.onCrusadeStart(this);
+
 		for (int i = 0; i < Game.players.size(); i++)
 		{
 			Game.players.get(i).hotbar.itemBar = new ItemBar(Game.players.get(i));

@@ -1596,9 +1596,7 @@ public class ScreenGame extends Screen implements IHiddenChatboxScreen, IPartyGa
                     viewBuilds.update();
 
                 if (ScreenPartyHost.isServer && this.cancelCountdown)
-                {
-                    startNow.update();
-                }
+                    startNow.tieToCommand(PartyServer.startNow).update();
 
                 TankPlayer.controlStick.mobile = TankPlayer.controlStickMobile;
                 TankPlayer.controlStick.snap = TankPlayer.controlStickSnap;

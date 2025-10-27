@@ -1,12 +1,10 @@
 package lwjglwindow;
 
 import basewindow.BaseFontRenderer;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FontRenderer extends BaseFontRenderer
 {
@@ -17,7 +15,7 @@ public class FontRenderer extends BaseFontRenderer
         public String image;
         public float size = 16; // how many characters fit per horizontal line
         public int hSpace = 2; // spacing between rows, increase this to 2 for antialiasing to prevent weird artifacts
-        public Map<Character, Integer> charIndexMap = new HashMap<>();
+        public Int2IntOpenHashMap charIndexMap = new Int2IntOpenHashMap();
 
         public FontInfo(String image, String chars, int[] charSizes)
         {
@@ -26,9 +24,7 @@ public class FontRenderer extends BaseFontRenderer
             this.charSizes = charSizes;
 
             for (int i = 0; i < chars.length(); i++)
-            {
                 charIndexMap.put(chars.charAt(i), i);
-            }
         }
     }
 
@@ -91,9 +87,7 @@ public class FontRenderer extends BaseFontRenderer
         for (FontInfo font : fontInfos)
         {
             if (font.charIndexMap.containsKey(c))
-            {
                 return font;
-            }
         }
         return defaultFont;
     }
@@ -101,12 +95,7 @@ public class FontRenderer extends BaseFontRenderer
     protected int drawChar(double x, double y, double z, double sX, double sY, char c, boolean depthtest)
     {
         FontInfo font = findFontForChar(c);
-        Integer i = font.charIndexMap.get(c);
-
-        if (i == null)
-        {
-            i = font.charIndexMap.getOrDefault('?', 31);
-        }
+        int i = font.charIndexMap.getOrDefault(c, '?');
 
         int col = (int) (i % font.size);
         int row = (int) (i / font.size);
@@ -134,65 +123,51 @@ public class FontRenderer extends BaseFontRenderer
 
     public void drawString(double x, double y, double z, double sX, double sY, String s, boolean depth)
     {
+        if (window.drawingShadow)
+            return;
+
         if (depth)
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         else
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
         double opacity = this.window.colorA;
+
         double curX = x;
-        char[] c = s.toCharArray();
 
         double r0 = this.window.colorR;
         double g0 = this.window.colorG;
         double b0 = this.window.colorB;
         double a0 = this.window.colorA;
 
-        for (int i = 0; i < c.length; i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            if (c[i] == '\u00C2')
+            if (s.charAt(i) == '\u00C2')
                 continue;
-            else if (c[i] == '\u00A7')
-            {
-                if (s.length() <= i + 1)
-                    continue;
 
-                if (c[i + 1] == 'r')
+            if (s.charAt(i) == '\u00A7')
+            {
+                if (s.charAt(i + 1) == 'r')
                 {
                     i++;
                     this.window.setColor(r0 * 255, g0 * 255, b0 * 255, a0 * 255);
-                    continue;
                 }
-
-                if (s.length() <= i + 12)
-                    continue;
-
-                try
-                {
-                    int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + "" + c[i + 3]);
-                    int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + "" + c[i + 6]);
-                    int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + "" + c[i + 9]);
-                    int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + "" + c[i + 12]);
-                    this.window.setColor(r, g, b, a * opacity);
-                } catch (Exception e)
-                {
-                    continue;
-                }
-
-                i += 12;
+                else
+                    i = handleColorChar(s, opacity, i);
             }
             else
-                curX += (drawChar(curX, y, z, sX, sY, c[i], depth) + 1) * sX * 4;
+                curX += (drawChar(curX, y, z, sX, sY, s.charAt(i), true) + 1) * sX * 4;
         }
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
     }
 
-    @Override
     public void drawString(double x, double y, double sX, double sY, String s)
     {
+        if (window.drawingShadow)
+            return;
+
         double curX = x;
-        char[] c = s.toCharArray();
         double opacity = this.window.colorA;
 
         double r0 = this.window.colorR;
@@ -200,59 +175,62 @@ public class FontRenderer extends BaseFontRenderer
         double b0 = this.window.colorB;
         double a0 = this.window.colorA;
 
-        for (int i = 0; i < c.length; i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            if (c[i] == '\u00C2')
+            if (s.charAt(i) == '\u00C2')
                 continue;
-            else if (c[i] == '\u00A7')
-            {
-                if (s.length() <= i + 1)
-                    continue;
 
-                if (c[i + 1] == 'r')
+            if (s.charAt(i) == '\u00A7')
+            {
+                if (s.charAt(i + 1) == 'r')
                 {
                     i++;
                     this.window.setColor(r0 * 255, g0 * 255, b0 * 255, a0 * 255);
-                    continue;
                 }
-
-                if (s.length() <= i + 12)
-                    continue;
-
-                try
-                {
-                    int r = Integer.parseInt(c[i + 1] + "" + c[i + 2] + "" + c[i + 3]);
-                    int g = Integer.parseInt(c[i + 4] + "" + c[i + 5] + "" + c[i + 6]);
-                    int b = Integer.parseInt(c[i + 7] + "" + c[i + 8] + "" + c[i + 9]);
-                    int a = Integer.parseInt(c[i + 10] + "" + c[i + 11] + "" + c[i + 12]);
-                    this.window.setColor(r, g, b, a * opacity);
-                } catch (Exception e)
-                {
-                    continue;
-                }
-
-                i += 12;
+                else
+                    i = handleColorChar(s, opacity, i);
             }
             else
-                curX += (drawChar(curX, y, 0, sX, sY, c[i], false) + 1) * sX * 4;
+                curX += (drawChar(curX, y, 0, sX, sY, s.charAt(i), false) + 1) * sX * 4;
         }
+    }
+
+    public int handleColorChar(String s, double opacity, int i)
+    {
+        if (s.length() <= i + 12)
+            return i;
+
+        try
+        {
+            int r = Integer.parseInt(s.charAt(i + 1) + "" + s.charAt(i + 2) + s.charAt(i + 3));
+            int g = Integer.parseInt(s.charAt(i + 4) + "" + s.charAt(i + 5) + s.charAt(i + 6));
+            int b = Integer.parseInt(s.charAt(i + 7) + "" + s.charAt(i + 8) + s.charAt(i + 9));
+            int a = Integer.parseInt(s.charAt(i + 10) + "" + s.charAt(i + 11) + s.charAt(i + 12));
+            this.window.setColor(r, g, b, a * opacity);
+        }
+        catch (Exception e)
+        {
+            return i;
+        }
+
+        i += 12;
+        return i;
     }
 
     public double getStringSizeX(double sX, String s)
     {
         double w = 0;
-        char[] c = s.toCharArray();
 
-        for (int i = 0; i < c.length; i++)
+        for (int i = 0; i < s.length(); i++)
         {
-            if (c[i] == '\u00C2')
+            if (s.charAt(i) == '\u00C2')
                 continue;
-            else if (c[i] == '\u00A7')
+            else if (s.charAt(i) == '\u00A7')
             {
                 if (s.length() <= i + 1)
                     continue;
 
-                if (c[i + 1] == 'r')
+                if (s.charAt(i + 1) == 'r')
                 {
                     i++;
                     continue;
@@ -265,9 +243,8 @@ public class FontRenderer extends BaseFontRenderer
             }
             else
             {
-                FontInfo font = findFontForChar(c[i]);
-                Integer index = font.charIndexMap.get(c[i]);
-                if (index == null) index = font.charIndexMap.getOrDefault('?', 31);
+                FontInfo font = findFontForChar(s.charAt(i));
+                int index = font.charIndexMap.getOrDefault(s.charAt(i), '?');
                 w += (font.charSizes[index] + 1) * sX * 4;
             }
         }

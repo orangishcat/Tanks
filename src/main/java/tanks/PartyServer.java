@@ -15,7 +15,8 @@ public class PartyServer
     public static boolean isPartyServer = false;
     public static UUID host;
 
-    public static String serverName = "\u00a7255127000255[SERVER]", commandPrefix = "/";
+    public static String serverName = "\u00a7255127000255[Server]", commandPrefix = "/";
+    public static List<String> defaultCrusades = Arrays.asList("adventure_crusade", "classic_crusade", "castle_crusade", "beginner_crusade");
 
     public static HashMap<String, Command> commands = new LinkedHashMap<>();
     public static Command playRandom, playVersus, restart, startNow, exitLevel, nextLevel;
@@ -72,13 +73,95 @@ public class PartyServer
                 catch (Exception e)
                 {
                     ScreenPartyHost.privateChat("Level load failed!", clientID);
+                    e.printStackTrace();
                 }
             }, "id"
         );
-        restart = Command.register("restart", "Restarts the current level");
+        Command.register("list_crusades", "Lists all crusades",
+            (parts, clientID) ->
+            {
+                SynchronizedList<ScreenPartyHost.SharedCrusade> crusades = ScreenPartyHost.activeScreen.sharedCrusades;
+                ScreenPartyHost.privateChat(
+                    "Available crusades:\n" +
+                        IntStream.range(0, defaultCrusades.size())
+                            .mapToObj(i -> String.format("  %s%d\u00a7r: %s", highlight_color, i + 1, Game.formatString(defaultCrusades.get(i))))
+                            .collect(Collectors.joining("\n")) + "\n" +
+                        IntStream.range(0, crusades.size())
+                            .mapToObj(i -> String.format("  %s%d\u00a7r: %s", highlight_color, i + 1 + defaultCrusades.size(), crusades.get(i).name))
+                            .collect(Collectors.joining("\n")), clientID
+                );
+            }
+        );
+        Command.register("play_crusade", "Plays a shared crusade",
+            (parts, clientID) ->
+            {
+                int id;
+                try
+                {
+                    id = Integer.parseInt(parts[0]) - 1;
+                }
+                catch (NumberFormatException e)
+                {
+                    ScreenPartyHost.privateChat("Invalid crusade id!", clientID);
+                    return;
+                }
+                try
+                {
+                    if (id < defaultCrusades.size())
+                    {
+                        Crusade.currentCrusade = new Crusade(String.join("\n",
+                            Game.game.fileManager.getInternalFileContents("/crusades/" + defaultCrusades.get(id) + ".tanks")),
+                            defaultCrusades.get(id));
+                        Crusade.crusadeMode = true;
+                        Crusade.currentCrusade.begin();
+                        Game.screen = new ScreenGame(Crusade.currentCrusade);
+                        return;
+                    }
+                    ScreenPartyHost.SharedCrusade shared = ScreenPartyHost.activeScreen.sharedCrusades.get(id);
+                    new Crusade(shared.crusade, shared.name).begin();
+                }
+                catch (Exception e)
+                {
+                    ScreenPartyHost.privateChat("Crusade load failed!", clientID);
+                    Game.cleanUp();
+                    e.printStackTrace();
+                }
+            }
+            , "id"
+        );
+
         nextLevel = Command.register("next", "Goes to the next level in a crusade");
+        restart = Command.register("restart", "Restarts the current level");
         startNow = Command.register("start_now", "Starts the game immediately");
         exitLevel = Command.register("exit", "Exits the current level");
+        Command.register("option", "Changes an option", (parts, clientID) ->
+            {
+                try
+                {
+                    switch (parts[0])
+                    {
+                        case "bot_count":
+                            Game.botPlayerCount = Integer.parseInt(parts[1]);
+                            ScreenPartyHost.setBotCount(Game.botPlayerCount);
+                            break;
+                        case "countdown":
+                            Game.partyStartTime = Double.parseDouble(parts[1]) * 100;
+                            break;
+                        case "friendly_fire":
+                            Game.disablePartyFriendlyFire = !Boolean.parseBoolean(parts[1]);
+                            break;
+                        default:
+                            ScreenPartyHost.privateChat("Unknown option! Available options: bot_count, countdown, friendly_fire", clientID);
+                            return;
+                    }
+                    ScreenPartyHost.sendChatMessage("Option " + parts[0] + " set to " + parts[1]);
+                }
+                catch (Exception e)
+                {
+                    ScreenPartyHost.privateChat("Invalid value!", clientID);
+                }
+            }, "option", "value"
+        );
         Command.register("transfer_host", "Transfers host to another player",
             (parts, clientID) ->
             {
@@ -127,6 +210,16 @@ public class PartyServer
     }
 
     public static void onLevelLoad(Level l)
+    {
+        clearHostPlayer();
+    }
+
+    public static void onCrusadeStart(Crusade crusade)
+    {
+        clearHostPlayer();
+    }
+
+    private static void clearHostPlayer()
     {
         Game.players.remove(Game.player);
         Game.player.username = serverName;
@@ -191,6 +284,7 @@ public class PartyServer
         public String description;
         public String[] partNames;
         public Button button;
+        public Screen screen;
         public BiConsumer<String[], UUID> function;
 
         public static Command register(String name, String description, String... partNames)
@@ -214,10 +308,11 @@ public class PartyServer
          */
         public void tieToButton(Screen s, Button b)
         {
-            if (button == b)
+            if (button == b && screen == s)
                 return;
 
             button = b;
+            screen = s;
             function = (parts, clientID) ->
             {
                 if (Game.screen != s)
