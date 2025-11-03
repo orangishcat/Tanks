@@ -1,8 +1,9 @@
 package tanks.network.event;
 
-import tanks.*;
+import tanks.Game;
 import tanks.gui.ChatMessage;
 import tanks.gui.screen.*;
+import tanks.handle.*;
 import tanks.network.ServerHandler;
 
 public class EventChat extends PersonalEvent
@@ -23,29 +24,29 @@ public class EventChat extends PersonalEvent
 	public void execute() 
 	{
 		if (this.clientID == null)
-			ScreenPartyLobby.chat.add(0, new ChatMessage(this.message));
-		else
-		{
-			boolean invalid = !isStringValid(this.message);
+        {
+            ScreenPartyLobby.chat.add(0, new ChatMessage(this.message));
+            return;
+        }
 
-			for (int i = 0; i < ScreenPartyHost.server.connections.size(); i++)
-			{
-				ServerHandler s = ScreenPartyHost.server.connections.get(i);
+        boolean invalid = !isStringValid(this.message);
 
-				if (s.clientID != null && s.clientID.equals(this.clientID))
-				{
-					if (invalid)
-						s.sendEventAndClose(new EventKick("Invalid chat message received!"));
-                    else if (ScreenPartyHost.activeScreen.mutedPlayers.contains(this.clientID))
-                        s.sendEvent(new EventChat("\u00A7255000000255The party host has disabled your ability to chat!"));
-					else if (!PartyServer.isPartyServer || PartyServer.onChatMessage(s.player, this.message))
-					{
-						ScreenPartyHost.chat.add(0, new ChatMessage(s.player, this.message));
-						Game.eventsOut.add(new EventPlayerChat(s.player, this.message));
-					}
-				}
-			}
-		}
+        for (ServerHandler s : ScreenPartyHost.server.connections)
+        {
+            if (s.clientID == null || !s.clientID.equals(this.clientID))
+                continue;
+
+            if (invalid)
+                s.sendEventAndClose(new EventKick("Invalid chat message received!"));
+            else if (ScreenPartyHost.activeScreen.mutedPlayers.contains(this.clientID))
+                s.sendEvent(new EventChat("\u00A7255000000255The party host has disabled your ability to chat!"));
+            else if (HandleRegistry.callAllHandles(IChatHandle.class,
+                (h, r) -> r & ((IChatHandle) h).handleMessage(s.player, this.message), true))
+            {
+                ScreenPartyHost.chat.add(0, new ChatMessage(s.player, this.message));
+                Game.eventsOut.add(new EventPlayerChat(s.player, this.message));
+            }
+        }
     }
 
 

@@ -7,6 +7,7 @@ import tanks.gui.*;
 import tanks.gui.ScreenElement.*;
 import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.*;
+import tanks.handle.INetworkEventHandle;
 import tanks.item.Item;
 import tanks.network.*;
 import tanks.network.event.*;
@@ -92,6 +93,7 @@ public class Panel
 
 	public ArrayList<double[]> lights = new ArrayList<>();
     public Int2IntLinkedOpenHashMap stackedEventsIn = new Int2IntLinkedOpenHashMap();
+    public ArrayList<INetworkEventHandle> networkEventHandles = new ArrayList<>();
 
 	public LoadingTerrainContinuation continuation = null;
 	public long continuationStartTime = 0;
@@ -366,6 +368,9 @@ public class Panel
                 if (e instanceof IStackableEvent && ((IStackableEvent) e).isStackable() && stackedEventsIn.get(IStackableEvent.key((IStackableEvent) e)) != i)
                     continue;
 
+                for (INetworkEventHandle h : networkEventHandles)
+                    h.handle(e, true);
+
                 e.execute();
             }
 
@@ -636,6 +641,15 @@ public class Panel
 
 		if (ScreenPartyHost.isServer && ScreenPartyHost.server != null)
 		{
+            if (!networkEventHandles.isEmpty())
+            {
+                for (INetworkEvent e : Game.eventsOut)
+                {
+                    for (INetworkEventHandle h : networkEventHandles)
+                        h.handle(e, false);
+                }
+            }
+
 			synchronized (ScreenPartyHost.server.connections)
 			{
                 for (ServerHandler s : ScreenPartyHost.server.connections)

@@ -19,6 +19,7 @@ import tanks.gui.screen.*;
 import tanks.gui.screen.leveleditor.OverlayEditorMenu;
 import tanks.gui.screen.leveleditor.ScreenLevelEditor;
 import tanks.gui.screen.leveleditor.selector.*;
+import tanks.handle.HandleRegistry;
 import tanks.hotbar.Hotbar;
 import tanks.hotbar.ItemBar;
 import tanks.item.Item;
@@ -775,6 +776,7 @@ public class Game
 		ArrayList<String> overrideLocations = new ArrayList<>();
 		overrideLocations.add(Game.homedir + Game.resourcesPath);
 		Game.game.window.setOverrideLocations(overrideLocations, Game.game.fileManager);
+        HandleRegistry.registerDefault();
 
         if (PartyServer.isPartyServer)
             PartyServer.onGameInit();

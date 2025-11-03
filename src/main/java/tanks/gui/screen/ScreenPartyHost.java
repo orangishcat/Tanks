@@ -230,25 +230,6 @@ public class ScreenPartyHost extends Screen
             Game.steamNetworkHandler.hostParty();
     }
 
-    public static void sendChatMessage(String s)
-    {
-        String message = getServerMessage(s);
-        Game.eventsOut.add(new EventChat(message));
-        chat.add(0, new ChatMessage(message));
-    }
-
-    public static void privateChat(String s, UUID id)
-    {
-        String message = getServerMessage(s);
-        sendEventTo(new EventChat("\u00a7150150150255(PM) " + message), id);
-        chat.add(0, new ChatMessage("\u00a7150150150255(To " + id.toString().substring(0, 8) + ") " + message));
-    }
-
-    private static String getServerMessage(String s)
-    {
-        return "\u00a7255127000255[Server]\u00a7r " + s.replaceAll("\n", " \n ");
-    }
-
     public static void sendEventTo(INetworkEvent e, UUID id)
     {
         if (!ScreenPartyHost.isServer)

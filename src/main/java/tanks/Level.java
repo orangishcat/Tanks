@@ -1,27 +1,17 @@
 package tanks;
 
 import basewindow.Color;
-import tanks.gui.screen.ILevelPreviewScreen;
-import tanks.gui.screen.ScreenGame;
-import tanks.gui.screen.ScreenPartyHost;
-import tanks.gui.screen.ScreenPartyLobby;
-import tanks.gui.screen.leveleditor.ScreenLevelEditor;
-import tanks.gui.screen.leveleditor.ScreenLevelEditorOverlay;
+import tanks.gui.screen.*;
+import tanks.gui.screen.leveleditor.*;
 import tanks.gui.screen.leveleditor.selector.SelectorTeam;
+import tanks.handle.*;
 import tanks.item.Item;
-import tanks.network.event.EventEnterLevel;
-import tanks.network.event.EventLoadLevel;
-import tanks.network.event.EventTankRemove;
-import tanks.network.event.INetworkEvent;
-import tanks.obstacle.Obstacle;
-import tanks.obstacle.ObstacleBeatBlock;
+import tanks.network.event.*;
+import tanks.obstacle.*;
 import tanks.registry.RegistryTank;
 import tanks.tank.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Level
 {
@@ -532,9 +522,6 @@ public class Level
 			Game.movables.add(t);
 		}
 
-        if (PartyServer.isPartyServer)
-            PartyServer.onLevelLoad(this);
-
 		this.availablePlayerSpawns.clear();
 
 		int playerCount = 1;
@@ -770,6 +757,8 @@ public class Level
 		}
 
         this.reloadTiles();
+
+        HandleRegistry.callAllHandles(ILevelLoadHandler.class, (h) -> ((ILevelLoadHandler) h).onLevelLoad(this));
 
 		if (!remote && sc == null || (sc instanceof ScreenLevelEditor))
 			Game.eventsOut.add(new EventEnterLevel());

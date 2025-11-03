@@ -1,8 +1,10 @@
 package tanks;
 
-import tanks.gui.Button;
+import tanks.gui.*;
 import tanks.gui.screen.*;
-import tanks.network.SynchronizedList;
+import tanks.handle.*;
+import tanks.network.*;
+import tanks.network.event.EventChat;
 import tanks.tank.TankPlayer;
 
 import java.util.*;
@@ -26,6 +28,8 @@ public class PartyServer
         Game.player.username = serverName;
         registerCommands();
         ScreenParty.createParty();
+        HandleRegistry.registry.register(IChatHandle.class, PartyServer::onChatMessage);
+        HandleRegistry.registry.register(ILevelLoadHandler.class, PartyServer::onLevelLoad);
     }
 
     public static void registerCommands()
@@ -39,17 +43,37 @@ public class PartyServer
                 SynchronizedList<ScreenPartyHost.SharedLevel> levels = ScreenPartyHost.activeScreen.sharedLevels;
                 if (levels.isEmpty())
                 {
-                    ScreenPartyHost.privateChat("No levels available!", clientID);
+                    privateChat("No levels available!", clientID);
                     return;
                 }
-                ScreenPartyHost.privateChat(
+                privateChat(
                     "Available levels:\n" +
                         IntStream.range(0, levels.size())
                             .mapToObj(i -> String.format("  %s%d\u00a7r: %s", highlight_color, i+1, levels.get(i).name))
                             .collect(Collectors.joining("\n")), clientID
                 );
             }
-        );
+        ).setPublic(true);
+        Command.register("pm", "Sends a private message", (parts, clientID) ->
+            {
+                List<UUID> targets = ScreenPartyHost.server.connections.stream()
+                    .filter(c -> (c.username.equals(parts[0]) || c.clientID.toString().equals(parts[0])) && !c.clientID.equals(clientID))
+                    .map(c -> c.clientID).collect(Collectors.toList());
+                if (targets.isEmpty())
+                {
+                    privateChat("Player not found!", clientID);
+                    return;
+                }
+                if (targets.size() > 1)
+                {
+                    privateChat("Multiple players found!", clientID);
+                    return;
+                }
+                String message = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+                privateChatRaw("\u00a7255127000255[PM to " + usernameFromId(targets.get(0)) + "]:\u00a7r " + message, clientID);
+                privateChatRaw("\u00a7255127000255[PM from " + usernameFromId(clientID) + "]:\u00a7r " + message, targets.get(0));
+            }, "player_username", "message..."
+        ).setPublic(true);
         Command.register("play_level", "Plays a shared level",
             (parts, clientID) ->
             {
@@ -60,7 +84,7 @@ public class PartyServer
                 }
                 catch (NumberFormatException e)
                 {
-                    ScreenPartyHost.privateChat("Invalid level id!", clientID);
+                    privateChat("Invalid level id!", clientID);
                     return;
                 }
 
@@ -72,7 +96,7 @@ public class PartyServer
                 }
                 catch (Exception e)
                 {
-                    ScreenPartyHost.privateChat("Level load failed!", clientID);
+                    privateChat("Level load failed!", clientID);
                     e.printStackTrace();
                 }
             }, "id"
@@ -81,7 +105,7 @@ public class PartyServer
             (parts, clientID) ->
             {
                 SynchronizedList<ScreenPartyHost.SharedCrusade> crusades = ScreenPartyHost.activeScreen.sharedCrusades;
-                ScreenPartyHost.privateChat(
+                privateChat(
                     "Available crusades:\n" +
                         IntStream.range(0, defaultCrusades.size())
                             .mapToObj(i -> String.format("  %s%d\u00a7r: %s", highlight_color, i + 1, Game.formatString(defaultCrusades.get(i))))
@@ -91,7 +115,7 @@ public class PartyServer
                             .collect(Collectors.joining("\n")), clientID
                 );
             }
-        );
+        ).setPublic(true);
         Command.register("play_crusade", "Plays a shared crusade",
             (parts, clientID) ->
             {
@@ -102,7 +126,7 @@ public class PartyServer
                 }
                 catch (NumberFormatException e)
                 {
-                    ScreenPartyHost.privateChat("Invalid crusade id!", clientID);
+                    privateChat("Invalid crusade id!", clientID);
                     return;
                 }
                 try
@@ -122,7 +146,7 @@ public class PartyServer
                 }
                 catch (Exception e)
                 {
-                    ScreenPartyHost.privateChat("Crusade load failed!", clientID);
+                    privateChat("Crusade load failed!", clientID);
                     Game.cleanUp();
                     e.printStackTrace();
                 }
@@ -151,14 +175,14 @@ public class PartyServer
                             Game.disablePartyFriendlyFire = !Boolean.parseBoolean(parts[1]);
                             break;
                         default:
-                            ScreenPartyHost.privateChat("Unknown option! Available options: bot_count, countdown, friendly_fire", clientID);
+                            privateChat("Unknown option! Available options: bot_count, countdown, friendly_fire", clientID);
                             return;
                     }
-                    ScreenPartyHost.sendChatMessage("Option " + parts[0] + " set to " + parts[1]);
+                    sendChatMessage("Option " + parts[0] + " set to " + parts[1]);
                 }
                 catch (Exception e)
                 {
-                    ScreenPartyHost.privateChat("Invalid value!", clientID);
+                    privateChat("Invalid value!", clientID);
                 }
             }, "option", "value"
         );
@@ -170,24 +194,24 @@ public class PartyServer
                     .map(c -> c.clientID).collect(Collectors.toList());
                 if (newHost.isEmpty())
                 {
-                    ScreenPartyHost.privateChat("Player not found! (or already host)", clientID);
+                    privateChat("Player not found! (or already host)", clientID);
                     return;
                 }
                 if (newHost.size() > 1)
                 {
-                    ScreenPartyHost.privateChat("Multiple players found!", clientID);
+                    privateChat("Multiple players found!", clientID);
                     return;
                 }
                 host = newHost.get(0);
-                ScreenPartyHost.sendChatMessage("Host was transferred to " + parts[0]);
-                ScreenPartyHost.privateChat("You are the party host!", host);
+                sendChatMessage("Host was transferred to " + parts[0]);
+                privateChat("You are the party host!", host);
             }, "player_username"
         );
         Command.register("reload", "Reload commands",
             (parts, clientID) ->
             {
                 registerCommands();
-                ScreenPartyHost.privateChat("Commands reloaded!", clientID);
+                privateChat("Commands reloaded!", clientID);
             }
         );
         Command.register("help", "Displays this help message",
@@ -195,11 +219,11 @@ public class PartyServer
             {
                 if (commands.isEmpty())
                 {
-                    ScreenPartyHost.privateChat("No commands available!", clientID);
+                    privateChat("No commands available!", clientID);
                     return;
                 }
 
-                ScreenPartyHost.privateChat(
+                privateChat(
                     "Available commands:\n" +
                         commands.values().stream()
                             .map(c -> String.format("  %s%s§r: %s", highlight_color, c.name, c.description))
@@ -207,6 +231,16 @@ public class PartyServer
                 );
             }
         );
+    }
+
+    private static String usernameFromId(UUID id)
+    {
+        for (ServerHandler s: ScreenPartyHost.server.connections)
+        {
+            if (s.clientID.equals(id))
+                return s.username;
+        }
+        return "Unknown";
     }
 
     public static void onLevelLoad(Level l)
@@ -236,15 +270,34 @@ public class PartyServer
             addClient(clientID);
     }
 
+    public static void sendChatMessage(String s)
+    {
+        String message = "\u00a7255127000255[Server]\u00a7r " + s;
+        Game.eventsOut.add(new EventChat(message));
+        ScreenPartyHost.chat.add(0, new ChatMessage(message));
+    }
+
+    public static void privateChat(String s, UUID id)
+    {
+        privateChatRaw("\u00a7150150150255(PM) \u00a7255127000255[Server]\u00a7r " + s, id);
+    }
+
+    public static void privateChatRaw(String s, UUID id)
+    {
+        String message = s.replaceAll("\n", " \n ");
+        ScreenPartyHost.sendEventTo(new EventChat(message), id);
+        ScreenPartyHost.chat.add(0, new ChatMessage("\u00a7150150150255(To " + usernameFromId(id) + ") " + message));
+    }
+
     public static void setHost(UUID clientID)
     {
-        ScreenPartyHost.privateChat("You are the party host!", clientID);
+        privateChat("You are the party host!", clientID);
         host = clientID;
     }
 
     public static void addClient(UUID clientID)
     {
-        ScreenPartyHost.privateChat("Welcome to the party!", clientID);
+        privateChat("Welcome to the party!", clientID);
     }
 
     public static void onClientDisconnect(UUID clientID)
@@ -252,7 +305,7 @@ public class PartyServer
         if (clientID.equals(host))
         {
             host = ScreenPartyHost.server.connections.get(0).clientID;
-            ScreenPartyHost.privateChat("You are the party host!", host);
+            privateChat("You are the party host!", host);
         }
     }
 
@@ -261,30 +314,34 @@ public class PartyServer
         if (!message.startsWith(commandPrefix))
             return true;
 
-        if (!player.clientID.equals(host))
-        {
-            ScreenPartyHost.privateChat(error_color + "You don't have permission to use commands!", player.clientID);
-            return false;
-        }
-
         String[] commandParts = message.substring(commandPrefix.length()).split(" ");
         if (commands.containsKey(commandParts[0]))
-            commands.get(commandParts[0]).run(Arrays.copyOfRange(commandParts, 1, commandParts.length), player.clientID);
+        {
+            Command c = commands.get(commandParts[0]);
+            if (!c.publicCommand && !player.clientID.equals(host))
+            {
+                privateChat(error_color + "You don't have permission to use this command!", player.clientID);
+                return false;
+            }
+
+            c.run(Arrays.copyOfRange(commandParts, 1, commandParts.length), player.clientID);
+        }
         else
-            ScreenPartyHost.privateChat(error_color + "Unknown command '" + commandParts[0] + "' !", player.clientID);
+            privateChat(error_color + "Unknown command '" + commandParts[0] + "' !", player.clientID);
 
         return false;
     }
 
     public static class Command
     {
-        private static final BiConsumer<String[], UUID> reject_func = (p, u) -> ScreenPartyHost.privateChat(error_color + "Can't do this right now!", u);
+        private static final BiConsumer<String[], UUID> reject_func = (p, u) -> privateChat(error_color + "Can't do this right now!", u);
 
         public String name;
         public String description;
         public String[] partNames;
         public Button button;
         public Screen screen;
+        public boolean publicCommand = false;
         public BiConsumer<String[], UUID> function;
 
         public static Command register(String name, String description, String... partNames)
@@ -317,20 +374,26 @@ public class PartyServer
             {
                 if (Game.screen != s)
                 {
-                    ScreenPartyHost.privateChat(error_color + "Can't do this right now!", clientID);
+                    privateChat(error_color + "Can't do this right now!", clientID);
                     return;
                 }
                 b.function.run();
             };
         }
 
+        public Command setPublic(boolean publicCommand)
+        {
+            this.publicCommand = publicCommand;
+            return this;
+        }
+
         public void run(String[] parts, UUID clientID)
         {
             try
             {
-                if (parts.length != partNames.length)
+                if (parts.length != partNames.length && !(partNames[partNames.length - 1].equals("...") && parts.length >= partNames.length - 1))
                 {
-                    ScreenPartyHost.privateChat("\u00a7255000000255Invalid number of arguments! Expected " + partNames.length + " but got " + parts.length +
+                    privateChat("\u00a7255000000255Invalid number of arguments! Expected " + partNames.length + " but got " + parts.length +
                         "\nUsage: " + commandPrefix + name + " " +
                         Arrays.stream(partNames).map(p -> "<" + p + ">").collect(Collectors.joining(" ")), clientID);
                     return;
@@ -339,7 +402,7 @@ public class PartyServer
             }
             catch (Exception e)
             {
-                ScreenPartyHost.privateChat(error_color + "An error occurred while running this command!", clientID);
+                privateChat(error_color + "An error occurred while running this command!", clientID);
             }
         }
     }
