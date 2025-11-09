@@ -47,6 +47,11 @@ public class TerrainRenderer
 
     public TerrainRenderer()
     {
+        this.initializeShaders();
+    }
+
+    protected void initializeShaders()
+    {
         try
         {
             ShaderGroup ds = Game.game.window.shaderDefault;
@@ -470,6 +475,9 @@ public class TerrainRenderer
 
     public void remove(IBatchRenderableObject o)
     {
+        if (o == null)
+            return;
+
         this.getRenderer(o, 0, 0, false).renderer.delete(o);
         this.renderersByObj.remove(o);
     }

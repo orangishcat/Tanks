@@ -2,6 +2,7 @@ package tanks;
 
 import basewindow.IUpdater;
 import tanks.extension.Extension;
+import tanks.handle.*;
 
 public class GameUpdater implements IUpdater
 {
@@ -38,6 +39,7 @@ public class GameUpdater implements IUpdater
 				Game.displayCrashScreen(((GameCrashedException) e).originalException);
 			else
 				Game.displayCrashScreen(e);
+            HandleRegistry.callAllHandles(ICrashHandler.class, h -> ((ICrashHandler) h).handle(e));
 		}
 	}
 }

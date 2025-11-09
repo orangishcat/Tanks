@@ -1883,6 +1883,9 @@ public class Drawing
 
 	public Model getModel(String dir)
 	{
+        if (Game.headless)
+            return null;
+
 		if (modelsByDir.get(dir) != null)
 			return modelsByDir.get(dir);
 

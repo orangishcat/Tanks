@@ -2,22 +2,17 @@ package main;
 
 import basewindow.ComputerFileManager;
 import lwjglwindow.LWJGLWindow;
+import lwjglwindow.headless.HeadlessWindow;
 import tanks.*;
 import tanks.Panel;
 import tanks.extension.Extension;
-import tanksonline.CommandExecutor;
-import tanksonline.PlayerMap;
-import tanksonline.TanksOnlineServer;
+import tanksonline.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.Properties;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 
 public class Tanks
 {
@@ -35,16 +30,21 @@ public class Tanks
         {
             if (arg.equals("online_server"))
                 Game.isOnlineServer = true;
-            if (arg.matches("port=\\d+"))
+            else if (arg.matches("port=\\d+"))
                 port = Integer.parseInt(arg.split("=")[1]);
-            if (arg.equals("debug"))
+            else if (arg.equals("debug"))
                 Game.debug = true;
-            if (arg.equals("party_server"))
+            else if (arg.equals("party_server"))
                 PartyServer.isPartyServer = true;
-            if (arg.equals("mac") || arg.equals("no_relaunch"))
+            else if (arg.equals("mac") || arg.equals("no_relaunch"))
                 relaunch = false;
-            if (arg.equals("no_steam"))
+            else if (arg.equals("no_steam"))
                 Game.disableSteam = true;
+            else if (arg.equals("headless"))
+            {
+                Game.headless = true;
+                Game.framework = Game.Framework.headless;
+            }
 
             if (i < args.length - 1 && args[i].equals("+connect_lobby"))
                 Game.steamLobbyInvite = Long.parseLong(args[i + 1]);
@@ -78,7 +78,7 @@ public class Tanks
                     }
                 }
 
-                if (Game.framework == Game.Framework.lwjgl)
+                if (Game.framework == Game.Framework.lwjgl || Game.framework == Game.Framework.headless)
                     Game.game.fileManager = new ComputerFileManager();
 
                 Game.initScript();
@@ -106,6 +106,10 @@ public class Tanks
                         if (!hash.equals(""))
                             Game.game.window.buildDate = "Build hash: " + hash;
                     }
+                }
+                else if (Game.framework == Game.Framework.headless)
+                {
+                    Game.game.window = new HeadlessWindow(new GameUpdater(), new GameDrawer());
                 }
 
                 Game.postInitScript();

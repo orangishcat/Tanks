@@ -485,6 +485,8 @@ public class Level
 		else
 			Obstacle.draw_size = 50;
 
+        HandleRegistry.callAllHandles(ILevelLoadHandler.class, (h) -> ((ILevelLoadHandler) h).onLevelLoad(this));
+
 		Chunk.Tile ft = Chunk.Tile.fallbackTile;
 		ft.colR = color.red;
 		ft.colG = color.green;
@@ -757,8 +759,6 @@ public class Level
 		}
 
         this.reloadTiles();
-
-        HandleRegistry.callAllHandles(ILevelLoadHandler.class, (h) -> ((ILevelLoadHandler) h).onLevelLoad(this));
 
 		if (!remote && sc == null || (sc instanceof ScreenLevelEditor))
 			Game.eventsOut.add(new EventEnterLevel());

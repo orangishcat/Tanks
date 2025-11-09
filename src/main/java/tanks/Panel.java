@@ -119,6 +119,48 @@ public class Panel
 
 	public void setUp()
 	{
+        settingUp = false;
+
+        ModAPI.setUp();
+
+        if (Game.game.window.soundPlayer == null)
+        {
+            Game.soundsEnabled = false;
+            Game.musicEnabled = false;
+        }
+
+        double scale = 1;
+        if (Game.game.window.touchscreen && Game.game.window.pointHeight > 0 && Game.game.window.pointHeight <= 500)
+        {
+            scale = 1.25;
+
+            Drawing.drawing.objWidth *= 1.4;
+            Drawing.drawing.objHeight *= 1.4;
+            Drawing.drawing.objXSpace *= 1.4;
+            Drawing.drawing.objYSpace *= 1.4;
+
+            Drawing.drawing.textSize = Drawing.drawing.objHeight * 0.6;
+            Drawing.drawing.titleSize = Drawing.drawing.textSize * 1.25;
+        }
+
+        Drawing.drawing.setInterfaceScaleZoom(scale);
+        TankPlayer.setShootStick(TankPlayer.shootStickEnabled);
+        TankPlayer.controlStick.mobile = TankPlayer.controlStickMobile;
+        TankPlayer.controlStick.snap = TankPlayer.controlStickSnap;
+
+        if (Game.headless)
+        {
+            TankModels.tank = new TankModels.TankSkin("tank", false);
+            Drawing.drawing.terrainRenderer = new HeadlessTerrainRenderer();
+            Drawing.drawing.trackRenderer = new HeadlessTrackRenderer();
+            return;
+        }
+
+        Game.createModels();
+
+        Game.dummyTank = new TankDummy("dummy",0, 0, 0);
+        Game.dummyTank.team = null;
+
 		Game.game.shaderIntro = new ShaderGroundIntro(Game.game.window);
 		Game.game.shaderOutOfBounds = new ShaderGroundOutOfBounds(Game.game.window);
  		Game.game.shaderTracks = new ShaderTracks(Game.game.window);
@@ -141,44 +183,12 @@ public class Panel
 		Drawing.drawing.terrainRenderer = new TerrainRenderer();
 		Drawing.drawing.trackRenderer = new TrackRenderer();
 
-		ModAPI.setUp();
-
 		Game.resetTiles();
 
 		if (Game.game.fullscreen)
 			Game.game.window.setFullscreen(true);
 
 		Game.game.window.setIcon("/images/icon64.png");
-
-		if (Game.game.window.soundPlayer == null)
-		{
-			Game.soundsEnabled = false;
-			Game.musicEnabled = false;
-		}
-
-		double scale = 1;
-		if (Game.game.window.touchscreen && Game.game.window.pointHeight > 0 && Game.game.window.pointHeight <= 500)
-		{
-			scale = 1.25;
-
-			Drawing.drawing.objWidth *= 1.4;
-			Drawing.drawing.objHeight *= 1.4;
-			Drawing.drawing.objXSpace *= 1.4;
-			Drawing.drawing.objYSpace *= 1.4;
-
-			Drawing.drawing.textSize = Drawing.drawing.objHeight * 0.6;
-			Drawing.drawing.titleSize = Drawing.drawing.textSize * 1.25;
-		}
-
-		Drawing.drawing.setInterfaceScaleZoom(scale);
-		TankPlayer.setShootStick(TankPlayer.shootStickEnabled);
-		TankPlayer.controlStick.mobile = TankPlayer.controlStickMobile;
-		TankPlayer.controlStick.snap = TankPlayer.controlStickSnap;
-
-		Game.createModels();
-
-		Game.dummyTank = new TankDummy("dummy",0, 0, 0);
-		Game.dummyTank.team = null;
 
 		for (Extension e : Game.extensionRegistry.extensions)
 			e.loadResources();
@@ -213,8 +223,6 @@ public class Panel
 				Game.game.window.soundPlayer.loadMusic("/music/arcade/rampage" + i + ".ogg");
 			}
 		}
-
-		settingUp = false;
 	}
 
 	public void update()
@@ -713,6 +721,9 @@ public class Panel
 	{
 		if ((Game.game.window.drawingShadow || !Game.shadowsEnabled) && (Game.screen instanceof ScreenGame && !(((ScreenGame) Game.screen).paused && !ScreenPartyHost.isServer && !ScreenPartyLobby.isClient)))
 			this.age += Panel.frameFrequency;
+
+        if (Game.headless)
+            return;
 
 		while (Panel.panel.pastPlayerTime.size() > 1 && Panel.panel.pastPlayerTime.get(1) < Panel.panel.age - Drawing.drawing.getTrackOffset())
 		{

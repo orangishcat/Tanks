@@ -1,37 +1,21 @@
 package lwjglwindow;
 
-import basewindow.BaseSoundPlayer;
-import org.lwjgl.openal.*;
-import org.lwjgl.system.MemoryStack;
+import basewindow.*;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static org.lwjgl.openal.AL10.*;
-import static org.lwjgl.openal.ALC10.*;
-import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_memory;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.libc.LibCStdlib.free;
 
 /**
  * Does nothing, useful if you don't have a sound device plugged in!
  */
 public class NoSoundPlayer extends BaseSoundPlayer
 {
-    public LWJGLWindow window;
+    public BaseWindow window;
     public String musicID = null;
     public float musicSpeed = 1;
     public float currentVolume;
     public long musicStart = 0;
 
-    public NoSoundPlayer(LWJGLWindow window)
+    public NoSoundPlayer(BaseWindow window)
     {
         this.window = window;
     }

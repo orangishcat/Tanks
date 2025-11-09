@@ -48,7 +48,7 @@ import java.util.*;
 
 public class Game
 {
-    public enum Framework {lwjgl, libgdx}
+    public enum Framework {lwjgl, libgdx, headless}
 	public static Framework framework;
 
 	public static final double tile_size = 50;
@@ -143,6 +143,7 @@ public class Game
 
     public static final int network_protocol = 60;
 	public static boolean debug = false;
+	public static boolean headless = false;
 	public static boolean traceAllRays = false;
 	public static boolean showNetworkIDs = false;
 	public static boolean drawAutoZoom = false;

@@ -30,6 +30,8 @@ public class PartyServer
         ScreenParty.createParty();
         HandleRegistry.registry.register(IChatHandle.class, PartyServer::onChatMessage);
         HandleRegistry.registry.register(ILevelLoadHandler.class, PartyServer::onLevelLoad);
+        HandleRegistry.registry.register(ICrashHandler.class, PartyServer::onCrash);
+        System.out.println("Party server started!");
     }
 
     public static void registerCommands()
@@ -243,6 +245,12 @@ public class PartyServer
         return "Unknown";
     }
 
+    public static void onCrash(Throwable throwable)
+    {
+        throwable.printStackTrace();
+        ScreenParty.createParty();
+    }
+
     public static void onLevelLoad(Level l)
     {
         clearHostPlayer();
@@ -286,7 +294,11 @@ public class PartyServer
     {
         String message = s.replaceAll("\n", " \n ");
         ScreenPartyHost.sendEventTo(new EventChat(message), id);
-        ScreenPartyHost.chat.add(0, new ChatMessage("\u00a7150150150255(To " + usernameFromId(id) + ") " + message));
+
+        String logMessage = new Date() + " " + "\u00a7150150150255(To " + usernameFromId(id) + ") " + message;
+        ScreenPartyHost.chat.add(0, new ChatMessage(logMessage));
+        if (Game.headless)
+            System.out.println(logMessage.replaceAll("§(\\d{12}|r)", ""));
     }
 
     public static void setHost(UUID clientID)
@@ -302,7 +314,7 @@ public class PartyServer
 
     public static void onClientDisconnect(UUID clientID)
     {
-        if (clientID.equals(host))
+        if (clientID.equals(host) && !ScreenPartyHost.server.connections.isEmpty())
         {
             host = ScreenPartyHost.server.connections.get(0).clientID;
             privateChat("You are the party host!", host);
@@ -400,9 +412,12 @@ public class PartyServer
                 }
                 function.accept(parts, clientID);
             }
-            catch (Exception e)
+            catch (Throwable e)
             {
                 privateChat(error_color + "An error occurred while running this command!", clientID);
+                if (e instanceof GameCrashedException)
+                    e = ((GameCrashedException) e).originalException;
+                e.printStackTrace();
             }
         }
     }

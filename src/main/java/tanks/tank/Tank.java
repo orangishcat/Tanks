@@ -25,10 +25,7 @@ public abstract class Tank extends Movable implements ISolidObject
 
 	public boolean fromRegistry = false;
 
-	public Model colorModel = TankModels.skinnedTankModel.color;
-	public Model baseModel = TankModels.skinnedTankModel.base;
-	public Model turretBaseModel = TankModels.skinnedTankModel.turretBase;
-	public Model turretModel = TankModels.skinnedTankModel.turret;
+	public Model colorModel, baseModel, turretBaseModel, turretModel;
 
 	@TankBuildProperty @Property(category = appearanceBody, id = "color_skin", name = "Tank body skin", miscType = Property.MiscType.colorModel)
 	public TankModels.TankSkin colorSkin = TankModels.tank;
@@ -222,6 +219,14 @@ public abstract class Tank extends Movable implements ISolidObject
 		turret = new Turret(this);
 		this.name = name;
 		this.nameTag = new NameTag(this, 0, this.size / 7 * 5, this.size / 2, this.name);
+
+        if (!Game.headless)
+        {
+            this.baseModel = TankModels.skinnedTankModel.base;
+            this.colorModel = TankModels.skinnedTankModel.color;
+            this.turretBaseModel = TankModels.skinnedTankModel.turretBase;
+            this.turretModel = TankModels.skinnedTankModel.turret;
+        }
 
 		this.primaryMetadataID = "team";
 		this.secondaryMetadataID = "rotation";
@@ -505,12 +510,6 @@ public abstract class Tank extends Movable implements ISolidObject
 
 		if (this.destroyTimer > Game.tile_size)
 			Game.removeMovables.add(this);
-
-		if (this.drawTread)
-		{
-			this.drawTread = false;
-			this.drawTread();
-		}
 
 		this.accelerationModifier = 1;
 		this.frictionModifier = 1;
@@ -873,6 +872,11 @@ public abstract class Tank extends Movable implements ISolidObject
 		this.nameTag.oz = this.size / 2;
 		this.showName = this.hasName && !this.hidden && !this.invisible;
 
+        if (this.drawTread)
+        {
+            this.drawTread = false;
+            this.drawTread();
+        }
 
 		if (this.currentlyVisible || this.destroy)
 		{
